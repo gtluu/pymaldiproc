@@ -4,7 +4,6 @@ from scipy.signal import savgol_filter, find_peaks, find_peaks_cwt, peak_widths
 from pyMSpec.smoothing import sg_smooth, apodization, rebin, fast_change, median
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
-from pymaldiproc.classes import MALDISpectrum
 
 
 def trim_spectra(list_of_spectra, lower_mass_range, upper_mass_range):
