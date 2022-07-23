@@ -1,0 +1,9 @@
+pyteomics
+numpy
+pandas
+scipy
+pyMSpec
+BaselineRemoval
+dash
+plotly
+flask
