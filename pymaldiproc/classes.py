@@ -6,14 +6,31 @@ class MALDISpectrum(object):
         self.chip = None
         self.spot = None
         self.ms_level = None
-        self.centroid = None
-        self.mz_array = None
-        self.intensity_array = None
+        self.raw_mz_array = None
+        self.raw_intensity_array = None
+        self.preprocessed_mz_array = None
+        self.preprocessed_intensity_array = None
         self.peak_picked_mz_array = None
         self.peak_picked_intensity_array = None
         self.data_processing = {}
 
         self.parse_pyteomics_dict(pyteomics_dict)
+
+    def mz_array(self, mode):
+        if mode == 'raw':
+            return self.raw_mz_array
+        elif mode == 'preprocessed':
+            return self.preprocessed_mz_array
+        elif mode == 'peak_picked':
+            return self.peak_picked_mz_array
+
+    def intensity_array(self, mode):
+        if mode == 'raw':
+            return self.raw_intensity_array
+        elif mode == 'preprocessed':
+            return self.preprocessed_intensity_array
+        elif mode == 'peak_picked':
+            return self.peak_picked_intensity_array
 
     def parse_pyteomics_dict(self, pyteomics_dict):
         # metadata
@@ -26,9 +43,5 @@ class MALDISpectrum(object):
 
         # spectra
         self.ms_level = pyteomics_dict['ms level']
-        if 'positive scan' in pyteomics_dict.keys() and 'centroid scan' not in pyteomics_dict.keys():
-            self.centroid = False
-        elif 'positive scan' not in pyteomics_dict.keys() and 'centroid scan' in pyteomics_dict.keys():
-            self.centroid = False
-        self.mz_array = pyteomics_dict['m/z array']
-        self.intensity_array = pyteomics_dict['intensity array']
+        self.raw_mz_array = pyteomics_dict['m/z array']
+        self.raw_intensity_array = pyteomics_dict['intensity array']

@@ -10,10 +10,10 @@ from pymaldiproc.classes import MALDISpectrum
 def trim_spectra(list_of_spectra, lower_mass_range, upper_mass_range):
     #trimmed_spectra = []
     for spectrum in list_of_spectra:
-        spectrum_df = pd.DataFrame(data={'mz': spectrum.mz_array, 'intensity': spectrum.intensity_array})
+        spectrum_df = pd.DataFrame(data={'mz': spectrum.raw_mz_array, 'intensity': spectrum.raw_intensity_array})
         spectrum_df = spectrum_df[~(spectrum_df['mz'] <= lower_mass_range) & ~(spectrum_df['mz'] >= upper_mass_range)]
-        spectrum.mz_array = spectrum_df['mz'].values
-        spectrum.intensity_array = spectrum_df['intensity'].values
+        spectrum.preprocessed_mz_array = spectrum_df['mz'].values
+        spectrum.preprocessed_intensity_array = spectrum_df['intensity'].values
         spectrum.data_processing['spectrum trimming'] = {'lower mass range': lower_mass_range,
                                                          'upper mass range': upper_mass_range}
         #trimmed_spectra.append(spectrum)
@@ -28,13 +28,13 @@ def transform_intensity(list_of_spectra, method='sqrt'):
     # transform intensity
     for spectrum in list_of_spectra:
         if method == 'sqrt':
-            spectrum.intensity_array = np.sqrt(spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = np.sqrt(spectrum.preprocessed_intensity_array)
         elif method == 'log':
-            spectrum.intensity_array = np.log(spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = np.log(spectrum.preprocessed_intensity_array)
         elif method == 'log2':
-            spectrum.intensity_array = np.log2(spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = np.log2(spectrum.preprocessed_intensity_array)
         elif method == 'log10':
-            spectrum.intensity_array = np.log10(spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = np.log10(spectrum.preprocessed_intensity_array)
         spectrum.data_processing['intensity transformation'] = {'method': method}
 
     return list_of_spectra
@@ -55,32 +55,32 @@ def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, p
     for spectrum in list_of_spectra:
         spectrum.data_processing['baseline smoothing'] = {'method': method}
         if method == 'SavitzkyGolay':
-            spectrum.intensity_array = savgol_filter(spectrum.intensity_array,
-                                                     window_length=window_length,
-                                                     polyorder=polyorder)
+            spectrum.preprocessed_intensity_array = savgol_filter(spectrum.preprocessed_intensity_array,
+                                                                  window_length=window_length,
+                                                                  polyorder=polyorder)
             spectrum.data_processing['baseline smoothing']['window length'] = window_length
             spectrum.data_processing['baseline smoothing']['polyorder'] = polyorder
         elif method == 'MovingAverage':
             pass
         elif method == 'apodization':
-            spectrum.mz_array, spectrum.intensity_array = apodization(spectrum.mz_array,
-                                                                      spectrum.intensity_array,
-                                                                      w_size=window_length)
+            spectrum.preprocessed_mz_array, spectrum.preprocessed_intensity_array = apodization(spectrum.preprocessed_mz_array,
+                                                                                                spectrum.preprocessed_intensity_array,
+                                                                                                w_size=window_length)
             spectrum.data_processing['baseline smoothing']['window length'] = window_length
         elif method == 'rebin':
-            spectrum.mz_array, spectrum.intensity_array = rebin(spectrum.mz_array,
-                                                                spectrum.intensity_array,
-                                                                delta_mz=delta_mz)
+            spectrum.preprocessed_mz_array, spectrum.preprocessed_intensity_array = rebin(spectrum.preprocessed_mz_array,
+                                                                                          spectrum.preprocessed_intensity_array,
+                                                                                          delta_mz=delta_mz)
             spectrum.data_processing['baseline smoothing']['delta m/z'] = delta_mz
         elif method == 'fast_change':
-            spectrum.mz_array, spectrum.intensity_array = fast_change(spectrum.mz_array,
-                                                                      spectrum.intensity_array,
-                                                                      diff_thresh=diff_thresh)
+            spectrum.preprocessed_mz_array, spectrum.preprocessed_intensity_array = fast_change(spectrum.preprocessed_mz_array,
+                                                                                                spectrum.preprocessed_intensity_array,
+                                                                                                diff_thresh=diff_thresh)
             spectrum.data_processing['baseline smoothing']['difference threshold'] = diff_thresh
         elif method == 'median':
-            spectrum.mz_array, spectrum.intensity_array = median(spectrum.mz_array,
-                                                                 spectrum.intensity_array,
-                                                                 w_size=window_length)
+            spectrum.preprocessed_mz_array, spectrum.preprocessed_intensity_array = median(spectrum.preprocessed_mz_array,
+                                                                                           spectrum.preprocessed_intensity_array,
+                                                                                           w_size=window_length)
             spectrum.data_processing['baseline smoothing']['window length'] = window_length
 
     return list_of_spectra
@@ -95,7 +95,7 @@ def remove_baseline(list_of_spectra, method='ZhangFit'):
     # remove baseline
     for spectrum in list_of_spectra:
         if method == 'ZhangFit':
-            spectrum.intensity_array = BaselineRemoval(spectrum.intensity_array).ZhangFit()
+            spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.preprocessed_intensity_array).ZhangFit()
         spectrum.data_processing['baseline removal'] = {'method': method}
 
     return list_of_spectra
@@ -110,13 +110,17 @@ def normalize_intensity(list_of_spectra, method='tic'):
     # normalize intensity
     for spectrum in list_of_spectra:
         if method == 'tic':
-            spectrum.intensity_array = tic(spectrum.mz_array, spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = tic(spectrum.preprocessed_mz_array,
+                                                        spectrum.preprocessed_intensity_array)
         elif method == 'rms':
-            spectrum.intensity_array = rms(spectrum.mz_array, spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = rms(spectrum.preprocessed_mz_array,
+                                                        spectrum.preprocessed_intensity_array)
         elif method == 'mad':
-            spectrum.intensity_array = mad(spectrum.mz_array, spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = mad(spectrum.preprocessed_mz_array,
+                                                        spectrum.preprocessed_intensity_array)
         elif method == 'sqrt':
-            spectrum.intensity_array = sqrt(spectrum.mz_array, spectrum.intensity_array)
+            spectrum.preprocessed_intensity_array = sqrt(spectrum.preprocessed_mz_array,
+                                                         spectrum.preprocessed_intensity_array)
         spectrum.data_processing['intensity normalization'] = {'method': method}
 
     return list_of_spectra
@@ -137,21 +141,21 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
     for spectrum in list_of_spectra:
         spectrum.data_processing['peak picking'] = {'method': method}
         if method == 'locmax':
-            peak_indices, peak_properties = find_peaks(spectrum.intensity_array)
-            spectrum.peak_picked_mz_array = spectrum.mz_array[peak_indices]
-            spectrum.peak_picked_intensity_array = spectrum.intensity_array[peak_indices]
+            peak_indices, peak_properties = find_peaks(spectrum.preprocessed_intensity_array)
+            spectrum.peak_picked_mz_array = spectrum.preprocessed_mz_array[peak_indices]
+            spectrum.peak_picked_intensity_array = spectrum.preprocessed_intensity_array[peak_indices]
             spectrum.centroid = True
         elif method == 'cwt':
             # estimate peak widths if necessary
             if widths is None:
-                estimated_widths = estimate_peak_widths(spectrum.intensity_array)
+                estimated_widths = estimate_peak_widths(spectrum.preprocessed_intensity_array)
                 widths_start = np.min(estimated_widths)
                 widths_stop = 2 * np.mean(estimated_widths)
                 widths_step = ((2 * np.mean(estimated_widths)) - np.min(estimated_widths)) / 10
                 widths = np.arange(widths_start, widths_stop, widths_step)
-            peak_indices = find_peaks_cwt(spectrum.intensity_array, widths, min_snr=snr)
-            spectrum.peak_picked_mz_array = spectrum.mz_array[peak_indices]
-            spectrum.peak_picked_intensity_array = spectrum.intensity_array[peak_indices]
+            peak_indices = find_peaks_cwt(spectrum.preprocessed_intensity_array, widths, min_snr=snr)
+            spectrum.peak_picked_mz_array = spectrum.preprocessed_mz_array[peak_indices]
+            spectrum.peak_picked_intensity_array = spectrum.preprocessed_intensity_array[peak_indices]
             spectrum.centroid = True
             spectrum.data_processing['peak picking']['lower peak width'] = np.min(widths)
             spectrum.data_processing['peak picking']['upper peak width'] = np.max(widths)
