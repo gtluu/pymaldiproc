@@ -143,7 +143,6 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
             peak_indices, peak_properties = find_peaks(spectrum.preprocessed_intensity_array)
             spectrum.peak_picked_mz_array = spectrum.preprocessed_mz_array[peak_indices]
             spectrum.peak_picked_intensity_array = spectrum.preprocessed_intensity_array[peak_indices]
-            spectrum.centroid = True
         elif method == 'cwt':
             # estimate peak widths if necessary
             if widths is None:
@@ -155,7 +154,6 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
             peak_indices = find_peaks_cwt(spectrum.preprocessed_intensity_array, widths, min_snr=snr)
             spectrum.peak_picked_mz_array = spectrum.preprocessed_mz_array[peak_indices]
             spectrum.peak_picked_intensity_array = spectrum.preprocessed_intensity_array[peak_indices]
-            spectrum.centroid = True
             spectrum.data_processing['peak picking']['lower peak width'] = np.min(widths)
             spectrum.data_processing['peak picking']['upper peak width'] = np.max(widths)
 
