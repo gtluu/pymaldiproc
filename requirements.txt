@@ -1,4 +1,5 @@
 pyteomics
+lxml
 numpy
 pandas
 scipy
