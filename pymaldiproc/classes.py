@@ -24,6 +24,7 @@ class MALDISpectrum(object):
 
     def parse_pyteomics_dict(self, pyteomics_dict):
         # metadata
+        # currently only supports MSConvert style metadata
         if 'spectrum title' in pyteomics_dict.keys():
             spectrum_id = pyteomics_dict['spectrum title'].split(' ')[0]
             spectrum_filename = pyteomics_dict['spectrum title'].split(' ')[1]
@@ -33,9 +34,8 @@ class MALDISpectrum(object):
             self.spot = spectrum_filename.split('\\')[-4].split('_')[1]
         # placeholder else clause
         # TODO: update TIMSCONVERT to include spectrum title
-        # TODO: add counter as id number to pyteomics_dict in MALDIDataset.import_mzml()
         else:
-            self.id = '1'
+            self.id = pyteomics_dict['pymaldiproc_spectra_count']
             self.replicate = '1'
 
         # spectra
@@ -73,12 +73,18 @@ class MALDIDataset(object):
                            for filename in filenames if filename.endswith('.mzML')]
 
         # read in data with pyteomics
+        spectra_count = 1
         for mzml_filename in input_files:
             mzml_data = list(pyt.read(mzml_filename))
             for scan_dict in mzml_data:
+                scan_dict['pymaldiproc_spectra_count'] = str(spectra_count)
                 spectrum = MALDISpectrum(scan_dict)
                 #self.spectra.append(spectrum)
                 self.spectra[spectrum.id] = {spectrum.replicate: spectrum}
+                spectra_count += 1
+
+    def apply_preprocessing(self, preprocessing_steps):
+        pass
 
     #
     def generate_consensus_peak_lists(self, method):
