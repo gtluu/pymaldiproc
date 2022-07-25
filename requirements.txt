@@ -6,5 +6,6 @@ scipy
 pyMSpec
 BaselineRemoval
 dash
+dash-extensions
 plotly
 flask
