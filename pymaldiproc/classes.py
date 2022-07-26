@@ -1,4 +1,5 @@
 import os
+from functools import reduce
 import numpy as np
 import pandas as pd
 from uuid import uuid4
@@ -216,7 +217,7 @@ class MALDIDataset(object):
     def __init__(self, input_path):
         self.spectra = []
         #self.spectra = {}
-        self.consensus_peak_lists = []
+        self.feature_matrix = None
 
         self.import_mzml(input_path)
         #self.spectra_ids = [spectrum.spectrum_id for spectrum in self.spectra]
@@ -270,3 +271,23 @@ class MALDIDataset(object):
                     spectrum.peak_picking(method=params['method'],
                                           widths=params['widths'],
                                           snr=params['snr'])
+
+    def get_feature_matrix(self, missing_value_imputation=True):
+        spectra_dfs_peak_picked = []
+        spectra_dfs_preprocessed = []
+        for spectrum in self.spectra:
+            spectra_dfs_peak_picked.append(pd.DataFrame(data={'mz': spectrum.peak_picked_mz_array,
+                                                              spectrum.spectrum_id: spectrum.peak_picked_intensity_array}))
+            spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.preprocessed_mz_array,
+                                                               spectrum.spectrum_id: spectrum.preprocessed_intensity_array}))
+        self.feature_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_peak_picked).sort_values(by='mz')
+        if missing_value_imputation:
+            ref_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_preprocessed).sort_values(by='mz')
+            for colname in self.feature_matrix.columns:
+                if colname != 'mz':
+                    tmp_df = pd.merge(self.feature_matrix[['mz', colname]],
+                                      ref_matrix[['mz', colname]],
+                                      how='left',
+                                      on='mz')
+                    #self.feature_matrix[colname].fillna(tmp_df.drop('mz', axis=1).mean(axis=1), inplace=True)
+                    self.feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
