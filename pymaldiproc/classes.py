@@ -218,6 +218,8 @@ class MALDIDataset(object):
         self.spectra = []
         #self.spectra = {}
         self.feature_matrix = None
+        self.cos_distance_matrix = None
+        self.cos_distance_matrix_shape = None
 
         self.import_mzml(input_path)
         #self.spectra_ids = [spectrum.spectrum_id for spectrum in self.spectra]
@@ -291,3 +293,6 @@ class MALDIDataset(object):
                                       on='mz')
                     #self.feature_matrix[colname].fillna(tmp_df.drop('mz', axis=1).mean(axis=1), inplace=True)
                     self.feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
+
+    def get_cos_distance_matrix(self):
+        pass

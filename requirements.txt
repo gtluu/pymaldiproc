@@ -9,3 +9,4 @@ dash
 dash-extensions
 plotly
 flask
+seaborn
