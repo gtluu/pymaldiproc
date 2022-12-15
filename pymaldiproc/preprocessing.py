@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from functools import reduce
 from scipy.signal import savgol_filter, find_peaks, find_peaks_cwt, peak_widths
 from pyMSpec.smoothing import sg_smooth, apodization, rebin, fast_change, median
 from BaselineRemoval import BaselineRemoval
@@ -131,6 +132,9 @@ def estimate_peak_widths(intensity_array):
     return widths[0]
 
 
+# TODO: add peak alignment functionality
+
+
 def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
     # check method
     if method not in ['locmax', 'cwt']:
@@ -158,3 +162,47 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
             spectrum.data_processing['peak picking']['upper peak width'] = np.max(widths)
 
     return list_of_spectra
+
+
+def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
+    # get a consensus m/z array
+    peak_picked_mz_arrays = [spectrum.peak_picked_mz_array for spectrum in list_of_spectra]
+    peak_picked_consensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(peak_picked_mz_arrays))}).sort_values(by='mz')
+    preprocessed_mz_arrays = [spectrum.preprocessed_mz_array for spectrum in list_of_spectra]
+    preprocessed_concensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(preprocessed_mz_arrays))}).sort_values(by='mz')
+
+    spectra_dfs_peak_picked = [peak_picked_consensus]
+    spectra_dfs_preprocessed = [preprocessed_concensus]
+    for spectrum in list_of_spectra:
+        spectra_dfs_peak_picked.append(pd.DataFrame(data={'mz': spectrum.peak_picked_mz_array,
+                                                          spectrum.spectrum_id: spectrum.peak_picked_intensity_array}))
+        spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.preprocessed_mz_array,
+                                                           spectrum.spectrum_id: spectrum.preprocessed_intensity_array}))
+    #feature_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_peak_picked).sort_values(by='mz')
+    feature_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_peak_picked).sort_values(by='mz')
+    if missing_value_imputation:
+        #ref_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_preprocessed).sort_values(by='mz')
+        ref_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_preprocessed).sort_values(by='mz')
+        for colname in feature_matrix.columns:
+            if colname != 'mz':
+                #tmp_df = pd.merge(feature_matrix[['mz', colname]],
+                #                  ref_matrix[['mz', colname]],
+                #                  how='left',
+                #                  on='mz')
+                tmp_df = pd.merge_asof(feature_matrix[['mz', colname]],
+                                       ref_matrix[['mz', colname]],
+                                       on='mz',
+                                       tolerance=0.5,
+                                       direction='nearest')
+                #feature_matrix[colname].fillna(tmp_df.drop('mz', axis=1).mean(axis=1), inplace=True)
+                feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
+    feature_matrix = feature_matrix.fillna(0)
+    return feature_matrix
+
+
+def export_feature_list(feature_matrix, output):
+    feature_matrix.to_csv(output, index=False)
+
+
+def get_cos_distance_matrix():
+    pass
