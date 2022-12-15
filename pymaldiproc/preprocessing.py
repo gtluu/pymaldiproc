@@ -164,33 +164,6 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
     return list_of_spectra
 
 
-def bin_peaks(list_of_spectra, lower_mass_range, upper_mass_range, num_bins=0, bin_width=0):
-    if num_bins == 0 and bin_width == 0:
-        raise Exception('Number of bins or bin width to use for binning must be specified')
-    elif num_bins != 0 and bin_width != 0:
-        raise Exception('Only specify number of bins or bin width. Do not specify both')
-    elif num_bins < 0 or bin_width < 0:
-        raise Exception('Number of bins/bin width must be > 0')
-    elif num_bins > 0:
-        for spectrum in list_of_spectra:
-            bins = np.linspace(lower_mass_range, upper_mass_range, num_bins, dtype=np.float64)
-            unique_indices, inverse_indices = np.unique(np.digitize(spectrum.peak_picked_mz_array, bins), return_inverse=True)
-            bin_counts = np.bincount(inverse_indices)
-            np.place(bin_counts, bin_counts < 1, [1])
-            spectrum.peak_picked_mz_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_mz_array) / bin_counts
-            spectrum.peak_picked_intensity_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_intensity_array)
-    elif bin_width > 0:
-        for spectrum in list_of_spectra:
-            bins = np.arange(lower_mass_range, upper_mass_range, bin_width, dtype=np.float64)
-            unique_indices, inverse_indices = np.unique(np.digitize(spectrum.peak_picked_mz_array, bins), return_inverse=True)
-            bin_counts = np.bincount(inverse_indices)
-            np.place(bin_counts, bin_counts < 1, [1])
-            spectrum.peak_picked_mz_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_mz_array) / bin_counts
-            spectrum.peak_picked_intensity_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_intensity_array)
-
-    return list_of_spectra
-
-
 def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
     # get a consensus m/z array
     peak_picked_mz_arrays = [spectrum.peak_picked_mz_array for spectrum in list_of_spectra]
