@@ -132,6 +132,9 @@ def estimate_peak_widths(intensity_array):
     return widths[0]
 
 
+# TODO: add peak alignment functionality
+
+
 def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
     # check method
     if method not in ['locmax', 'cwt']:
@@ -161,26 +164,72 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
     return list_of_spectra
 
 
-def get_feature_matrix(self, missing_value_imputation=True):
-    spectra_dfs_peak_picked = []
-    spectra_dfs_preprocessed = []
-    for spectrum in self.spectra:
+def bin_peaks(list_of_spectra, lower_mass_range, upper_mass_range, num_bins=0, bin_width=0):
+    if num_bins == 0 and bin_width == 0:
+        raise Exception('Number of bins or bin width to use for binning must be specified')
+    elif num_bins != 0 and bin_width != 0:
+        raise Exception('Only specify number of bins or bin width. Do not specify both')
+    elif num_bins < 0 or bin_width < 0:
+        raise Exception('Number of bins/bin width must be > 0')
+    elif num_bins > 0:
+        for spectrum in list_of_spectra:
+            bins = np.linspace(lower_mass_range, upper_mass_range, num_bins, dtype=np.float64)
+            unique_indices, inverse_indices = np.unique(np.digitize(spectrum.peak_picked_mz_array, bins), return_inverse=True)
+            bin_counts = np.bincount(inverse_indices)
+            np.place(bin_counts, bin_counts < 1, [1])
+            spectrum.peak_picked_mz_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_mz_array) / bin_counts
+            spectrum.peak_picked_intensity_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_intensity_array)
+    elif bin_width > 0:
+        for spectrum in list_of_spectra:
+            bins = np.arange(lower_mass_range, upper_mass_range, bin_width, dtype=np.float64)
+            unique_indices, inverse_indices = np.unique(np.digitize(spectrum.peak_picked_mz_array, bins), return_inverse=True)
+            bin_counts = np.bincount(inverse_indices)
+            np.place(bin_counts, bin_counts < 1, [1])
+            spectrum.peak_picked_mz_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_mz_array) / bin_counts
+            spectrum.peak_picked_intensity_array = np.bincount(inverse_indices, weights=spectrum.peak_picked_intensity_array)
+
+    return list_of_spectra
+
+
+def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
+    # get a consensus m/z array
+    peak_picked_mz_arrays = [spectrum.peak_picked_mz_array for spectrum in list_of_spectra]
+    peak_picked_consensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(peak_picked_mz_arrays))}).sort_values(by='mz')
+    preprocessed_mz_arrays = [spectrum.preprocessed_mz_array for spectrum in list_of_spectra]
+    preprocessed_concensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(preprocessed_mz_arrays))}).sort_values(by='mz')
+
+    spectra_dfs_peak_picked = [peak_picked_consensus]
+    spectra_dfs_preprocessed = [preprocessed_concensus]
+    for spectrum in list_of_spectra:
         spectra_dfs_peak_picked.append(pd.DataFrame(data={'mz': spectrum.peak_picked_mz_array,
                                                           spectrum.spectrum_id: spectrum.peak_picked_intensity_array}))
         spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.preprocessed_mz_array,
                                                            spectrum.spectrum_id: spectrum.preprocessed_intensity_array}))
-    self.feature_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_peak_picked).sort_values(by='mz')
+    #feature_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_peak_picked).sort_values(by='mz')
+    feature_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_peak_picked).sort_values(by='mz')
     if missing_value_imputation:
-        ref_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_preprocessed).sort_values(by='mz')
-        for colname in self.feature_matrix.columns:
+        #ref_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_preprocessed).sort_values(by='mz')
+        ref_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_preprocessed).sort_values(by='mz')
+        for colname in feature_matrix.columns:
             if colname != 'mz':
-                tmp_df = pd.merge(self.feature_matrix[['mz', colname]],
-                                  ref_matrix[['mz', colname]],
-                                  how='left',
-                                  on='mz')
-                #self.feature_matrix[colname].fillna(tmp_df.drop('mz', axis=1).mean(axis=1), inplace=True)
-                self.feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
+                #tmp_df = pd.merge(feature_matrix[['mz', colname]],
+                #                  ref_matrix[['mz', colname]],
+                #                  how='left',
+                #                  on='mz')
+                tmp_df = pd.merge_asof(feature_matrix[['mz', colname]],
+                                       ref_matrix[['mz', colname]],
+                                       on='mz',
+                                       tolerance=0.5,
+                                       direction='nearest')
+                #feature_matrix[colname].fillna(tmp_df.drop('mz', axis=1).mean(axis=1), inplace=True)
+                feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
+    feature_matrix = feature_matrix.fillna(0)
+    return feature_matrix
 
 
-def get_cos_distance_matrix(self):
+def export_feature_list(feature_matrix, output):
+    feature_matrix.to_csv(output, index=False)
+
+
+def get_cos_distance_matrix():
     pass
