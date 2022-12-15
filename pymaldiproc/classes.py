@@ -55,17 +55,21 @@ class MALDISpectrum(object):
 
     # get most up to date mz_array (raw or preprocessed)
     def get_mz_array(self):
-        if self.preprocessed_mz_array is None:
+        if self.preprocessed_mz_array is None and self.peak_picked_mz_array is None:
             return self.raw_mz_array
-        elif self.preprocessed_mz_array is not None:
+        elif self.preprocessed_mz_array is not None and self.peak_picked_mz_array is None:
             return self.preprocessed_mz_array
+        elif self.peak_picked_mz_array is not None:
+            return self.peak_picked_mz_array
 
     # get most up to date intensity_array (raw or preprocessed)
     def get_intensity_array(self):
-        if self.preprocessed_intensity_array is None:
+        if self.preprocessed_intensity_array is None and self.peak_picked_intensity_array is None:
             return self.raw_intensity_array
-        elif self.preprocessed_intensity_array is not None:
+        elif self.preprocessed_intensity_array is not None and self.peak_picked_intensity_array is None:
             return self.preprocessed_intensity_array
+        elif self.peak_picked_intensity_array is not None:
+            return self.peak_picked_intensity_array
 
     # get peak picked (centroided) feature list
     def get_peak_list(self):
