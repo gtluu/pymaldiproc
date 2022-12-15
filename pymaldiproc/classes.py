@@ -74,12 +74,3 @@ class MALDISpectrum(object):
                                       'intensity': self.peak_picked_intensity_array})
         else:
             return pd.DataFrame(data={'mz': [0], 'intensity': [0]})
-
-
-class ConsensusPeakList(object):
-    def __init__(self, consensus_peak_list_dict):
-        self.id = consensus_peak_list_dict['id']
-        self.ms_level = consensus_peak_list_dict['ms_level']
-        self.consensus_mz_array = consensus_peak_list_dict['mz_array']
-        self.consensus_intensity_array = consensus_peak_list_dict['intensity_array']
-        self.data_processing = consensus_peak_list_dict['data_processing']
