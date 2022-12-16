@@ -1,25 +1,29 @@
 from pymaldiproc.classes import *
+from pymaldiproc.data_import import *
+from pymaldiproc.preprocessing import *
 import plotly.express as px
 from dash import Dash, Input, Output, dcc, html, State, callback_context
 #from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
 
-dataset = MALDIDataset('prototype')
-indexed_dataset = {spectrum.spectrum_id: spectrum for spectrum in dataset.spectra}
+jb182_prot = import_mzml('prototype/JB182_CCA_prot.mzML')
+jb132_prot = import_mzml('prototype/JB132_CCA_prot.mzML')
+k12_prot = import_mzml('prototype/K12_CCA_prot.mzML')
+dataset = jb182_prot + jb132_prot + k12_prot
+indexed_dataset = {spectrum.spectrum_id: spectrum for spectrum in dataset}
 
 app = Dash(__name__)
 #app = DashProxy(prevent_initial_callbacks=False, transforms=[MultiplexerTransform()])
 
 app.layout = html.Div([
     html.Div(dcc.Graph(id='spectrum', figure={}), className='row'),
-    html.Div(dcc.Graph(id='preprocessed_spectrum', figure={}), className='row'),
     html.Div([
         html.Div(
             html.H1('Spectrum ID', className='row')
         ),
         html.Div(dcc.Dropdown(id='spectrum_id',
                               multi=False,
-                              options=[{'label': i.spectrum_id, 'value': i.spectrum_id} for i in dataset.spectra],
-                              value=[i.spectrum_id for i in dataset.spectra]),
+                              options=[{'label': i.spectrum_id, 'value': i.spectrum_id} for i in dataset],
+                              value=[i.spectrum_id for i in dataset]),
                  className='one column')
     ]),
     html.Div([
@@ -152,13 +156,14 @@ def graph_spectrum(value):
     # get spectrum
     if value is not None:
         spectrum = indexed_dataset[value]
-        spectrum_df = pd.DataFrame(data={'mz': spectrum.get_mz_array(),
-                                         'intensity': spectrum.get_intensity_array()})
+        spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
+                                         'Intensity': spectrum.get_intensity_array()})
 
         fig = px.line(data_frame=spectrum_df,
-                      x='mz',
-                      y='intensity')
-        fig.update_xaxes(range=[2000, 20000])
+                      x='m/z',
+                      y='Intensity')
+        fig.update_layout(xaxis_tickformat='d',
+                          yaxis_tickformat='~e')
         return fig
 
 
