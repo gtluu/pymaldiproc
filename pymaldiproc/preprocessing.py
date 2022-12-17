@@ -8,7 +8,6 @@ from pyMSpec.normalisation import tic, rms, mad, sqrt
 
 
 def trim_spectra(list_of_spectra, lower_mass_range, upper_mass_range):
-    #trimmed_spectra = []
     for spectrum in list_of_spectra:
         spectrum_df = pd.DataFrame(data={'mz': spectrum.raw_mz_array, 'intensity': spectrum.raw_intensity_array})
         spectrum_df = spectrum_df[~(spectrum_df['mz'] <= lower_mass_range) & ~(spectrum_df['mz'] >= upper_mass_range)]
@@ -16,7 +15,6 @@ def trim_spectra(list_of_spectra, lower_mass_range, upper_mass_range):
         spectrum.preprocessed_intensity_array = spectrum_df['intensity'].values
         spectrum.data_processing['spectrum trimming'] = {'lower mass range': lower_mass_range,
                                                          'upper mass range': upper_mass_range}
-        #trimmed_spectra.append(spectrum)
     return list_of_spectra
 
 
@@ -44,9 +42,9 @@ def transform_intensity(list_of_spectra, method='sqrt'):
 def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, polyorder=3, delta_mz=0.2,
                     diff_thresh=0.01):
     # check method
-    #if method not in ['SavitzkyGolay', 'MovingAverage', 'apodization', 'rebin', 'fast_change', 'median']:
-    #    raise Exception('Method must be "SavitzkyGolay", "MovingAverage", "apodization", "rebin", "fast_change", '
-    #                    '"median"')
+    if method not in ['SavitzkyGolay', 'MovingAverage', 'apodization', 'rebin', 'fast_change', 'median']:
+        raise Exception('Method must be "SavitzkyGolay", "MovingAverage", "apodization", "rebin", "fast_change", '
+                        '"median"')
 
     if method not in ['SavitzkyGolay', 'apodization', 'rebin', 'fast_change', 'median']:
         raise Exception('Method must be "SavitzkyGolay", "apodization", "rebin", "fast_change", "median"')
@@ -89,8 +87,8 @@ def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, p
 # TODO: implement other algorithms
 def remove_baseline(list_of_spectra, method='ZhangFit'):
     # check method
-    #if method not in ['snip', 'tophat', 'convexhull', 'median', 'ZhangFit', 'modpoly', 'imodpoly']:
-    #    raise Exception('Method must be "snip", "tophat", "convexhull", "median", "ZhangFit", "modpoly", or "imodpoly"')
+    if method not in ['snip', 'tophat', 'convexhull', 'median', 'ZhangFit', 'modpoly', 'imodpoly']:
+        raise Exception('Method must be "snip", "tophat", "convexhull", "median", "ZhangFit", "modpoly", or "imodpoly"')
 
     # remove baseline
     for spectrum in list_of_spectra:
@@ -178,23 +176,16 @@ def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
                                                           spectrum.spectrum_id: spectrum.peak_picked_intensity_array}))
         spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.preprocessed_mz_array,
                                                            spectrum.spectrum_id: spectrum.preprocessed_intensity_array}))
-    #feature_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_peak_picked).sort_values(by='mz')
     feature_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_peak_picked).sort_values(by='mz')
     if missing_value_imputation:
-        #ref_matrix = reduce(lambda x, y: pd.merge(x, y, how='outer', on='mz'), spectra_dfs_preprocessed).sort_values(by='mz')
         ref_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_preprocessed).sort_values(by='mz')
         for colname in feature_matrix.columns:
             if colname != 'mz':
-                #tmp_df = pd.merge(feature_matrix[['mz', colname]],
-                #                  ref_matrix[['mz', colname]],
-                #                  how='left',
-                #                  on='mz')
                 tmp_df = pd.merge_asof(feature_matrix[['mz', colname]],
                                        ref_matrix[['mz', colname]],
                                        on='mz',
                                        tolerance=0.5,
                                        direction='nearest')
-                #feature_matrix[colname].fillna(tmp_df.drop('mz', axis=1).mean(axis=1), inplace=True)
                 feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
     feature_matrix = feature_matrix.fillna(0)
     return feature_matrix
