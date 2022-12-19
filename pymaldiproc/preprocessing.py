@@ -77,22 +77,31 @@ def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, p
     return list_of_spectra
 
 
-# TODO: implement other algorithms
-def remove_baseline(list_of_spectra, method='ZhangFit'):
+def remove_baseline(list_of_spectra, method='ZhangFit', lambda_=100, porder=1, repitition=None, degree=2,
+                    gradient=0.001):
     # check method
-    if method not in ['snip', 'tophat', 'convexhull', 'median', 'ZhangFit', 'modpoly', 'imodpoly']:
-        raise Exception('Method must be "snip", "tophat", "convexhull", "median", "ZhangFit", "modpoly", or "imodpoly"')
+    if method not in ['ZhangFit', 'ModPoly', 'IModPoly']:
+        raise Exception('Method must be "ZhangFit", "ModPoly", or "IModPoly"')
 
     # remove baseline
     for spectrum in list_of_spectra:
         if method == 'ZhangFit':
-            spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.preprocessed_intensity_array).ZhangFit()
+            if repitition is None:
+                repitition = 15
+            spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.preprocessed_intensity_array).ZhangFit(lambda_=lambda_, porder=porder, repitition=repitition)
+        elif method == 'ModPoly':
+            if repitition is None:
+                repitition = 100
+            spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.preprocessed_intensity_array).ModPoly(degree=degree, repitition=repitition, gradient=gradient)
+        elif method == 'IModPoly':
+            if repitition is None:
+                repitition = 100
+            spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.preprocessed_intensity_array).IModPoly(degree=degree, repitition=repitition, gradient=gradient)
         spectrum.data_processing['baseline removal'] = {'method': method}
 
     return list_of_spectra
 
 
-# TODO: implement PQN and median from MALDIquant
 def normalize_intensity(list_of_spectra, method='tic'):
     # check method
     if method not in ['tic', 'rms', 'mad', 'sqrt']:
