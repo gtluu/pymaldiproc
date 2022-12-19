@@ -186,7 +186,3 @@ def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
 
 def export_feature_list(feature_matrix, output):
     feature_matrix.to_csv(output, index=False)
-
-
-def get_cos_distance_matrix():
-    pass
