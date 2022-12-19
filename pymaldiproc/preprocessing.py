@@ -38,14 +38,9 @@ def transform_intensity(list_of_spectra, method='sqrt'):
     return list_of_spectra
 
 
-# TODO: implement MovingAverage method
 def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, polyorder=3, delta_mz=0.2,
                     diff_thresh=0.01):
     # check method
-    if method not in ['SavitzkyGolay', 'MovingAverage', 'apodization', 'rebin', 'fast_change', 'median']:
-        raise Exception('Method must be "SavitzkyGolay", "MovingAverage", "apodization", "rebin", "fast_change", '
-                        '"median"')
-
     if method not in ['SavitzkyGolay', 'apodization', 'rebin', 'fast_change', 'median']:
         raise Exception('Method must be "SavitzkyGolay", "apodization", "rebin", "fast_change", "median"')
 
@@ -58,8 +53,6 @@ def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, p
                                                                   polyorder=polyorder)
             spectrum.data_processing['baseline smoothing']['window length'] = window_length
             spectrum.data_processing['baseline smoothing']['polyorder'] = polyorder
-        elif method == 'MovingAverage':
-            pass
         elif method == 'apodization':
             spectrum.preprocessed_mz_array, spectrum.preprocessed_intensity_array = apodization(spectrum.preprocessed_mz_array,
                                                                                                 spectrum.preprocessed_intensity_array,
