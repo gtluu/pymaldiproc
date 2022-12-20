@@ -10,3 +10,4 @@ dash-extensions
 plotly
 flask
 seaborn
+lxml

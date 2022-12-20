@@ -12,10 +12,10 @@ from pyMSpec.normalisation import tic, rms, mad, sqrt
 
 # Barebones class to hold basic MALDI spectrum data.
 class MALDISpectrum(object):
-    def __init__(self, pyteomics_dict):
+    def __init__(self, pyteomics_dict, software):
         self.name = None
         self.uuid = str(uuid4())
-        self.replicate = '1'
+        self.replicate = '1'  # only looks at replicate for MSConvert data. needs to be manually edited for timsTOF
         self.spectrum_id = None
         self.chip = None
         self.spot = None
@@ -28,23 +28,20 @@ class MALDISpectrum(object):
         self.peak_picked_intensity_array = None
         self.data_processing = {}
 
-        self.parse_pyteomics_dict(pyteomics_dict)
+        self.parse_pyteomics_dict(pyteomics_dict, software)
 
-    def parse_pyteomics_dict(self, pyteomics_dict):
+    def parse_pyteomics_dict(self, pyteomics_dict, software):
         # metadata
-        # currently only supports MSConvert style metadata
-        if 'spectrum title' in pyteomics_dict.keys():
+        if 'pwiz' in software:
             spectrum_id = pyteomics_dict['spectrum title'].split(' ')[0]
             spectrum_filename = pyteomics_dict['spectrum title'].split(' ')[1]
             self.name = spectrum_id.split('.')[0]
             self.replicate = spectrum_id.split('.')[1]
             self.chip = spectrum_filename.split('\\')[-4].split('_')[0]
             self.spot = spectrum_filename.split('\\')[-4].split('_')[1]
-        # placeholder else clause
-        # TODO: update TIMSCONVERT to include spectrum title
-        else:
-            self.name = pyteomics_dict['pymaldiproc_spectra_count']
-            self.replicate = '1'
+        elif software == 'psims-writer':  # assume psims usage == TIMSCONVERT
+            self.name = str(pyteomics_dict['spectrum title']) + '_' + str(pyteomics_dict['index'])
+            self.spot = pyteomics_dict['maldi spot identifier']
 
         self.spectrum_id = self.name + '|' + self.replicate + '|' + self.uuid
 
