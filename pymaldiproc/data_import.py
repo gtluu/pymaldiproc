@@ -16,12 +16,7 @@ def import_mzml(input_path):
     list_of_spectra = []
     for mzml_filename in input_files:
         mzml_data = list(pyt.read(mzml_filename))
-        # check what conversion software was used
-        huge_parser = XMLParser(huge_tree=True)
-        meta = parse(mzml_filename, parser=huge_parser).getroot()
-        ns = meta.tag[:meta.tag.find('}') + 1]
-        software = meta.find('.//' + ns + 'processingMethod').attrib['softwareRef']
         for scan_dict in mzml_data:
-            list_of_spectra.append(MALDISpectrum(scan_dict, software))
+            list_of_spectra.append(MALDISpectrum(scan_dict, mzml_filename))
 
     return list_of_spectra
