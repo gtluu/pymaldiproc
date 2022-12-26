@@ -52,6 +52,49 @@ app.layout = html.Div([
 ])
 
 
+def get_spectrum_graph(spectrum):
+    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
+                                     'Intensity': spectrum.get_intensity_array()})
+
+    fig = px.line(data_frame=spectrum_df,
+                  x='m/z',
+                  y='Intensity')
+    fig.update_layout(xaxis_tickformat='d',
+                      yaxis_tickformat='~e')
+
+    children = [
+        html.Div(
+            dcc.Graph(
+                id='spectrum_plot',
+                figure=fig,
+                style={
+                    'width': '100%',
+                    'height': '600px'
+                }
+            )
+        ),
+        html.Div(
+            html.H1('Preprocessing', className='row')
+        ),
+        html.Div(
+            [
+                #html.Button('Trim Spectrum', id='trim_spectrum'),
+                html.Button('Transform Intensity', id='transform_intensity'),
+                html.Button('Smooth Baseline', id='smooth_baseline'),
+                html.Button('Remove Baseline', id='remove_baseline'),
+                #html.Button('Normalize Intensity', id='normalize_intensity'),
+                #html.Button('Bin Spectrum', id='bin_spectrum'),
+                html.Button('Peak Picking', id='peak_picking'),
+                html.Button('Export Peak List', id='export_peak_list'),
+                html.Button('Undo Preprocessing', id='undo_preprocessing'),
+                dcc.Download(id='peak_list')
+            ]
+        ),
+    ]
+
+    return children
+
+
 @app.callback(Output('dropdown', 'children'),
               Input('upload', 'contents'),
               State('upload', 'filename'))
@@ -88,45 +131,7 @@ def graph_spectrum(value):
     if value is not None:
         global INDEXED_DATA
         spectrum = INDEXED_DATA[value]
-        spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                         'Intensity': spectrum.get_intensity_array()})
-
-        fig = px.line(data_frame=spectrum_df,
-                      x='m/z',
-                      y='Intensity')
-        fig.update_layout(xaxis_tickformat='d',
-                          yaxis_tickformat='~e')
-
-        children = [
-            html.Div(
-                dcc.Graph(
-                    id='spectrum_plot',
-                    figure=fig,
-                    style={
-                        'width': '100%',
-                        'height': '600px'
-                    }
-                )
-            ),
-            html.Div(
-                html.H1('Preprocessing', className='row')
-            ),
-            html.Div(
-                [
-                    #html.Button('Trim Spectrum', id='trim_spectrum'),
-                    html.Button('Transform Intensity', id='transform_intensity'),
-                    html.Button('Smooth Baseline', id='smooth_baseline'),
-                    html.Button('Remove Baseline', id='remove_baseline'),
-                    html.Button('Normalize Intensity', id='normalize_intensity'),
-                    #html.Button('Bin Spectrum', id='bin_spectrum'),
-                    html.Button('Peak Picking', id='peak_picking'),
-                    html.Button('Export Peak List', id='export_peak_list'),
-                    html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                    dcc.Download(id='peak_list')
-                ]
-            ),
-        ]
-
+        children = get_spectrum_graph(spectrum)
         return children
 
 
@@ -137,45 +142,7 @@ def transform_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value] = transform_intensity([INDEXED_DATA[value]])[0]
     spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
-
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity')
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
-
-    children = [
-        html.Div(
-            dcc.Graph(
-                id='spectrum_plot',
-                figure=fig,
-                style={
-                    'width': '100%',
-                    'height': '600px'
-                }
-            )
-        ),
-        html.Div(
-            html.H1('Preprocessing', className='row')
-        ),
-        html.Div(
-            [
-                # html.Button('Trim Spectrum', id='trim_spectrum'),
-                html.Button('Transform Intensity', id='transform_intensity'),
-                html.Button('Smooth Baseline', id='smooth_baseline'),
-                html.Button('Remove Baseline', id='remove_baseline'),
-                html.Button('Normalize Intensity', id='normalize_intensity'),
-                #html.Button('Bin Spectrum', id='bin_spectrum'),
-                html.Button('Peak Picking', id='peak_picking'),
-                html.Button('Export Peak List', id='export_peak_list'),
-                html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                dcc.Download(id='peak_list')
-            ]
-        ),
-    ]
-
+    children = get_spectrum_graph(spectrum)
     return children
 
 
@@ -186,45 +153,7 @@ def smooth_baseline_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value] = smooth_baseline([INDEXED_DATA[value]])[0]
     spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
-
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity')
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
-
-    children = [
-        html.Div(
-            dcc.Graph(
-                id='spectrum_plot',
-                figure=fig,
-                style={
-                    'width': '100%',
-                    'height': '600px'
-                }
-            )
-        ),
-        html.Div(
-            html.H1('Preprocessing', className='row')
-        ),
-        html.Div(
-            [
-                # html.Button('Trim Spectrum', id='trim_spectrum'),
-                html.Button('Transform Intensity', id='transform_intensity'),
-                html.Button('Smooth Baseline', id='smooth_baseline'),
-                html.Button('Remove Baseline', id='remove_baseline'),
-                html.Button('Normalize Intensity', id='normalize_intensity'),
-                #html.Button('Bin Spectrum', id='bin_spectrum'),
-                html.Button('Peak Picking', id='peak_picking'),
-                html.Button('Export Peak List', id='export_peak_list'),
-                html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                dcc.Download(id='peak_list')
-            ]
-        ),
-    ]
-
+    children = get_spectrum_graph(spectrum)
     return children
 
 
@@ -235,95 +164,19 @@ def remove_baseline_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value] = remove_baseline([INDEXED_DATA[value]])[0]
     spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
-
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity')
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
-
-    children = [
-        html.Div(
-            dcc.Graph(
-                id='spectrum_plot',
-                figure=fig,
-                style={
-                    'width': '100%',
-                    'height': '600px'
-                }
-            )
-        ),
-        html.Div(
-            html.H1('Preprocessing', className='row')
-        ),
-        html.Div(
-            [
-                # html.Button('Trim Spectrum', id='trim_spectrum'),
-                html.Button('Transform Intensity', id='transform_intensity'),
-                html.Button('Smooth Baseline', id='smooth_baseline'),
-                html.Button('Remove Baseline', id='remove_baseline'),
-                html.Button('Normalize Intensity', id='normalize_intensity'),
-                #html.Button('Bin Spectrum', id='bin_spectrum'),
-                html.Button('Peak Picking', id='peak_picking'),
-                html.Button('Export Peak List', id='export_peak_list'),
-                html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                dcc.Download(id='peak_list')
-            ]
-        ),
-    ]
-
+    children = get_spectrum_graph(spectrum)
     return children
 
 
-@app.callback(Output('spectrum', 'children'),
+'''@app.callback(Output('spectrum', 'children'),
               Input('normalize_intensity', 'n_clicks'),
               State('spectrum_id', 'value'))
 def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value] = normalize_intensity([INDEXED_DATA[value]])[0]
     spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
-
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity')
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
-
-    children = [
-        html.Div(
-            dcc.Graph(
-                id='spectrum_plot',
-                figure=fig,
-                style={
-                    'width': '100%',
-                    'height': '600px'
-                }
-            )
-        ),
-        html.Div(
-            html.H1('Preprocessing', className='row')
-        ),
-        html.Div(
-            [
-                # html.Button('Trim Spectrum', id='trim_spectrum'),
-                html.Button('Transform Intensity', id='transform_intensity'),
-                html.Button('Smooth Baseline', id='smooth_baseline'),
-                html.Button('Remove Baseline', id='remove_baseline'),
-                html.Button('Normalize Intensity', id='normalize_intensity'),
-                #html.Button('Bin Spectrum', id='bin_spectrum'),
-                html.Button('Peak Picking', id='peak_picking'),
-                html.Button('Export Peak List', id='export_peak_list'),
-                html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                dcc.Download(id='peak_list')
-            ]
-        ),
-    ]
-
-    return children
+    children = get_spectrum_graph(spectrum)
+    return children'''
 
 
 @app.callback(Output('spectrum', 'children'),
@@ -333,45 +186,7 @@ def peak_picking_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value] = peak_picking([INDEXED_DATA[value]])[0]
     spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
-
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity')
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
-
-    children = [
-        html.Div(
-            dcc.Graph(
-                id='spectrum_plot',
-                figure=fig,
-                style={
-                    'width': '100%',
-                    'height': '600px'
-                }
-            )
-        ),
-        html.Div(
-            html.H1('Preprocessing', className='row')
-        ),
-        html.Div(
-            [
-                # html.Button('Trim Spectrum', id='trim_spectrum'),
-                html.Button('Transform Intensity', id='transform_intensity'),
-                html.Button('Smooth Baseline', id='smooth_baseline'),
-                html.Button('Remove Baseline', id='remove_baseline'),
-                html.Button('Normalize Intensity', id='normalize_intensity'),
-                #html.Button('Bin Spectrum', id='bin_spectrum'),
-                html.Button('Peak Picking', id='peak_picking'),
-                html.Button('Export Peak List', id='export_peak_list'),
-                html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                dcc.Download(id='peak_list')
-            ]
-        ),
-    ]
-
+    children = get_spectrum_graph(spectrum)
     return children
 
 
@@ -397,47 +212,9 @@ def undo_preprocessing(n_clicks, value):
     INDEXED_DATA[value].peak_picked_intensity_array = None
     INDEXED_DATA[value].data_processing = {}
     spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
-
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity')
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
-
-    children = [
-        html.Div(
-            dcc.Graph(
-                id='spectrum_plot',
-                figure=fig,
-                style={
-                    'width': '100%',
-                    'height': '600px'
-                }
-            )
-        ),
-        html.Div(
-            html.H1('Preprocessing', className='row')
-        ),
-        html.Div(
-            [
-                # html.Button('Trim Spectrum', id='trim_spectrum'),
-                html.Button('Transform Intensity', id='transform_intensity'),
-                html.Button('Smooth Baseline', id='smooth_baseline'),
-                html.Button('Remove Baseline', id='remove_baseline'),
-                html.Button('Normalize Intensity', id='normalize_intensity'),
-                # html.Button('Bin Spectrum', id='bin_spectrum'),
-                html.Button('Peak Picking', id='peak_picking'),
-                html.Button('Export Peak List', id='export_peak_list'),
-                html.Button('Undo Preprocessing', id='undo_preprocessing'),
-                dcc.Download(id='peak_list')
-            ]
-        ),
-    ]
-
+    children = get_spectrum_graph(spectrum)
     return children
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
