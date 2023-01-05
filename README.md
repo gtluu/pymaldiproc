@@ -59,4 +59,38 @@ pip install git+https://github.com/mars20/icoshift
 
 ## Usage
 
-Usage instruction to come shortly.
+#### Using pyMALDIproc
+
+```
+from pymaldiproc.classes import MALDISpectrum
+from pymaldiproc.data_import import import_mzml
+from pymaldiproc.preprocessing import *
+
+# Read in MALDI spectra from mzML file.
+data = import_mzml('profile.mzML')  # data is a list of spectra
+
+# Data Preprocessing
+preprocessed_data = trim_spectra(data, 2000, 20000)
+preprocessed_data = transform_intensity(preprocessed_data)
+preprocessed_data = smooth_baseline(preprocessed_data)
+preprocessed_data = remove_baseline(preprocessed_data)
+preprocessed_data = normalize_intensity(preprocessed_data)
+preprocessed_data = bin_spectra(preprocessed_data, 10000, 2000, 20000)
+preprocessed_data = align_spectra(preprocessed_data)
+
+# Peak Picking
+peaks = peak_picking(preprocessed_data)
+
+# Get feature matrix with peak lists for all spectra in the dataset.
+feature_matrix = get_feature_matrix(peaks)
+# Export feature matrix
+export_feature_list(feature_matrix, 'feature_matrix.csv')
+```
+
+#### Using the Example Dashboard
+
+Run the following command with the ```pymaldiproc``` venv activated.
+```
+python /path/to/pymaldiproc/example_dashboard.py
+```
+The dashboard will be available at ```https://localhost:8050```.
