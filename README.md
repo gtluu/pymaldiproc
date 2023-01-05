@@ -27,8 +27,7 @@ Follow the prompts to complete installation.
 
 #### Set Up ```conda env```
 
-3. Create a conda instance. You must be using Python 3.7. Newer versions of Python are not guaranteed to be compatible 
-with Bruker's API in Linux.
+3. Create a conda instance. You must be using Python 3.7.
 ```
 conda create -n pymaldiproc python=3.7
 ```
