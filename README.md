@@ -35,6 +35,7 @@ conda create -n pymaldiproc python=3.7
 4. Activate conda environment.
 ```
 conda activate pymaldiproc
+```
 
 #### Install pyMALDIproc
 
