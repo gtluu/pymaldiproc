@@ -20,3 +20,21 @@ def import_mzml(input_path):
             list_of_spectra.append(MALDISpectrum(scan_dict, mzml_filename))
 
     return list_of_spectra
+
+
+def import_mzxml(input_path):
+    # find mzML files
+    if input_path.endswith('.mzXML'):
+        input_files = [input_path]
+    elif not input_path.endswith('.mzxML') and os.path.isdir(input_path):
+        input_files = [os.path.join(dirpath, filename) for dirpath, dirnames, filenames in os.walk(input_path)
+                       for filename in filenames if filename.endswith('.mzXML')]
+
+    # read in data with pyteomics
+    list_of_spectra = []
+    for mzxml_filename in input_files:
+        mzxml_data = list(pyt.read(mzxml_filename))
+        for scan_dict in mzxml_data:
+            list_of_spectra.append(MALDISpectrum(scan_dict, mzxml_filename))
+
+    return list_of_spectra

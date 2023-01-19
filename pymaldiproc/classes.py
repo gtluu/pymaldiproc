@@ -31,16 +31,23 @@ class MALDISpectrum(object):
 
     def parse_pyteomics_dict(self, pyteomics_dict):
         # metadata
-        self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(pyteomics_dict['index'])
+        if self.source.lower().endswith('mzml'):
+            self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(pyteomics_dict['index'])
+        elif self.source.lower().endswith('mzxml'):
+            self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(pyteomics_dict['num'])
+
         try:
             self.spot = pyteomics_dict['maldi spot identifier']
             self.spectrum_id = self.name + '|' + self.spot + '|' + self.uuid
         except KeyError:
-            print('MALDI Spot Identifier information not found.')
+            #print('MALDI Spot Identifier information not found.')
             self.spectrum_id = self.name + '|' + self.uuid
 
         # spectra
-        self.ms_level = pyteomics_dict['ms level']
+        if self.source.lower().endswith('mzml'):
+            self.ms_level = pyteomics_dict['ms level']
+        elif self.source.lower().endswith('mzxml'):
+            self.ms_level = pyteomics_dict['msLevel']
         self.raw_mz_array = pyteomics_dict['m/z array']
         self.raw_intensity_array = pyteomics_dict['intensity array']
 
