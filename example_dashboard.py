@@ -7,14 +7,17 @@ from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransfor
 import dash_bootstrap_components as dbc
 import base64
 
+# will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
+# relative path for directory where uploaded data is stored
 UPLOAD_DIR = 'data'
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
-#app = Dash(__name__)
+# Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
 app = DashProxy(prevent_initial_callbacks=True, transforms=[MultiplexerTransform()])
 
+# barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
 app.layout = html.Div([
     html.Div(
         dcc.Upload(
@@ -52,6 +55,8 @@ app.layout = html.Div([
 ])
 
 
+# get a spectrum df with m/z and intensity columns and plot it using a px.line plot
+# also add UI elements for preprocessing buttons
 def get_spectrum_graph(spectrum):
     spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
                                      'Intensity': spectrum.get_intensity_array()})
@@ -95,10 +100,14 @@ def get_spectrum_graph(spectrum):
     return children
 
 
+# after uploading data, add a dropdown UI element to select a spectrum
 @app.callback(Output('dropdown', 'children'),
               Input('upload', 'contents'),
               State('upload', 'filename'))
 def upload_data(list_of_contents, list_of_filenames):
+    # uploaded data is added to the global variable INDEXED_DATA here
+    # the following callbacks below here also call "global INDEXED_DATA" to use this same persistent data and modify
+    # the spectrum plot
     global INDEXED_DATA
     if list_of_contents is not None:
         for contents, filename in zip(list_of_contents, list_of_filenames):
