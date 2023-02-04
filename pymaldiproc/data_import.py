@@ -1,5 +1,6 @@
 import os
-from pyteomics import mzml as pyt
+from pyteomics import mzml as pyt_mzml
+from pyteomics import mzxml as pyt_mzxml
 from lxml.etree import parse, XMLParser
 from pymaldiproc.classes import MALDISpectrum
 
@@ -15,7 +16,7 @@ def import_mzml(input_path):
     # read in data with pyteomics
     list_of_spectra = []
     for mzml_filename in input_files:
-        mzml_data = list(pyt.read(mzml_filename))
+        mzml_data = list(pyt_mzml.read(mzml_filename))
         for scan_dict in mzml_data:
             list_of_spectra.append(MALDISpectrum(scan_dict, mzml_filename))
 
@@ -33,7 +34,7 @@ def import_mzxml(input_path):
     # read in data with pyteomics
     list_of_spectra = []
     for mzxml_filename in input_files:
-        mzxml_data = list(pyt.read(mzxml_filename))
+        mzxml_data = list(pyt_mzxml.read(mzxml_filename))
         for scan_dict in mzxml_data:
             list_of_spectra.append(MALDISpectrum(scan_dict, mzxml_filename))
 
