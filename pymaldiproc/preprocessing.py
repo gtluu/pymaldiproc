@@ -92,7 +92,7 @@ def remove_baseline(list_of_spectra, method='ZhangFit', lambda_=100, porder=1, r
                 repitition = 15
             spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.get_intensity_array()).ZhangFit(lambda_=lambda_,
                                                                                                              porder=porder,
-                                                                                                             itermax=repitition)
+                                                                                                             repitition=repitition)
             spectrum.data_processing['baseline removal']['lambda'] = lambda_
             spectrum.data_processing['baseline removal']['porder'] = porder
             spectrum.data_processing['baseline removal']['repitition'] = repitition
