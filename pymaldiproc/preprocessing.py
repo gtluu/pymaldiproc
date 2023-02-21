@@ -39,7 +39,7 @@ def transform_intensity(list_of_spectra, method='sqrt'):
     return list_of_spectra
 
 
-def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=20, polyorder=3, delta_mz=0.2,
+def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=19, polyorder=3, delta_mz=0.2,
                     diff_thresh=0.01):
     # check method
     if method not in ['SavitzkyGolay', 'apodization', 'rebin', 'fast_change', 'median']:
