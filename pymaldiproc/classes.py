@@ -35,6 +35,8 @@ class MALDISpectrum(object):
             self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(pyteomics_dict['index'])
         elif self.source.lower().endswith('mzxml'):
             self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(pyteomics_dict['num'])
+        else:
+            self.name = ''
 
         try:
             self.spot = pyteomics_dict['maldi spot identifier']
