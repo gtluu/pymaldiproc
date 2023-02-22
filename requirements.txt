@@ -9,6 +9,3 @@ dash
 dash-extensions
 dash-bootstrap-components
 plotly
-flask
-seaborn
-lxml
