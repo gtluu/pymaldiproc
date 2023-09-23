@@ -51,16 +51,12 @@ git clone -c core.symlinks=true https://www.github.com/gtluu/pyMALDIproc
 # pyMALDIproc dependencies
 pip install -r /path/to/pyMALDIproc/requirements.txt
 ```
-7. You will also need to install the Python3 version of icoshift.
-```
-pip install git+https://github.com/mars20/icoshift
-```
 
 ## Usage
 
 #### Using pyMALDIproc
 
-```
+```python
 from pymaldiproc.classes import MALDISpectrum
 from pymaldiproc.data_import import import_mzml
 from pymaldiproc.preprocessing import *
