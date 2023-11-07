@@ -10,3 +10,4 @@ dash-extensions
 dash-bootstrap-components
 plotly
 git+https://github.com/mars20/icoshift.git
+git+https://github.com/gtluu/pyTDFSDK.git
