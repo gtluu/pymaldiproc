@@ -17,7 +17,7 @@ class MALDISpectrum(object):
         self.name = None
         self.uuid = str(uuid4())
         self.spectrum_id = None
-        self.spot = None
+        self.coord = None
         self.ms_level = None
         self.raw_mz_array = None
         self.raw_intensity_array = None
@@ -39,10 +39,9 @@ class MALDISpectrum(object):
             self.name = ''
 
         try:
-            self.spot = pyteomics_dict['maldi spot identifier']
-            self.spectrum_id = self.name + '|' + self.spot + '|' + self.uuid
+            self.coord = pyteomics_dict['maldi spot identifier']
+            self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
         except KeyError:
-            #print('MALDI Spot Identifier information not found.')
             self.spectrum_id = self.name + '|' + self.uuid
 
         # spectra
