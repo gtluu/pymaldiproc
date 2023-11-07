@@ -57,7 +57,7 @@ pip install -r /path/to/pyMALDIproc/requirements.txt
 #### Using pyMALDIproc
 
 ```python
-from pymaldiproc.classes import MALDISpectrum
+from pymaldiproc.classes import OpenMALDISpectrum
 from pymaldiproc.data_import import import_mzml
 from pymaldiproc.preprocessing import *
 
