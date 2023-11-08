@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pymaldiproc',
-      version='0.2.0',
+      version='0.2.1',
       packages=['pymaldiproc'],
       url='https://github.com/gtluu/pymaldiproc',
       license='Apache License',

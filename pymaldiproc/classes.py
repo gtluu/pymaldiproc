@@ -13,6 +13,7 @@ class OpenMALDISpectrum(object):
         self.spectrum_id = None
         self.coord = None
         self.ms_level = None
+        self.centroided = None
         self.raw_mz_array = None
         self.raw_intensity_array = None
         self.preprocessed_mz_array = None
@@ -37,6 +38,11 @@ class OpenMALDISpectrum(object):
             self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
         except KeyError:
             self.spectrum_id = self.name + '|' + self.uuid
+
+        if 'centroid spectrum' in pyteomics_dict and 'profile spectrum' not in pyteomics_dict:
+            self.centroided = True
+        elif 'centroid spectrum' not in pyteomics_dict and 'profile spectrum' in pyteomics_dict:
+            self.centroided = False
 
         # spectra
         if self.source.lower().endswith('mzml'):

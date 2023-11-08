@@ -2,8 +2,11 @@ pyteomics
 lxml
 numpy
 pandas
+matplotlib
 scipy
+PyMassSpec
 pyMSpec
+pybaselines
 BaselineRemoval
 dash
 dash-extensions

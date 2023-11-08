@@ -3,6 +3,8 @@ import pandas as pd
 from functools import reduce
 from scipy.signal import savgol_filter, find_peaks, find_peaks_cwt, peak_widths
 from pyMSpec.smoothing import sg_smooth, apodization, rebin, fast_change, median
+from pybaselines.smooth import snip, noise_median
+from pybaselines.morphological import tophat
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
 from icoshift import icoshift
@@ -39,7 +41,7 @@ def transform_intensity(list_of_spectra, method='sqrt'):
     return list_of_spectra
 
 
-def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=19, polyorder=3, delta_mz=0.2,
+def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=21, polyorder=3, delta_mz=0.2,
                     diff_thresh=0.01):
     # check method
     if method not in ['SavitzkyGolay', 'apodization', 'rebin', 'fast_change', 'median']:
@@ -78,41 +80,77 @@ def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=19, p
     return list_of_spectra
 
 
-def remove_baseline(list_of_spectra, method='ZhangFit', lambda_=100, porder=1, repitition=None, degree=2,
-                    gradient=0.001):
+def remove_baseline(list_of_spectra, method='SNIP', min_half_window=1, max_half_window=100, decreasing=True,
+                    smooth_half_window=None, filter_order=2, sigma=None, increment=1, max_hits=1, window_tol=0.000001,
+                    lambda_=100, porder=1, repetition=None, degree=2, gradient=0.001):
     # check method
-    if method not in ['ZhangFit', 'ModPoly', 'IModPoly']:
-        raise Exception('Method must be "ZhangFit", "ModPoly", or "IModPoly"')
+    if method not in ['SNIP', 'TopHat', 'Median','ZhangFit', 'ModPoly', 'IModPoly']:
+        raise Exception('Method must be "SNIP", "TopHat", "Median", "ZhangFit", "ModPoly", or "IModPoly"')
 
     # remove baseline
     for spectrum in list_of_spectra:
         spectrum.data_processing['baseline removal'] = {'method': method}
-        if method == 'ZhangFit':
-            if repitition is None:
-                repitition = 15
+        if method == 'SNIP':
+            baseline = snip(data=spectrum.get_intensity_array(),
+                            max_half_window=max_half_window,
+                            decreasing=decreasing,
+                            smooth_half_window=smooth_half_window,
+                            filter_order=filter_order)
+            spectrum.preprocessed_intensity_array = spectrum.get_intensity_array() - baseline
+            spectrum.data_processing['baseline removal']['max half window'] = max_half_window
+            spectrum.data_processing['baseline removal']['decreasing'] = decreasing
+            spectrum.data_processing['baseline removal']['smooth half window'] = smooth_half_window
+            spectrum.data_processing['baseline removal']['filter order'] = filter_order
+        elif method == 'TopHat':
+            baseline = tophat(data=spectrum.get_intensity_array(),
+                              half_window=max_half_window,
+                              increment=increment,
+                              max_hits=max_hits,
+                              window_tol=window_tol,
+                              max_half_window=max_half_window,
+                              min_half_window=min_half_window)
+            spectrum.preprocessed_intensity_array = spectrum.get_intensity_array() - baseline
+            spectrum.data_processing['baseline removal']['half window'] = max_half_window
+            spectrum.data_processing['baseline removal']['increment'] = increment
+            spectrum.data_processing['baseline removal']['max hits'] = max_hits
+            spectrum.data_processing['baseline removal']['window tolerance'] = window_tol
+            spectrum.data_processing['baseline removal']['max half window'] = max_half_window
+            spectrum.data_processing['baseline removal']['min half window'] = min_half_window
+        elif method == 'Median':
+            baseline = noise_median(data=spectrum.get_intensity_array(),
+                                    half_window=max_half_window,
+                                    smooth_half_window=smooth_half_window,
+                                    sigma=sigma)
+            spectrum.preprocessed_intensity_array = spectrum.get_intensity_array() - baseline
+            spectrum.data_processing['baseline removal']['half window'] = max_half_window
+            spectrum.data_processing['baseline removal']['smooth half window'] = smooth_half_window
+            spectrum.data_processing['baseline removal']['sigma'] = sigma
+        elif method == 'ZhangFit':
+            if repetition is None:
+                repetition = 15
             spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.get_intensity_array()).ZhangFit(lambda_=lambda_,
                                                                                                              porder=porder,
-                                                                                                             repitition=repitition)
+                                                                                                             repitition=repetition)
             spectrum.data_processing['baseline removal']['lambda'] = lambda_
             spectrum.data_processing['baseline removal']['porder'] = porder
-            spectrum.data_processing['baseline removal']['repitition'] = repitition
+            spectrum.data_processing['baseline removal']['repetition'] = repetition
         elif method == 'ModPoly':
-            if repitition is None:
-                repitition = 100
+            if repetition is None:
+                repetition = 100
             spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.get_intensity_array()).ModPoly(degree=degree,
-                                                                                                            repitition=repitition,
+                                                                                                            repitition=repetition,
                                                                                                             gradient=gradient)
             spectrum.data_processing['baseline removal']['degree'] = degree
-            spectrum.data_processing['baseline removal']['repitition'] = repitition
+            spectrum.data_processing['baseline removal']['repetition'] = repetition
             spectrum.data_processing['baseline removal']['gradient'] = gradient
         elif method == 'IModPoly':
-            if repitition is None:
-                repitition = 100
+            if repetition is None:
+                repetition = 100
             spectrum.preprocessed_intensity_array = BaselineRemoval(spectrum.get_intensity_array()).IModPoly(degree=degree,
-                                                                                                             repitition=repitition,
+                                                                                                             repitition=repetition,
                                                                                                              gradient=gradient)
             spectrum.data_processing['baseline removal']['degree'] = degree
-            spectrum.data_processing['baseline removal']['repitition'] = repitition
+            spectrum.data_processing['baseline removal']['repetition'] = repetition
             spectrum.data_processing['baseline removal']['gradient'] = gradient
 
     return list_of_spectra
