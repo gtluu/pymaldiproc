@@ -11,6 +11,7 @@ from icoshift import icoshift
 
 
 def trim_spectra(list_of_spectra, lower_mass_range, upper_mass_range):
+    print('Trimming spectra')
     for spectrum in list_of_spectra:
         spectrum_df = pd.DataFrame(data={'mz': spectrum.get_mz_array(), 'intensity': spectrum.get_intensity_array()})
         spectrum_df = spectrum_df[~(spectrum_df['mz'] <= lower_mass_range) & ~(spectrum_df['mz'] >= upper_mass_range)]
@@ -22,6 +23,7 @@ def trim_spectra(list_of_spectra, lower_mass_range, upper_mass_range):
 
 
 def transform_intensity(list_of_spectra, method='sqrt'):
+    print('Performing intensity transformation')
     # check method
     if method not in ['sqrt', 'log', 'log2', 'log10']:
         raise Exception('Method must be "sqrt", "log", "log2", or "log10"')
@@ -43,6 +45,7 @@ def transform_intensity(list_of_spectra, method='sqrt'):
 
 def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=21, polyorder=3, delta_mz=0.2,
                     diff_thresh=0.01):
+    print('Smoothing baseline')
     # check method
     if method not in ['SavitzkyGolay', 'apodization', 'rebin', 'fast_change', 'median']:
         raise Exception('Method must be "SavitzkyGolay", "apodization", "rebin", "fast_change", "median"')
@@ -83,6 +86,7 @@ def smooth_baseline(list_of_spectra, method='SavitzkyGolay', window_length=21, p
 def remove_baseline(list_of_spectra, method='SNIP', min_half_window=1, max_half_window=100, decreasing=True,
                     smooth_half_window=None, filter_order=2, sigma=None, increment=1, max_hits=1, window_tol=0.000001,
                     lambda_=100, porder=1, repetition=None, degree=2, gradient=0.001):
+    print('Removing baseline')
     # check method
     if method not in ['SNIP', 'TopHat', 'Median','ZhangFit', 'ModPoly', 'IModPoly']:
         raise Exception('Method must be "SNIP", "TopHat", "Median", "ZhangFit", "ModPoly", or "IModPoly"')
@@ -157,6 +161,7 @@ def remove_baseline(list_of_spectra, method='SNIP', min_half_window=1, max_half_
 
 
 def normalize_intensity(list_of_spectra, method='tic'):
+    print('Normalizing intensity')
     # check method
     if method not in ['tic', 'rms', 'mad', 'sqrt']:
         raise Exception('Method must be "tic", "rms", "mad", or "sqrt"')
@@ -181,6 +186,7 @@ def normalize_intensity(list_of_spectra, method='tic'):
 
 
 def bin_spectra(list_of_spectra, n_bins, lower_mass_range, upper_mass_range, array_type='preprocessed'):
+    print('Binning spectra')
     bins = np.linspace(lower_mass_range, upper_mass_range, n_bins, dtype=np.float64)
 
     for spectrum in list_of_spectra:
@@ -212,6 +218,7 @@ def bin_spectra(list_of_spectra, n_bins, lower_mass_range, upper_mass_range, arr
 
 def align_spectra(list_of_spectra, method='average', inter='whole', n='f', scale=None, coshift_preprocessing=False,
                   coshift_preprocessing_max_shift=None, fill_with_previous=True, average2_multiplier=3):
+    print('Aligning spectra')
     # check method
     if method not in ['average', 'median', 'max', 'average2']:
         raise Exception('Method must be "average", "median", "max", or "average2"')
@@ -240,12 +247,14 @@ def align_spectra(list_of_spectra, method='average', inter='whole', n='f', scale
 
 
 def estimate_peak_widths(intensity_array):
+    print('Estimating peak widths')
     peak_indices, peak_properties = find_peaks(intensity_array)
     widths = peak_widths(intensity_array, peak_indices)
     return widths[0]
 
 
 def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
+    print('Performing peak picking')
     # check method
     if method not in ['locmax', 'cwt']:
         raise Exception('Method must be "locmax" or "cwt"')
@@ -275,6 +284,7 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
 
 
 def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
+    print('Creating feature intensity matrix')
     # get a consensus m/z array
     peak_picked_mz_arrays = [spectrum.peak_picked_mz_array for spectrum in list_of_spectra]
     peak_picked_consensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(peak_picked_mz_arrays))}).sort_values(by='mz')
@@ -304,4 +314,5 @@ def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
 
 
 def export_feature_list(feature_matrix, output):
+    print('Exporting feature matrix to ' + output)
     feature_matrix.to_csv(output, index=False)
