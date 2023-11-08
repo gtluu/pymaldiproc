@@ -180,14 +180,29 @@ def normalize_intensity(list_of_spectra, method='tic'):
     return list_of_spectra
 
 
-def bin_spectra(list_of_spectra, n_bins, lower_mass_range, upper_mass_range):
+def bin_spectra(list_of_spectra, n_bins, lower_mass_range, upper_mass_range, array_type='preprocessed'):
     bins = np.linspace(lower_mass_range, upper_mass_range, n_bins, dtype=np.float64)
 
     for spectrum in list_of_spectra:
-        spectrum.preprocessed_intensity_array, spectrum.preprocessed_mz_array = np.histogram(spectrum.preprocessed_mz_array,
-                                                                                             bins=bins,
-                                                                                             weights=spectrum.preprocessed_intensity_array)
-        spectrum.preprocessed_mz_array = spectrum.preprocessed_mz_array[:-1]
+        unique_indices, inverse_indices = np.unique(np.digitize(spectrum.get_mz_array(), bins), return_inverse=True)
+        bin_counts = np.bincount(inverse_indices)
+        np.place(bin_counts, bin_counts < 1, [1])
+        if array_type == 'raw':
+            spectrum.raw_mz_array = np.bincount(inverse_indices,
+                                                weights=spectrum.raw_mz_array) / bin_counts
+            spectrum.raw_intensity_array = np.bincount(inverse_indices,
+                                                       weights=spectrum.raw_intensity_array)
+        elif array_type == 'preprocessed':
+            spectrum.preprocessed_mz_array = np.bincount(inverse_indices,
+                                                         weights=spectrum.preprocessed_mz_array) / bin_counts
+            spectrum.preprocessed_intensity_array = np.bincount(inverse_indices,
+                                                                weights=spectrum.preprocessed_intensity_array)
+        elif array_type == 'peak_picked':
+            spectrum.peak_picked_mz_array = np.bincount(inverse_indices,
+                                                        weights=spectrum.peak_picked_mz_array) / bin_counts
+            spectrum.peak_picked_intensity_array = np.bincount(inverse_indices,
+                                                               weights=spectrum.peak_picked_intensity_array) / bin_counts
+
         spectrum.data_processing['spectra binning'] = {'lower mass range': lower_mass_range,
                                                        'upper mass range': upper_mass_range,
                                                        'number of bins': n_bins}
