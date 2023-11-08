@@ -1,6 +1,6 @@
 pyteomics
 lxml
-numpy
+numpy==
 pandas
 matplotlib
 scipy

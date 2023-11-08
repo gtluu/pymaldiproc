@@ -99,7 +99,7 @@ def remove_baseline(list_of_spectra, method='SNIP', min_half_window=1, max_half_
                             max_half_window=max_half_window,
                             decreasing=decreasing,
                             smooth_half_window=smooth_half_window,
-                            filter_order=filter_order)
+                            filter_order=filter_order)[0]
             spectrum.preprocessed_intensity_array = spectrum.get_intensity_array() - baseline
             spectrum.data_processing['baseline removal']['max half window'] = max_half_window
             spectrum.data_processing['baseline removal']['decreasing'] = decreasing
@@ -112,7 +112,7 @@ def remove_baseline(list_of_spectra, method='SNIP', min_half_window=1, max_half_
                               max_hits=max_hits,
                               window_tol=window_tol,
                               max_half_window=max_half_window,
-                              min_half_window=min_half_window)
+                              min_half_window=min_half_window)[0]
             spectrum.preprocessed_intensity_array = spectrum.get_intensity_array() - baseline
             spectrum.data_processing['baseline removal']['half window'] = max_half_window
             spectrum.data_processing['baseline removal']['increment'] = increment
@@ -124,7 +124,7 @@ def remove_baseline(list_of_spectra, method='SNIP', min_half_window=1, max_half_
             baseline = noise_median(data=spectrum.get_intensity_array(),
                                     half_window=max_half_window,
                                     smooth_half_window=smooth_half_window,
-                                    sigma=sigma)
+                                    sigma=sigma)[0]
             spectrum.preprocessed_intensity_array = spectrum.get_intensity_array() - baseline
             spectrum.data_processing['baseline removal']['half window'] = max_half_window
             spectrum.data_processing['baseline removal']['smooth half window'] = smooth_half_window
