@@ -283,7 +283,7 @@ def peak_picking(list_of_spectra, method='cwt', widths=None, snr=3):
     return list_of_spectra
 
 
-def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
+def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_value_imputation=True):
     print('Creating feature intensity matrix')
     # get a consensus m/z array
     peak_picked_mz_arrays = [spectrum.peak_picked_mz_array for spectrum in list_of_spectra]
@@ -298,18 +298,20 @@ def get_feature_matrix(list_of_spectra, missing_value_imputation=True):
                                                           spectrum.spectrum_id: spectrum.get_intensity_array()}))
         spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.get_mz_array(),
                                                            spectrum.spectrum_id: spectrum.get_intensity_array()}))
-    feature_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_peak_picked).sort_values(by='mz')
+    feature_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=tolerance, direction='nearest'), spectra_dfs_peak_picked).sort_values(by='mz')
     if missing_value_imputation:
-        ref_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=0.5, direction='nearest'), spectra_dfs_preprocessed).sort_values(by='mz')
+        ref_matrix = reduce(lambda x, y: pd.merge_asof(x, y, on='mz', tolerance=tolerance, direction='nearest'), spectra_dfs_preprocessed).sort_values(by='mz')
         for colname in feature_matrix.columns:
             if colname != 'mz':
                 tmp_df = pd.merge_asof(feature_matrix[['mz', colname]],
                                        ref_matrix[['mz', colname]],
                                        on='mz',
-                                       tolerance=0.5,
+                                       tolerance=tolerance,
                                        direction='nearest')
                 feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
     feature_matrix = feature_matrix.fillna(0)
+    feature_matrix = feature_matrix.round({'mz': decimals})
+    feature_matrix = feature_matrix.groupby(['mz'], as_index=False).aggregate(sum)
     return feature_matrix
 
 
