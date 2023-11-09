@@ -109,6 +109,12 @@ class PMPTsfSpectrum(TsfSpectrum):
         self.peak_picked_intensity_array = None
         self.data_processing = {}
 
+        self.get_spectrum_metadata()
+
+    def get_spectrum_metadata(self):
+        self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
+        self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
+
     # get most up to date mz_array (raw or preprocessed)
     def get_mz_array(self, array_type=None):
         if array_type is None:
@@ -166,6 +172,12 @@ class PMPTdfSpectrum(TdfSpectrum):
         self.peak_picked_mz_array = None
         self.peak_picked_intensity_array = None
         self.data_processing = {}
+
+        self.get_spectrum_metadata()
+
+    def get_spectrum_metadata(self):
+        self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
+        self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
 
     # get most up to date mz_array (raw or preprocessed)
     def get_mz_array(self, array_type=None):
