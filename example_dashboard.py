@@ -125,7 +125,7 @@ def get_spectrum_graph(spectrum):
                     style={'marginTop': '5px', 'marginBottom': '10px'}
                 ),
                 dcc.RadioItems(
-                    id='smooth_method_options',
+                    id='smooth_options',
                     options=[
                         {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
                         {'label': 'Apodization', 'value': 'apodization'},
@@ -134,6 +134,26 @@ def get_spectrum_graph(spectrum):
                         {'label': 'Median', 'value': 'median'}
                     ],
                     value='SavitzkyGolay',  # default value
+                    labelStyle={'display': 'inline-block', 'margin-right': '20px'}
+                )
+            ], style={'padding': '10px'}
+        ),
+        html.Div(
+            [
+                html.H4("Remove Baseline Method:",
+                    style={'marginTop': '5px', 'marginBottom': '10px'}
+                ),
+                dcc.RadioItems(
+                    id='remove_options',
+                    options=[
+                        {'label': 'SNIP', 'value': 'SNIP'},
+                        {'label': 'Top Hat', 'value': 'TopHat'},
+                        {'label': 'Median', 'value': 'Median'},
+                        {'label': 'Zhang Fit', 'value': 'ZhangFit'},
+                        {'label': 'ModPoly', 'value': 'ModPoly'},
+                        {'label': 'IModPoly', 'value': 'IModPoly'}
+                    ],
+                    value='SNIP',  # default value
                     labelStyle={'display': 'inline-block', 'margin-right': '20px'}
                 )
             ], style={'padding': '10px'}
@@ -222,22 +242,19 @@ def graph_spectrum(value):
 @app.callback(
     Output('spectrum', 'children'),
     [Input('transform_intensity', 'n_clicks'),
-    State('spectrum_id', 'value'),
-    State('transform_options', 'value')]  # Add State to get the value of the selected radio item
+     State('spectrum_id', 'value'),
+     State('transform_options', 'value')]
 )
-def apply_transform_intensity(n_clicks, value, selected_method):  # Include selected_method in the function parameters
+def transform_intensity_callback(n_clicks, spectrum_id, selected_method):
     if n_clicks is not None:
         global INDEXED_DATA
-        spectrum = INDEXED_DATA.get(value)
+        spectrum = INDEXED_DATA.get(spectrum_id)
         if spectrum:
-            # Use the selected_method variable to pass the method to the transform_intensity function
-            transformed_spectra = transform_intensity([spectrum], method=selected_method)  
-            INDEXED_DATA[value] = transformed_spectra[0]  
-            children = get_spectrum_graph(transformed_spectra[0])  
-            print("transform method:", selected_method)
-            return children
+            # Adjust your transform_intensity call to match your function's expected parameters
+            transformed_spectrum = transform_intensity([spectrum], selected_method)[0]  # Assuming transform_intensity function is correctly defined to accept the method parameter
+            INDEXED_DATA[spectrum_id] = transformed_spectrum
+            return get_spectrum_graph(transformed_spectrum)
     raise PreventUpdate
-
 
 # @app.callback(Output('spectrum', 'children'),
 #               Input('smooth_baseline', 'n_clicks'),
@@ -259,15 +276,11 @@ def apply_transform_intensity(n_clicks, value, selected_method):  # Include sele
 def smooth_baseline_button(n_clicks, spectrum_id):
     if n_clicks is None:
         raise PreventUpdate
-    # Retrieve the spectrum object
     spectrum = INDEXED_DATA.get(spectrum_id)
     if not spectrum:
         raise PreventUpdate
-    # Apply the smooth_baseline function
     smoothed_spectrum = smooth_baseline([spectrum], method='SavitzkyGolay')[0]  # Adjust parameters as needed
-    # Update the INDEXED_DATA with the smoothed spectrum
     INDEXED_DATA[spectrum_id] = smoothed_spectrum
-    # Generate and return the updated graph
     return get_spectrum_graph(smoothed_spectrum)
 
 
@@ -285,24 +298,18 @@ def smooth_baseline_button(n_clicks, spectrum_id):
 
 @app.callback(
     Output('spectrum', 'children'),
-    Input('remove_baseline_button', 'n_clicks'),
-    State('spectrum_id', 'value')
+    Input('remove_baseline', 'n_clicks'),
+    [State('spectrum_id', 'value'),
+     State('remove_options', 'value')]  # Assuming 'baseline_options' is the ID for the baseline method radio buttons
 )
-def remove_baseline_click(n_clicks, spectrum_id):
+def on_remove_baseline_click(n_clicks, spectrum_id, baseline_method):
     if n_clicks is None:
         raise PreventUpdate
-
-    # Retrieve the original spectrum data
-    original_spectrum = INDEXED_DATA[spectrum_id]['original']
-
-    # Apply the remove_baseline function
-    processed_spectrum = remove_baseline([original_spectrum], method='SNIP')[0]
-
-    # Update INDEXED_DATA with the processed data
-    INDEXED_DATA[spectrum_id]['processed'] = processed_spectrum
-
-    # Generate and return the updated graph
+    original_spectrum = INDEXED_DATA[spectrum_id]['original'] # retrieve original data
+    processed_spectrum = remove_baseline([original_spectrum], method=baseline_method)[0]    #use correct method
+    INDEXED_DATA[spectrum_id]['processed'] = processed_spectrum  # update w processed data
     return get_spectrum_graph(processed_spectrum)
+
 
 
 # '''@app.callback(Output('spectrum', 'children'),
