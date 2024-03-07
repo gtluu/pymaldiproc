@@ -268,9 +268,9 @@ def transform_intensity_callback(n_clicks, spectrum_id, selected_method):
 #     return children
 
 @app.callback(
-    Output('spectrum', 'children'),  # Assuming this updates your spectrum graph
-    Input('smooth_baseline', 'n_clicks'),  # Button for smoothing baseline
-    State('spectrum_id', 'value')  # Dropdown or input that specifies which spectrum to operate on
+    Output('spectrum', 'children'),  
+    Input('smooth_baseline', 'n_clicks'), 
+    State('spectrum_id', 'value')  
 )
 def smooth_baseline_button(n_clicks, spectrum_id):
     if n_clicks is None:
@@ -304,9 +304,9 @@ def smooth_baseline_button(n_clicks, spectrum_id):
 def on_remove_baseline_click(n_clicks, spectrum_id, baseline_method):
     if n_clicks is None:
         raise PreventUpdate
-    original_spectrum = INDEXED_DATA[spectrum_id]['original'] # retrieve original data
+    original_spectrum = INDEXED_DATA[spectrum_id]['original']   # retrieve original data
     processed_spectrum = remove_baseline([original_spectrum], method=baseline_method)[0]    #use correct method
-    INDEXED_DATA[spectrum_id]['processed'] = processed_spectrum  # update w processed data
+    INDEXED_DATA[spectrum_id]['processed'] = processed_spectrum     # update w processed data
     return get_spectrum_graph(processed_spectrum)
 
 
