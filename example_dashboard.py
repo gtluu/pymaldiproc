@@ -250,8 +250,7 @@ def transform_intensity_callback(n_clicks, spectrum_id, selected_method):
         global INDEXED_DATA
         spectrum = INDEXED_DATA.get(spectrum_id)
         if spectrum:
-            # Adjust your transform_intensity call to match your function's expected parameters
-            transformed_spectrum = transform_intensity([spectrum], selected_method)[0]  # Assuming transform_intensity function is correctly defined to accept the method parameter
+            transformed_spectrum = transform_intensity([spectrum], selected_method)[0]  
             INDEXED_DATA[spectrum_id] = transformed_spectrum
             return get_spectrum_graph(transformed_spectrum)
     raise PreventUpdate
@@ -279,7 +278,7 @@ def smooth_baseline_button(n_clicks, spectrum_id):
     spectrum = INDEXED_DATA.get(spectrum_id)
     if not spectrum:
         raise PreventUpdate
-    smoothed_spectrum = smooth_baseline([spectrum], method='SavitzkyGolay')[0]  # Adjust parameters as needed
+    smoothed_spectrum = smooth_baseline([spectrum], method='SavitzkyGolay')[0] 
     INDEXED_DATA[spectrum_id] = smoothed_spectrum
     return get_spectrum_graph(smoothed_spectrum)
 
@@ -300,7 +299,7 @@ def smooth_baseline_button(n_clicks, spectrum_id):
     Output('spectrum', 'children'),
     Input('remove_baseline', 'n_clicks'),
     [State('spectrum_id', 'value'),
-     State('remove_options', 'value')]  # Assuming 'baseline_options' is the ID for the baseline method radio buttons
+     State('remove_options', 'value')] 
 )
 def on_remove_baseline_click(n_clicks, spectrum_id, baseline_method):
     if n_clicks is None:
