@@ -3,12 +3,14 @@ from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 import plotly.express as px
 from dash import Dash, dcc, html, State, callback_context
+from dash.exceptions import PreventUpdate   
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
 import dash_bootstrap_components as dbc
 import base64
 
 # will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
+
 # relative path for directory where uploaded data is stored
 UPLOAD_DIR = 'data'
 if not os.path.exists(UPLOAD_DIR):
@@ -95,6 +97,47 @@ def get_spectrum_graph(spectrum):
                 dcc.Download(id='peak_list')
             ]
         ),
+
+        html.Div(
+            html.H1('Modifications (optional)', className='row')
+        ),
+        html.Div(
+            [   
+                html.H4("Transform Intensity Method:", 
+                    style={'marginTop': '10px', 'marginBottom': '5px'}
+                ),
+                dcc.RadioItems(
+                    id='transform_options',
+                    options=[
+                        {'label': 'sqrt', 'value': 'sqrt'},
+                        {'label': 'ln', 'value': 'log'},
+                        {'label': 'log2', 'value': 'log2'},
+                        {'label': 'log10', 'value': 'log10'}
+                    ],
+                    value='sqrt',  # default value
+                    labelStyle={'display': 'inline-block', 'margin-right': '20px'}  # display inline
+                )
+            ], style={'padding': '10px', 'textAlign': 'left'}
+        ),
+        html.Div(
+            [
+                html.H4("Smooth Baseline Method:",
+                    style={'marginTop': '5px', 'marginBottom': '10px'}
+                ),
+                dcc.RadioItems(
+                    id='smooth_method_options',
+                    options=[
+                        {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
+                        {'label': 'Apodization', 'value': 'apodization'},
+                        {'label': 'Rebin', 'value': 'rebin'},
+                        {'label': 'Fast Change', 'value': 'fast_change'},
+                        {'label': 'Median', 'value': 'median'}
+                    ],
+                    value='SavitzkyGolay',  # default value
+                    labelStyle={'display': 'inline-block', 'margin-right': '20px'}
+                )
+            ], style={'padding': '10px'}
+        ),
     ]
 
     return children
@@ -118,6 +161,7 @@ def upload_data(list_of_contents, list_of_filenames):
             data = import_mzml(os.path.join(UPLOAD_DIR, filename))
             for spectrum in data:
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
+                # INDEXED_DATA[spectrum.spectrum_id] = {'original': spectrum} #, 'transformed': None}
 
         children = [
             html.Div(
@@ -137,93 +181,195 @@ def upload_data(list_of_contents, list_of_filenames):
 @app.callback(Output('spectrum', 'children'),
               Input('spectrum_id', 'value'))
 def graph_spectrum(value):
+    print("graph started")
     if value is not None:
-        global INDEXED_DATA
+        #global INDEXED_DATA
         spectrum = INDEXED_DATA[value]
         children = get_spectrum_graph(spectrum)
+        print("graph done")
         return children
 
 
-@app.callback(Output('spectrum', 'children'),
-              Input('transform_intensity', 'n_clicks'),
-              State('spectrum_id', 'value'))
-def transform_intensity_button(n_clicks, value):
-    global INDEXED_DATA
-    INDEXED_DATA[value] = transform_intensity([INDEXED_DATA[value]])[0]
-    spectrum = INDEXED_DATA[value]
-    children = get_spectrum_graph(spectrum)
-    return children
+# @app.callback(Output('spectrum', 'children'),
+#               Input('transform_intensity', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def transform_intensity_button(n_clicks, value):
+#     print("transform button clicked")
+#     #global INDEXED_DATA
+#     INDEXED_DATA[value] = transform_intensity([INDEXED_DATA[value]])[0]
+#     spectrum = INDEXED_DATA[value]
+#     children = get_spectrum_graph(spectrum)
+#     print("transform button done")
+#     return children
+
+# @app.callback(
+#     Output('spectrum', 'children'),
+#     Input('transform_intensity', 'n_clicks'),
+#     State('spectrum_id', 'value')
+# )
+# def transform_intensity(n_clicks, value):
+#     if n_clicks is not None:
+#         global INDEXED_DATA
+#         spectrum = INDEXED_DATA.get(value)
+#         if spectrum:
+#             transformed_spectra = transform_intensity([spectrum], method='sqrt')  # todo: check for method and apply
+#             INDEXED_DATA[value] = transformed_spectra[0]  # update spectrum
+#             children = get_spectrum_graph(transformed_spectra[0])   #update graph with new data
+#             print("Intensity transformation applied")
+#             return children
+#     raise PreventUpdate #prevent other callbacks from randonly being called
+
+@app.callback(
+    Output('spectrum', 'children'),
+    [Input('transform_intensity', 'n_clicks'),
+    State('spectrum_id', 'value'),
+    State('transform_options', 'value')]  # Add State to get the value of the selected radio item
+)
+def apply_transform_intensity(n_clicks, value, selected_method):  # Include selected_method in the function parameters
+    if n_clicks is not None:
+        global INDEXED_DATA
+        spectrum = INDEXED_DATA.get(value)
+        if spectrum:
+            # Use the selected_method variable to pass the method to the transform_intensity function
+            transformed_spectra = transform_intensity([spectrum], method=selected_method)  
+            INDEXED_DATA[value] = transformed_spectra[0]  
+            children = get_spectrum_graph(transformed_spectra[0])  
+            print("transform method:", selected_method)
+            return children
+    raise PreventUpdate
 
 
-@app.callback(Output('spectrum', 'children'),
-              Input('smooth_baseline', 'n_clicks'),
-              State('spectrum_id', 'value'))
-def smooth_baseline_button(n_clicks, value):
-    global INDEXED_DATA
-    INDEXED_DATA[value] = smooth_baseline([INDEXED_DATA[value]])[0]
-    spectrum = INDEXED_DATA[value]
-    children = get_spectrum_graph(spectrum)
-    return children
+# @app.callback(Output('spectrum', 'children'),
+#               Input('smooth_baseline', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def smooth_baseline_button(n_clicks, value):
+#     print("smooth button clicked")
+#     #global INDEXED_DATA
+#     INDEXED_DATA[value] = smooth_baseline([INDEXED_DATA[value]])[0]
+#     spectrum = INDEXED_DATA[value]
+#     children = get_spectrum_graph(spectrum)
+#     print("smooth button done")
+#     return children
+
+@app.callback(
+    Output('spectrum', 'children'),  # Assuming this updates your spectrum graph
+    Input('smooth_baseline', 'n_clicks'),  # Button for smoothing baseline
+    State('spectrum_id', 'value')  # Dropdown or input that specifies which spectrum to operate on
+)
+def smooth_baseline_button(n_clicks, spectrum_id):
+    if n_clicks is None:
+        raise PreventUpdate
+    # Retrieve the spectrum object
+    spectrum = INDEXED_DATA.get(spectrum_id)
+    if not spectrum:
+        raise PreventUpdate
+    # Apply the smooth_baseline function
+    smoothed_spectrum = smooth_baseline([spectrum], method='SavitzkyGolay')[0]  # Adjust parameters as needed
+    # Update the INDEXED_DATA with the smoothed spectrum
+    INDEXED_DATA[spectrum_id] = smoothed_spectrum
+    # Generate and return the updated graph
+    return get_spectrum_graph(smoothed_spectrum)
 
 
-@app.callback(Output('spectrum', 'children'),
-              Input('remove_baseline', 'n_clicks'),
-              State('spectrum_id', 'value'))
-def remove_baseline_button(n_clicks, value):
-    global INDEXED_DATA
-    INDEXED_DATA[value] = remove_baseline([INDEXED_DATA[value]])[0]
-    spectrum = INDEXED_DATA[value]
-    children = get_spectrum_graph(spectrum)
-    return children
+# @app.callback(Output('spectrum', 'children'),
+#               Input('remove_baseline', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def remove_baseline_button(n_clicks, value):
+#     print("remove button clicked")
+#     #global INDEXED_DATA
+#     INDEXED_DATA[value] = remove_baseline([INDEXED_DATA[value]])[0]
+#     spectrum = INDEXED_DATA[value]
+#     children = get_spectrum_graph(spectrum)
+#     print("remove button done")
+#     return children
+
+@app.callback(
+    Output('spectrum', 'children'),
+    Input('remove_baseline_button', 'n_clicks'),
+    State('spectrum_id', 'value')
+)
+def remove_baseline_click(n_clicks, spectrum_id):
+    if n_clicks is None:
+        raise PreventUpdate
+
+    # Retrieve the original spectrum data
+    original_spectrum = INDEXED_DATA[spectrum_id]['original']
+
+    # Apply the remove_baseline function
+    processed_spectrum = remove_baseline([original_spectrum], method='SNIP')[0]
+
+    # Update INDEXED_DATA with the processed data
+    INDEXED_DATA[spectrum_id]['processed'] = processed_spectrum
+
+    # Generate and return the updated graph
+    return get_spectrum_graph(processed_spectrum)
 
 
-'''@app.callback(Output('spectrum', 'children'),
-              Input('normalize_intensity', 'n_clicks'),
-              State('spectrum_id', 'value'))
-def normalize_intensity_button(n_clicks, value):
-    global INDEXED_DATA
-    INDEXED_DATA[value] = normalize_intensity([INDEXED_DATA[value]])[0]
-    spectrum = INDEXED_DATA[value]
-    children = get_spectrum_graph(spectrum)
-    return children'''
+# '''@app.callback(Output('spectrum', 'children'),
+#               Input('normalize_intensity', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def normalize_intensity_button(n_clicks, value):
+#     global INDEXED_DATA
+#     INDEXED_DATA[value] = normalize_intensity([INDEXED_DATA[value]])[0]
+#     spectrum = INDEXED_DATA[value]
+#     children = get_spectrum_graph(spectrum)
+#     return children'''
 
 
-@app.callback(Output('spectrum', 'children'),
-              Input('peak_picking', 'n_clicks'),
-              State('spectrum_id', 'value'))
-def peak_picking_button(n_clicks, value):
-    global INDEXED_DATA
-    INDEXED_DATA[value] = peak_picking([INDEXED_DATA[value]])[0]
-    spectrum = INDEXED_DATA[value]
-    children = get_spectrum_graph(spectrum)
-    return children
+# @app.callback(Output('spectrum', 'children'),
+#               Input('peak_picking', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def peak_picking_button(n_clicks, value):
+#     print("peak button clicked")
+#     #global INDEXED_DATA
+#     INDEXED_DATA[value] = peak_picking([INDEXED_DATA[value]])[0]
+#     spectrum = INDEXED_DATA[value]
+#     children = get_spectrum_graph(spectrum)
+#     print("peak button done")
+#     return children
 
 
-@app.callback(Output('peak_list', 'data'),
-              Input('export_peak_list', 'n_clicks'),
-              State('spectrum_id', 'value'))
-def export_peak_list(n_clicks, value):
-    spectrum = INDEXED_DATA[value]
-    spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
-                                     'Intensity': spectrum.get_intensity_array()})
+# @app.callback(Output('peak_list', 'data'),
+#               Input('export_peak_list', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def export_peak_list(n_clicks, value):
+#     print("export button clicked")
+#     spectrum = INDEXED_DATA[value]
+#     spectrum_df = pd.DataFrame(data={'m/z': spectrum.get_mz_array(),
+#                                      'Intensity': spectrum.get_intensity_array()})
+#     print("export button done")
+#     return dcc.send_data_frame(spectrum_df.to_csv, value + '|peak_list.csv', index=False)
 
-    return dcc.send_data_frame(spectrum_df.to_csv, value + '|peak_list.csv', index=False)
 
-
-@app.callback(Output('spectrum', 'children'),
-              Input('undo_preprocessing', 'n_clicks'),
-              State('spectrum_id', 'value'))
+# @app.callback(Output('spectrum', 'children'),
+#               Input('undo_preprocessing', 'n_clicks'),
+#               State('spectrum_id', 'value'))
+# def undo_preprocessing(n_clicks, value):
+#     print("undo button clicked")
+#     #global INDEXED_DATA
+#     INDEXED_DATA[value].preprocessed_mz_array = None
+#     INDEXED_DATA[value].preprocessed_intensity_array = None
+#     INDEXED_DATA[value].peak_picked_mz_array = None
+#     INDEXED_DATA[value].peak_picked_intensity_array = None
+#     INDEXED_DATA[value].data_processing = {}
+#     spectrum = INDEXED_DATA[value]
+#     children = get_spectrum_graph(spectrum)
+#     print("undo button clicked")
+#     return children
+@app.callback(
+    Output('spectrum', 'children'),
+    Input('undo_preprocessing', 'n_clicks'),
+    State('spectrum_id', 'value')
+)
 def undo_preprocessing(n_clicks, value):
-    global INDEXED_DATA
-    INDEXED_DATA[value].preprocessed_mz_array = None
-    INDEXED_DATA[value].preprocessed_intensity_array = None
-    INDEXED_DATA[value].peak_picked_mz_array = None
-    INDEXED_DATA[value].peak_picked_intensity_array = None
-    INDEXED_DATA[value].data_processing = {}
-    spectrum = INDEXED_DATA[value]
-    children = get_spectrum_graph(spectrum)
-    return children
+    if n_clicks is None:
+        raise PreventUpdate
+    spectrum_info = INDEXED_DATA.get(value)
+    if spectrum_info:
+        return get_spectrum_graph(spectrum_info['original'])
+    raise PreventUpdate  # display original graph
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    #app.run_server(debug=False)
+    app.run_server(port=8051, debug=False)

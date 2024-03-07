@@ -32,14 +32,13 @@ def transform_intensity(list_of_spectra, method='sqrt'):
     for spectrum in list_of_spectra:
         if method == 'sqrt':
             spectrum.preprocessed_intensity_array = np.sqrt(spectrum.get_intensity_array())
-        elif method == 'log':
+        elif method == 'log':   #ln
             spectrum.preprocessed_intensity_array = np.log(spectrum.get_intensity_array())
         elif method == 'log2':
             spectrum.preprocessed_intensity_array = np.log2(spectrum.get_intensity_array())
         elif method == 'log10':
             spectrum.preprocessed_intensity_array = np.log10(spectrum.get_intensity_array())
         spectrum.data_processing['intensity transformation'] = {'method': method}
-
     return list_of_spectra
 
 
