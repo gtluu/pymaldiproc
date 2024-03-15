@@ -3,7 +3,7 @@ from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 from pymaldiproc.layout import *
 import plotly.express as px
-from dash import Dash, dcc, html, State, callback_context
+from dash import Dash, dcc, html, State, callback_context, no_update
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
 import dash_bootstrap_components as dbc
 import base64
@@ -38,75 +38,90 @@ def upload_data(list_of_contents, list_of_filenames):
     return get_dropdown_layout(INDEXED_DATA)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('spectrum_id', 'value'))
 def plot_spectrum(value):
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
-    return [get_spectrum_plot_layout(fig)]
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('trim_spectrum', 'n_clicks'),
               State('spectrum_id', 'value'))
 def trim_spectrum_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].trim_spectrum(100, 2000)
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('transform_intensity', 'n_clicks'),
               State('spectrum_id', 'value'))
 def transform_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].transform_intensity()
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('smooth_baseline', 'n_clicks'),
               State('spectrum_id', 'value'))
 def smooth_baseline_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].smooth_baseline()
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('remove_baseline', 'n_clicks'),
               State('spectrum_id', 'value'))
 def remove_baseline_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].remove_baseline()
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('normalize_intensity', 'n_clicks'),
               State('spectrum_id', 'value'))
 def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].normalize_intensity()
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('bin_spectrum', 'n_clicks'),
               State('spectrum_id', 'value'))
 def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].bin_spectrum(5000, 100, 2000)
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('peak_picking', 'n_clicks'),
               State('spectrum_id', 'value'))
 def peak_picking_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].peak_picking()
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
 # TODO: add a button and callback to remove peak picking
@@ -128,13 +143,26 @@ def export_peak_list(n_clicks, value):
     return dcc.send_data_frame(spectrum_df.to_csv, value + '|peak_list.csv', index=False)
 
 
-@app.callback(Output('spectrum', 'children'),
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
               Input('undo_preprocessing', 'n_clicks'),
               State('spectrum_id', 'value'))
 def undo_preprocessing(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].undo_all_processing()
-    return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+
+
+@app.callback(Output('spectrum_plot', 'figure', allow_duplicate=True),
+              Input('spectrum_plot', 'relayoutData'),
+              State('store_plot', 'data'),
+              prevent_initial_call=True,
+              memoize=True)
+def resample_spectrum(relayoutdata: dict, fig: FigureResampler):
+    if fig is None:
+        return no_update
+    return fig.construct_update_data_patch(relayoutdata)
 
 
 if __name__ == '__main__':

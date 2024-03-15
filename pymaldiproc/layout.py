@@ -120,6 +120,4 @@ def get_spectrum(spectrum):
     if spectrum.peak_picked_mz_array is not None and spectrum.peak_picked_intensity_array is not None:
         pass
 
-    #fig.register_update_graph_callback(app, 'spectrum')
-
     return fig
