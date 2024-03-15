@@ -42,7 +42,6 @@ def upload_data(list_of_contents, list_of_filenames):
               Input('spectrum_id', 'value'))
 def plot_spectrum(value):
     global INDEXED_DATA
-    #return get_spectrum(INDEXED_DATA[value])
     fig = get_spectrum(INDEXED_DATA[value])
     return [get_spectrum_plot_layout(fig)]
 
