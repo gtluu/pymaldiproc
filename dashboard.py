@@ -4,7 +4,7 @@ from pymaldiproc.preprocessing import *
 from pymaldiproc.layout import *
 import plotly.express as px
 from dash import Dash, dcc, html, State, callback_context
-from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
+from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
 import dash_bootstrap_components as dbc
 import base64
 
@@ -17,7 +17,7 @@ if not os.path.exists(UPLOAD_DIR):
 
 
 # Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
-app = DashProxy(prevent_initial_callbacks=True, transforms=[MultiplexerTransform()])
+app = DashProxy(prevent_initial_callbacks=True, transforms=[MultiplexerTransform(), ServersideOutputTransform()])
 app.layout = get_dashboard_layout()
 
 
@@ -42,7 +42,9 @@ def upload_data(list_of_contents, list_of_filenames):
               Input('spectrum_id', 'value'))
 def plot_spectrum(value):
     global INDEXED_DATA
-    return get_spectrum(INDEXED_DATA[value])  # may need to deep copy?
+    #return get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value])
+    return [get_spectrum_plot_layout(fig)]
 
 
 @app.callback(Output('spectrum', 'children'),

@@ -2,6 +2,7 @@ from pymaldiproc.classes import *
 from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 import plotly.express as px
+from plotly_resampler import register_plotly_resampler, FigureResampler
 from dash import Dash, dcc, html, State, callback_context
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
 import dash_bootstrap_components as dbc
@@ -43,7 +44,9 @@ def get_dashboard_layout():
         html.Div(
             id='spectrum',
             className='row'
-        )
+        ),
+        dcc.Loading(dcc.Store(id='store_data')),
+        dcc.Loading(dcc.Store(id='store_plot'))
     ])
     return dashboard_layout
 
@@ -94,7 +97,7 @@ def get_dropdown_layout(data):
             dcc.Dropdown(id='spectrum_id',
                          multi=False,
                          options=[{'label': i, 'value': i} for i in data.keys()],
-                         #options=[{'label': '|'.join(i.split('|')[:-1]), 'value': i} for i in data.keys()],
+                         # options=[{'label': '|'.join(i.split('|')[:-1]), 'value': i} for i in data.keys()],
                          value=[i for i in data.keys()])
         )
     ]
@@ -105,11 +108,11 @@ def get_spectrum(spectrum):
     spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
                                 'Intensity': copy.deepcopy(spectrum.preprocessed_intensity_array)})
 
-    fig = px.line(data_frame=spectrum_df,
-                  x='m/z',
-                  y='Intensity',
-                  hover_data={'m/z': ':.4f',
-                              'Intensity': ':.1f'})
+    fig = FigureResampler(px.line(data_frame=spectrum_df,
+                                  x='m/z',
+                                  y='Intensity',
+                                  hover_data={'m/z': ':.4f',
+                                              'Intensity': ':.1f'}))
     fig.update_layout(xaxis_tickformat='d',
                       yaxis_tickformat='~e')
 
@@ -117,4 +120,6 @@ def get_spectrum(spectrum):
     if spectrum.peak_picked_mz_array is not None and spectrum.peak_picked_intensity_array is not None:
         pass
 
-    return [get_spectrum_plot_layout(fig)]
+    #fig.register_update_graph_callback(app, 'spectrum')
+
+    return fig
