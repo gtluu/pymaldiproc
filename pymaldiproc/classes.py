@@ -13,12 +13,13 @@ from pybaselines.morphological import tophat
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
 from icoshift import icoshift
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 # Barebones class to hold basic MALDI spectrum data.
 class OpenMALDISpectrum(object):
-    # TODO: add support for ion mobility array
-    def __init__(self, pyteomics_dict, filename, include_mobility=False):
+    def __init__(self, pyteomics_dict, filename):
         self.source = filename
         self.name = None
         self.uuid = str(uuid4())
@@ -281,8 +282,13 @@ class OpenMALDISpectrum(object):
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
             self.data_processing['peak picking']['upper peak width'] = np.max(widths)
 
+        gc.collect()
+
     def plot_spectrum(self):
-        pass
+        spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                                    'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
+        fig = sns.lineplot(data=spectrum_df, x='m/z', y='Intensity')
+        plt.show()
 
 
 class PMPTsfSpectrum(TsfSpectrum):
@@ -520,8 +526,13 @@ class PMPTsfSpectrum(TsfSpectrum):
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
             self.data_processing['peak picking']['upper peak width'] = np.max(widths)
 
+        gc.collect()
+
     def plot_spectrum(self):
-        pass
+        spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                                    'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
+        fig = sns.lineplot(data=spectrum_df, x='m/z', y='Intensity')
+        plt.show()
 
 
 class PMPTdfSpectrum(TdfSpectrum):
@@ -760,5 +771,10 @@ class PMPTdfSpectrum(TdfSpectrum):
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
             self.data_processing['peak picking']['upper peak width'] = np.max(widths)
 
+        gc.collect()
+
     def plot_spectrum(self):
-        pass
+        spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                                    'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
+        fig = sns.lineplot(data=spectrum_df, x='m/z', y='Intensity')
+        plt.show()
