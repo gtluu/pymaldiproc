@@ -81,10 +81,10 @@ feature_matrix = get_feature_matrix(peaks)
 export_feature_matrix(feature_matrix, 'feature_matrix.csv')
 ```
 
-#### Using the Example Dashboard
+#### Using the pyMALDIproc Dashboard
 
 Run the following command with the ```pymaldiproc``` venv activated.
 ```
-python /path/to/pymaldiproc/example_dashboard.py
+python [path to pymaldiproc]/dashboard.py
 ```
 The dashboard will be available at ```https://localhost:8050```.
