@@ -15,7 +15,6 @@ UPLOAD_DIR = 'data'
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
-
 # Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
 app = DashProxy(prevent_initial_callbacks=True, transforms=[MultiplexerTransform(), ServersideOutputTransform()])
 app.layout = get_dashboard_layout()
@@ -140,22 +139,31 @@ def peak_picking_button(n_clicks, value):
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-# TODO: add a button and callback to remove peak picking
+@app.callback([Output('spectrum', 'children'),
+               Output('store_plot', 'data')],
+              Input('undo_peak_picking', 'n_clicks'),
+              State('spectrum_id', 'value'))
+def undo_peak_picking(n_clicks, value):
+    global INDEXED_DATA
+    INDEXED_DATA[value].peak_picked_mz_array = None
+    INDEXED_DATA[value].peak_picked_intensity_array = None
+    del INDEXED_DATA[value].data_processing['peak picking']
+    gc.collect()
+    fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
+    return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
 @app.callback(Output('peak_list', 'data'),
-              Input('export_current_peak_list', 'n_clicks'),
+              Input('export_peak_list', 'n_clicks'),
               State('spectrum_id', 'value'))
 def export_peak_list(n_clicks, value):
     global INDEXED_DATA
-    if INDEXED_DATA[value].peak_picked_mz_array is not None and \
-            INDEXED_DATA[value].peak_picked_intensity_array is not None:
-        spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
-                                         'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
-    else:
-        # TODO: add message that says no centroided peak list found
-        spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].preprocessed_mz_array),
-                                         'Intensity': copy.deepcopy(INDEXED_DATA[value].preprocessed_intensity_array)})
+    if INDEXED_DATA[value].peak_picked_mz_array is None and INDEXED_DATA[value].peak_picked_intensity_array is None:
+        INDEXED_DATA[value].peak_picking()
+    spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
+                                     'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
     return dcc.send_data_frame(spectrum_df.to_csv, value + '|peak_list.csv', index=False)
 
 

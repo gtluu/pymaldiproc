@@ -45,7 +45,7 @@ def get_dashboard_layout():
             id='spectrum',
             className='row'
         ),
-        dcc.Loading(dcc.Store(id='store_plot'))  # TODO: add code to delete dcc.Stores when tab closes
+        dcc.Loading(dcc.Store(id='store_plot'))
     ])
     return dashboard_layout
 
@@ -77,9 +77,10 @@ def get_preprocessing_layout():
             html.Button('Remove Baseline', id='remove_baseline'),
             html.Button('Normalize Intensity', id='normalize_intensity'),
             html.Button('Bin Spectrum', id='bin_spectrum'),
-            html.Button('Peak Picking', id='peak_picking'),
-            html.Button('Export Current Peak List', id='export_current_peak_list'),
+            html.Button('Label Peaks', id='peak_picking'),
+            html.Button('Export Peak List from Labeled Peaks', id='export_peak_list'),
             html.Button('Undo Preprocessing', id='undo_preprocessing'),
+            html.Button('Undo Peak Labeling', id='undo_peak_picking'),
             dcc.Download(id='peak_list')
         ]
     )
