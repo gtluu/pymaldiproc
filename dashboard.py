@@ -44,6 +44,8 @@ def upload_data(list_of_contents, list_of_filenames):
 def plot_spectrum(value):
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -55,6 +57,8 @@ def trim_spectrum_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].trim_spectrum(100, 2000)
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -66,6 +70,8 @@ def transform_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].transform_intensity()
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -77,6 +83,8 @@ def smooth_baseline_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].smooth_baseline()
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -88,6 +96,8 @@ def remove_baseline_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].remove_baseline()
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -99,6 +109,8 @@ def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].normalize_intensity()
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -110,6 +122,8 @@ def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].bin_spectrum(5000, 100, 2000)
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -121,6 +135,8 @@ def peak_picking_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].peak_picking()
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -151,6 +167,8 @@ def undo_preprocessing(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].undo_all_processing()
     fig = get_spectrum(INDEXED_DATA[value])
+    for filename in os.listdir('file_system_backend'):
+        os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 

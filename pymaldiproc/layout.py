@@ -45,8 +45,7 @@ def get_dashboard_layout():
             id='spectrum',
             className='row'
         ),
-        dcc.Loading(dcc.Store(id='store_data')),
-        dcc.Loading(dcc.Store(id='store_plot'))
+        dcc.Loading(dcc.Store(id='store_plot'))  # TODO: add code to delete dcc.Stores when tab closes
     ])
     return dashboard_layout
 
