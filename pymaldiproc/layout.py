@@ -107,8 +107,14 @@ def get_spectrum(spectrum):
 
     fig = px.line(data_frame=spectrum_df,
                   x='m/z',
-                  y='Intensity')
+                  y='Intensity',
+                  hover_data={'m/z': ':.4f',
+                              'Intensity': ':.1f'})
     fig.update_layout(xaxis_tickformat='d',
                       yaxis_tickformat='~e')
+
+    # TODO: add code to add peak labels
+    if spectrum.peak_picked_mz_array is not None and spectrum.peak_picked_intensity_array is not None:
+        pass
 
     return [get_spectrum_plot_layout(fig)]

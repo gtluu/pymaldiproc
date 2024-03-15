@@ -108,6 +108,9 @@ def peak_picking_button(n_clicks, value):
     return get_spectrum(INDEXED_DATA[value])
 
 
+# TODO: add a button and callback to remove peak picking
+
+
 @app.callback(Output('peak_list', 'data'),
               Input('export_current_peak_list', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -122,6 +125,15 @@ def export_peak_list(n_clicks, value):
         spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].preprocessed_mz_array),
                                          'Intensity': copy.deepcopy(INDEXED_DATA[value].preprocessed_intensity_array)})
     return dcc.send_data_frame(spectrum_df.to_csv, value + '|peak_list.csv', index=False)
+
+
+@app.callback(Output('spectrum', 'children'),
+              Input('undo_preprocessing', 'n_clicks'),
+              State('spectrum_id', 'value'))
+def undo_preprocessing(n_clicks, value):
+    global INDEXED_DATA
+    INDEXED_DATA[value].undo_all_processing()
+    return get_spectrum(INDEXED_DATA[value])
 
 
 if __name__ == '__main__':

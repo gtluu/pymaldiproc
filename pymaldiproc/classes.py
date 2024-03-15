@@ -284,6 +284,18 @@ class OpenMALDISpectrum(object):
 
         gc.collect()
 
+    def undo_all_processing(self):
+        self.preprocessed_mz_array = None
+        self.preprocessed_intensity_array = None
+        self.peak_picked_mz_array = None
+        self.peak_picked_intensity_array = None
+        self.data_processing = None
+        gc.collect()
+        self.preprocessed_mz_array = copy.deepcopy(self.mz_array)
+        self.preprocessed_intensity_array = copy.deepcopy(self.intensity_array)
+        self.data_processing = {}
+        gc.collect()
+
     def plot_spectrum(self):
         spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
                                     'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
