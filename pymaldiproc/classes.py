@@ -7,6 +7,7 @@ from uuid import uuid4
 from pyTDFSDK.classes import TsfSpectrum, TdfSpectrum
 from functools import reduce
 from scipy.signal import savgol_filter, find_peaks, find_peaks_cwt, peak_widths
+from scipy.stats import median_abs_deviation
 from pyMSpec.smoothing import sg_smooth, apodization, rebin, fast_change, median
 from pybaselines.smooth import snip, noise_median
 from pybaselines.morphological import tophat
@@ -216,7 +217,12 @@ class PMPMethods(object):
 
         self.data_processing['peak picking'] = {'method': method}
         if method == 'locmax':
-            peak_indices, peak_properties = find_peaks(copy.deepcopy(self.preprocessed_intensity_array))
+            #print(np.mean(self.preprocessed_intensity_array))
+            #print(np.median(self.preprocessed_intensity_array))
+            #print(median_abs_deviation(self.preprocessed_intensity_array))
+            peak_indices, peak_properties = find_peaks(copy.deepcopy(self.preprocessed_intensity_array),
+                                                       height=np.mean(self.preprocessed_intensity_array) * snr)
+            self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
         elif method == 'cwt':
@@ -228,6 +234,7 @@ class PMPMethods(object):
                 widths_step = ((2 * np.mean(estimated_widths)) - np.min(estimated_widths)) / 10
                 widths = np.arange(widths_start, widths_stop, widths_step)
             peak_indices = find_peaks_cwt(copy.deepcopy(self.preprocessed_intensity_array), widths, min_snr=snr)
+            self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
@@ -240,6 +247,7 @@ class PMPMethods(object):
         self.preprocessed_intensity_array = None
         self.peak_picked_mz_array = None
         self.peak_picked_intensity_array = None
+        self.peak_picking_indices = None
         self.data_processing = None
         gc.collect()
         self.preprocessed_mz_array = copy.deepcopy(self.mz_array)
@@ -270,6 +278,7 @@ class OpenMALDISpectrum(PMPMethods):
         self.preprocessed_intensity_array = None
         self.peak_picked_mz_array = None
         self.peak_picked_intensity_array = None
+        self.peak_picking_indices = None
         self.data_processing = {}
 
         self.parse_pyteomics_dict(pyteomics_dict)
@@ -317,6 +326,7 @@ class PMPTsfSpectrum(TsfSpectrum, PMPMethods):
         self.preprocessed_intensity_array = copy.deepcopy(self.intensity_array)
         self.peak_picked_mz_array = None
         self.peak_picked_intensity_array = None
+        self.peak_picking_indices = None
         self.data_processing = {}
 
         self.get_spectrum_metadata()
@@ -339,6 +349,7 @@ class PMPTdfSpectrum(TdfSpectrum, PMPMethods):
         self.preprocessed_intensity_array = copy.deepcopy(self.intensity_array)
         self.peak_picked_mz_array = None
         self.peak_picked_intensity_array = None
+        self.peak_picking_indices = None
         self.data_processing = {}
 
         self.get_spectrum_metadata()

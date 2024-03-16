@@ -104,15 +104,28 @@ def get_dropdown_layout(data):
     return dropdown + get_preprocessing_layout()
 
 
-def get_spectrum(spectrum):
+def get_spectrum(spectrum, label_peaks=False):
     spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
                                 'Intensity': copy.deepcopy(spectrum.preprocessed_intensity_array)})
 
-    fig = FigureResampler(px.line(data_frame=spectrum_df,
-                                  x='m/z',
-                                  y='Intensity',
-                                  hover_data={'m/z': ':.4f',
-                                              'Intensity': ':.1f'}))
+    if label_peaks:
+        labels = copy.deepcopy(np.round(copy.deepcopy(spectrum.preprocessed_mz_array), decimals=4).astype(str))
+        mask = np.ones(labels.size, dtype=bool)
+        mask[spectrum.peak_picking_indices] = False
+        labels[mask] = ''
+        fig = FigureResampler(px.line(data_frame=spectrum_df,
+                                      x='m/z',
+                                      y='Intensity',
+                                      hover_data={'m/z': ':.4f',
+                                                  'Intensity': ':.1f'},
+                                      text=labels))
+        fig.update_traces(textposition='top center')
+    else:
+        fig = FigureResampler(px.line(data_frame=spectrum_df,
+                                      x='m/z',
+                                      y='Intensity',
+                                      hover_data={'m/z': ':.4f',
+                                                  'Intensity': ':.1f'}))
     fig.update_layout(xaxis_tickformat='d',
                       yaxis_tickformat='~e')
 

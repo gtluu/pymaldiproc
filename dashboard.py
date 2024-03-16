@@ -119,7 +119,7 @@ def normalize_intensity_button(n_clicks, value):
               State('spectrum_id', 'value'))
 def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].bin_spectrum(5000, 100, 2000)
+    INDEXED_DATA[value].bin_spectrum(10000, 100, 2000)
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -133,7 +133,7 @@ def normalize_intensity_button(n_clicks, value):
 def peak_picking_button(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].peak_picking()
-    fig = get_spectrum(INDEXED_DATA[value])
+    fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
@@ -147,6 +147,7 @@ def undo_peak_picking(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].peak_picked_mz_array = None
     INDEXED_DATA[value].peak_picked_intensity_array = None
+    INDEXED_DATA[value].peak_picking_indices = None
     del INDEXED_DATA[value].data_processing['peak picking']
     gc.collect()
     fig = get_spectrum(INDEXED_DATA[value])
