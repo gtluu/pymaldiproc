@@ -217,9 +217,6 @@ class PMPMethods(object):
 
         self.data_processing['peak picking'] = {'method': method}
         if method == 'locmax':
-            #print(np.mean(self.preprocessed_intensity_array))
-            #print(np.median(self.preprocessed_intensity_array))
-            #print(median_abs_deviation(self.preprocessed_intensity_array))
             peak_indices, peak_properties = find_peaks(copy.deepcopy(self.preprocessed_intensity_array),
                                                        height=np.mean(self.preprocessed_intensity_array) * snr)
             self.peak_picking_indices = copy.deepcopy(peak_indices)
