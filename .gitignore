@@ -7,3 +7,6 @@
 /data
 /pymaldiproc.egg-info
 /file_system_backend
+geckodriver.exe
+chromedriver.exe
+msedgedriver.exe
