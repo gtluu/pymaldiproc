@@ -10,3 +10,5 @@
 geckodriver.exe
 chromedriver.exe
 msedgedriver.exe
+/build
+/dist
