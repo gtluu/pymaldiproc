@@ -12,3 +12,4 @@ chromedriver.exe
 msedgedriver.exe
 /build
 /dist
+/__pycache__
