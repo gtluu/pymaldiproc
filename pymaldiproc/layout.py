@@ -13,6 +13,7 @@ import base64
 def get_dashboard_layout():
     dashboard_layout = html.Div([
         html.Div(
+            # TODO: replace this with a button that gets a file path for input.
             dcc.Upload(
                 id='upload',
                 children=html.Div(
