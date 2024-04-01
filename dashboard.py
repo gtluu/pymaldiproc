@@ -56,11 +56,12 @@ def plot_spectrum(value):
                Input('edit_processing_parameters_cancel', 'n_clicks')],
               [State('edit_processing_parameters_modal', 'is_open')])
 def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n_clicks_cancel, is_open):
+    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
     if n_clicks_button or n_clicks_save or n_clicks_cancel:
-        if n_clicks_save:
+        if changed_id == 'edit_processing_parameters_save.n_clicks':
             # TODO: add code to parse edited parameters.
             # TODO: need a global dict to store processing parameters; use code from flex_maldi_dda_automation config file
-            pass
+            print('save')
         return not is_open
     return is_open
 

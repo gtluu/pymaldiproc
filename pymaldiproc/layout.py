@@ -83,10 +83,10 @@ def get_preprocessing_layout():
         dbc.Modal([
             dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
             dbc.ModalBody('placeholder text'),
-            dbc.ModalFooter([
+            dbc.ModalFooter(dbc.ButtonGroup([
                 dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
                 dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
-            ])
+            ]))
         ],
         id='edit_processing_parameters_modal',
         is_open=False),
