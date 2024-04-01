@@ -61,11 +61,6 @@ def get_dashboard_layout():
 
             dcc.Loading(
                 dcc.Store(id='store_plot')
-            ),
-
-            html.Div(
-                id='dummy',
-                style={'display': 'none'}
             )
         ]
     )
@@ -563,20 +558,33 @@ def get_preprocessing_layout():
             dbc.Button('Undo Preprocessing', id='undo_preprocessing', style={'margin': '5px'}),
             dbc.Button('Undo Peak Labeling', id='undo_peak_picking', style={'margin': '5px'}),
             dbc.Button('Edit Preprocessing Parameters', id='edit_preprocessing_parameters', style={'margin': '5px'}),
-            dbc.Modal([
-                dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
-                dbc.ModalBody(get_preprocessing_parameters_layout()),
-                dbc.ModalFooter(dbc.ButtonGroup([
-                    dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
-                    dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
-                ]))
-            ],
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
+                    dbc.ModalBody(get_preprocessing_parameters_layout()),
+                    dbc.ModalFooter(dbc.ButtonGroup([
+                        dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
+                        dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
+                    ]))
+                ],
                 id='edit_processing_parameters_modal',
                 size='lg',
                 backdrop='static',
                 scrollable=True,
                 centered=True,
-                is_open=False),
+                is_open=False
+            ),
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing parameters have been saved.')),
+                    dbc.ModalFooter(dbc.Button('Close',
+                                               id='edit_processing_parameters_modal_saved_close',
+                                               className='ms-auto'))
+                ],
+                id='edit_processing_parameters_modal_saved',
+                centered=True,
+                is_open=False
+            ),
             dcc.Download(id='peak_list')
         ]
     )

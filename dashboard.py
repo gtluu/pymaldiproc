@@ -54,7 +54,7 @@ def plot_spectrum(value):
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('edit_processing_parameters_save', 'n_clicks'),
                Input('edit_processing_parameters_cancel', 'n_clicks')],
-              [State('edit_processing_parameters_modal', 'is_open')])
+              State('edit_processing_parameters_modal', 'is_open'))
 def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n_clicks_cancel, is_open):
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
     if n_clicks_button or n_clicks_save or n_clicks_cancel:
@@ -63,6 +63,16 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n
             # TODO: need a global dict to store processing parameters; use code from flex_maldi_dda_automation config file
             # TODO: spawn a 2nd modal to confirm changes were saved message
             print('save')
+        return not is_open
+    return is_open
+
+
+@app.callback(Output('edit_processing_parameters_modal_saved', 'is_open'),
+              [Input('edit_processing_parameters_save', 'n_clicks'),
+               Input('edit_processing_parameters_modal_saved_close', 'n_clicks')],
+              State('edit_processing_parameters_modal_saved', 'is_open'))
+def toggle_edit_processing_parameters_saved_modal(n_clicks_save, n_clicks_close, is_open):
+    if n_clicks_save or n_clicks_close:
         return not is_open
     return is_open
 
