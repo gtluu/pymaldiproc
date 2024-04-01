@@ -222,6 +222,7 @@ class PMPMethods(object):
             self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
+            self.data_processing['peak picking']['signal to noise ratio'] = snr
         elif method == 'cwt':
             # estimate peak widths if necessary
             if widths is None:
@@ -234,6 +235,7 @@ class PMPMethods(object):
             self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
+            self.data_processing['peak picking']['signal to noise ratio'] = snr
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
             self.data_processing['peak picking']['upper peak width'] = np.max(widths)
 

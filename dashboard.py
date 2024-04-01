@@ -7,9 +7,51 @@ from dash import Dash, dcc, html, State, callback_context, no_update
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
 import dash_bootstrap_components as dbc
 import base64
+import configparser
 
 # will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
+# default processing parameters from config file
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), 'etc', 'preprocessing.cfg'))
+PREPROCESSING_PARAMS = {'trim_spectrum_lower_mass_range': int(config['trim_spectrum']['lower_mass_range']),
+                        'trim_spectrum_upper_mass_range': int(config['trim_spectrum']['upper_mass_range']),
+                        'transform_intensity_method': config['transform_intensity']['method'],
+                        'smooth_baseline_method': config['smooth_baseline']['method'],
+                        'smooth_baseline_window_length': int(config['smooth_baseline']['window_length']),
+                        'smooth_baseline_polyorder': int(config['smooth_baseline']['polyorder']),
+                        'smooth_baseline_delta_mz': float(config['smooth_baseline']['delta_mz']),
+                        'smooth_baseline_diff_thresh': float(config['smooth_baseline']['diff_thresh']),
+                        'remove_baseline_method': config['remove_baseline']['method'],
+                        'remove_baseline_min_half_window': int(config['remove_baseline']['min_half_window']),
+                        'remove_baseline_max_half_window': int(config['remove_baseline']['max_half_window']),
+                        'remove_baseline_decreasing': config['remove_baseline'].getboolean('decreasing'),
+                        'remove_baseline_smooth_half_window': None,
+                        'remove_baseline_filter_order': int(config['remove_baseline']['filter_order']),
+                        'remove_baseline_sigma': None,
+                        'remove_baseline_increment': int(config['remove_baseline']['increment']),
+                        'remove_baseline_max_hits': int(config['remove_baseline']['max_hits']),
+                        'remove_baseline_window_tol': float(config['remove_baseline']['window_tol']),
+                        'remove_baseline_lambda_': int(config['remove_baseline']['lambda_']),
+                        'remove_baseline_porder': int(config['remove_baseline']['porder']),
+                        'remove_baseline_repetition': None,
+                        'remove_baseline_degree': int(config['remove_baseline']['degree']),
+                        'remove_baseline_gradient': float(config['remove_baseline']['gradient']),
+                        'normalize_intensity_method': config['normalize_intensity']['method'],
+                        'bin_spectrum_n_bins': int(config['bin_spectrum']['n_bins']),
+                        'bin_spectrum_lower_mass_range': int(config['bin_spectrum']['lower_mass_range']),
+                        'bin_spectrum_upper_mass_range': int(config['bin_spectrum']['upper_mass_range']),
+                        'peak_picking_method': config['peak_picking']['method'],
+                        'peak_picking_snr': int(config['peak_picking']['snr']),
+                        'peak_picking_widths': None}
+if config['remove_baseline']['smooth_half_window'] != 'None':
+    PREPROCESSING_PARAMS['remove_baseline_smooth_half_window'] = int(config['remove_baseline']['smooth_half_window'])
+if config['remove_baseline']['sigma'] != 'None':
+    PREPROCESSING_PARAMS['remove_baseline_sigma'] = float(config['rmeove_baseline']['sigma'])
+if config['remove_baseline']['repetition'] != 'None':
+    PREPROCESSING_PARAMS['remove_baseline_repetition'] = int(config['remove_baseline']['repetition'])
+if config['peak_picking']['widths'] != 'None':
+    PREPROCESSING_PARAMS['peak_picking_widths'] = int(config['peak_picking']['widths'])
 # relative path for directory where uploaded data is stored
 UPLOAD_DIR = 'data'
 if not os.path.exists(UPLOAD_DIR):
@@ -19,7 +61,7 @@ if not os.path.exists(UPLOAD_DIR):
 app = DashProxy(prevent_initial_callbacks=True,
                 transforms=[MultiplexerTransform(), ServersideOutputTransform()],
                 external_stylesheets=[dbc.themes.BOOTSTRAP])
-app.layout = get_dashboard_layout()
+app.layout = get_dashboard_layout(PREPROCESSING_PARAMS)
 
 
 @app.callback(Output('dropdown', 'children'),
@@ -61,7 +103,6 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n
         if changed_id == 'edit_processing_parameters_save.n_clicks':
             # TODO: add code to parse edited parameters.
             # TODO: need a global dict to store processing parameters; use code from flex_maldi_dda_automation config file
-            # TODO: spawn a 2nd modal to confirm changes were saved message
             print('save')
         return not is_open
     return is_open
@@ -81,16 +122,17 @@ def toggle_edit_processing_parameters_saved_modal(n_clicks_save, n_clicks_close,
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('smooth_baseline_method', 'value')])
 def toggle_smooth_baseline_method_parameters(n_clicks, value):
+    global PREPROCESSING_PARAMS
     if value == 'SavitzkyGolay':
-        return get_smooth_baseline_savitzky_golay_parameters()
+        return get_smooth_baseline_savitzky_golay_parameters(PREPROCESSING_PARAMS)
     elif value == 'apodization':
-        return get_smooth_baseline_apodization_parameters()
+        return get_smooth_baseline_apodization_parameters(PREPROCESSING_PARAMS)
     elif value == 'rebin':
-        return get_smooth_baseline_rebin_parameters()
+        return get_smooth_baseline_rebin_parameters(PREPROCESSING_PARAMS)
     elif value == 'fast_change':
-        return get_smooth_baseline_fast_change_parameters()
+        return get_smooth_baseline_fast_change_parameters(PREPROCESSING_PARAMS)
     elif value == 'median':
-        return get_smooth_baseline_median_parameters()
+        return get_smooth_baseline_median_parameters(PREPROCESSING_PARAMS)
 
 
 @app.callback(Output('remove_baseline_method_parameters', 'children'),
@@ -98,17 +140,17 @@ def toggle_smooth_baseline_method_parameters(n_clicks, value):
                Input('remove_baseline_method', 'value')])
 def toggle_remove_baseline_method_parameters(n_clicks, value):
     if value == 'SNIP':
-        return get_remove_baseline_snip_parameters()
+        return get_remove_baseline_snip_parameters(PREPROCESSING_PARAMS)
     elif value == 'TopHat':
-        return get_remove_baseline_tophat_parameters()
+        return get_remove_baseline_tophat_parameters(PREPROCESSING_PARAMS)
     elif value == 'Median':
-        return get_remove_baseline_median_parameters()
+        return get_remove_baseline_median_parameters(PREPROCESSING_PARAMS)
     elif value == 'ZhangFit':
-        return get_remove_baseline_zhangfit_parameters()
+        return get_remove_baseline_zhangfit_parameters(PREPROCESSING_PARAMS)
     elif value == 'ModPoly':
-        return get_remove_baseline_modpoly_parameters()
+        return get_remove_baseline_modpoly_parameters(PREPROCESSING_PARAMS)
     elif value == 'IModPoly':
-        return get_remove_baseline_imodpoly_parameters()
+        return get_remove_baseline_imodpoly_parameters(PREPROCESSING_PARAMS)
 
 
 @app.callback(Output('peak_picking_method_parameters', 'children'),
@@ -116,9 +158,9 @@ def toggle_remove_baseline_method_parameters(n_clicks, value):
                Input('peak_picking_method', 'value')])
 def toggle_peak_picking_method_parameters(n_clicks, value):
     if value == 'locmax':
-        return get_peak_picking_locmax_parameters()
+        return get_peak_picking_locmax_parameters(PREPROCESSING_PARAMS)
     elif value == 'cwt':
-        return get_peak_picking_cwt_parameters()
+        return get_peak_picking_cwt_parameters(PREPROCESSING_PARAMS)
 
 
 @app.callback([Output('spectrum', 'children'),
