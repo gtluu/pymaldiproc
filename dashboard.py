@@ -61,6 +61,7 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n
         if changed_id == 'edit_processing_parameters_save.n_clicks':
             # TODO: add code to parse edited parameters.
             # TODO: need a global dict to store processing parameters; use code from flex_maldi_dda_automation config file
+            # TODO: spawn a 2nd modal to confirm changes were saved message
             print('save')
         return not is_open
     return is_open

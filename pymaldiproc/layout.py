@@ -89,6 +89,10 @@ def get_preprocessing_layout():
             ]))
         ],
         id='edit_processing_parameters_modal',
+        size='lg',
+        backdrop='static',
+        scrollable=True,
+        centered=True,
         is_open=False),
         dcc.Download(id='peak_list')
     ])
