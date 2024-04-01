@@ -61,6 +61,11 @@ def get_dashboard_layout():
 
             dcc.Loading(
                 dcc.Store(id='store_plot')
+            ),
+
+            html.Div(
+                id='dummy',
+                style={'display': 'none'}
             )
         ]
     )
@@ -81,10 +86,304 @@ def get_spectrum_plot_layout(fig):
     return spectrum_plot
 
 
+def get_smooth_baseline_savitzky_golay_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Window Length'),
+                dbc.Input(id='smooth_baseline_window_length')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Polyorder'),
+                dbc.Input(id='smooth_baseline_polyorder')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_smooth_baseline_apodization_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Window Length'),
+                dbc.Input(id='smooth_baseline_window_length')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_smooth_baseline_rebin_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Delta m/z'),
+                dbc.Input(id='smooth_baseline_delta_mz')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_smooth_baseline_fast_change_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Difference Threshold'),
+                dbc.Input(id='smooth_baseline_diff_thresh')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_smooth_baseline_median_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Window Length'),
+                dbc.Input(id='smooth_baseline_window_length')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_remove_baseline_snip_parameters():
+    return [
+        html.P('Use Decreasing Iterative Window Sizes', style={'margin': '10px'}),
+        dcc.RadioItems(
+            id='remove_baseline_decreasing',
+            options=[
+                {'label': 'True', 'value': True},
+                {'label': 'False', 'value': False}
+            ],
+            value=True,
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+            inputStyle={'margin-right': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Maximum Half Window'),
+                dbc.Input(id='remove_baseline_max_half_window')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Smoothing Half Window'),
+                dbc.Input(id='remove_baseline_smooth_half_window')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Filter Order'),
+                dbc.Input(id='remove_baseline_filter_order')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_remove_baseline_tophat_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Minimum Half Window'),
+                dbc.Input(id='remove_baseline_max_half_window')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Maximum Half Window'),
+                dbc.Input(id='remove_baseline_max_half_window')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Increment'),
+                dbc.Input(id='remove_baseline_increment')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Max Hits'),
+                dbc.Input(id='remove_baseline_max_hits')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Window Tolerance'),
+                dbc.Input(id='remove_baseline_window_tolerance')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_remove_baseline_median_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Maximum Half Window'),
+                dbc.Input(id='remove_baseline_max_half_window')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Smoothing Half Window'),
+                dbc.Input(id='remove_baseline_smooth_half_window')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Sigma'),
+                dbc.Input(id='remove_baseline_sigma')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_remove_baseline_zhangfit_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Lambda'),
+                dbc.Input(id='remove_baseline_lambda')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('p-order'),
+                dbc.Input(id='remove_baseline_porder')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Repetition'),
+                dbc.Input(id='remove_baseline_repetition')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_remove_baseline_modpoly_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Degree'),
+                dbc.Input(id='remove_baseline_degree')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Repetition'),
+                dbc.Input(id='remove_baseline_repetition')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Gradient'),
+                dbc.Input(id='remove_baseline_gradient')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_remove_baseline_imodpoly_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Degree'),
+                dbc.Input(id='remove_baseline_degree')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Repetition'),
+                dbc.Input(id='remove_baseline_repetition')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Gradient'),
+                dbc.Input(id='remove_baseline_gradient')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_peak_picking_locmax_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Signal-to-Noise Ratio'),
+                dbc.Input(id='peak_picking_snr')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
+def get_peak_picking_cwt_parameters():
+    return [
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Signal-to-Noise Ratio'),
+                dbc.Input(id='peak_picking_snr')
+            ],
+            style={'margin': '10px'}
+        ),
+        dbc.InputGroup(
+            [
+                dbc.InputGroupText('Widths (Optional)'),
+                dbc.Input(id='peak_picking_widths')
+            ],
+            style={'margin': '10px'}
+        )
+    ]
+
+
 def get_preprocessing_parameters_layout():
+    # TODO: change RadioItems to dbc.ButtonGroups?
     trim_spectrum_parameters = html.Div(
         [
-            html.H5('Spectrum Trimming Parameters')
+            html.H5('Spectrum Trimming Parameters'),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Lower Mass Range'),
+                    dbc.Input(id='trim_spectrum_lower_mass_range')
+                ],
+                style={'margin': '10px'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Upper Mass Range'),
+                    dbc.Input(id='trim_spectrum_upper_mass_range')
+                ],
+                style={'margin': '10px'}
+            )
         ],
         id='trim_spectrum_parameters',
         style={'margin': '20px'}
@@ -127,6 +426,10 @@ def get_preprocessing_parameters_layout():
                 value='SavitzkyGolay',
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
+            ),
+            html.Div(
+                id='smooth_baseline_method_parameters',
+                children=[]
             )
         ],
         id='smooth_baseline_parameters',
@@ -150,6 +453,10 @@ def get_preprocessing_parameters_layout():
                 value='SNIP',
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
+            ),
+            html.Div(
+                id='remove_baseline_method_parameters',
+                children=[]
             )
         ],
         id='remove_baseline_parameters',
@@ -179,7 +486,28 @@ def get_preprocessing_parameters_layout():
 
     bin_spectrum_parameters = html.Div(
         [
-            html.H5('Spectrum Binning Parameters')
+            html.H5('Spectrum Binning Parameters'),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Number of Bins'),
+                    dbc.Input(id='bin_spectrum_n_bins')
+                ],
+                style={'margin': '10px'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Lower Mass Range'),
+                    dbc.Input(id='bin_spectrum_lower_mass_range')
+                ],
+                style={'margin': '10px'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Upper Mass Range'),
+                    dbc.Input(id='bin_spectrum_upper_mass_range')
+                ],
+                style={'margin': '10px'}
+            )
         ],
         id='bin_spectrum_parameters',
         style={'margin': '20px'}
@@ -192,12 +520,16 @@ def get_preprocessing_parameters_layout():
             dcc.RadioItems(
                 id='peak_picking_method',
                 options=[
-                    {'label': 'LocMax', 'value': 'locmax'},
-                    {'label': 'CWT', 'value': 'cwt'}
+                    {'label': 'Local Maxima', 'value': 'locmax'},
+                    {'label': 'Continuous Wavelet Transform', 'value': 'cwt'}
                 ],
                 value='locmax',
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
+            ),
+            html.Div(
+                id='peak_picking_method_parameters',
+                children=[]
             )
         ],
         id='peak_picking_parameters',

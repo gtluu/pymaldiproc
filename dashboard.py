@@ -67,6 +67,50 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n
     return is_open
 
 
+@app.callback(Output('smooth_baseline_method_parameters', 'children'),
+              [Input('edit_preprocessing_parameters', 'n_clicks'),
+               Input('smooth_baseline_method', 'value')])
+def toggle_smooth_baseline_method_parameters(n_clicks, value):
+    if value == 'SavitzkyGolay':
+        return get_smooth_baseline_savitzky_golay_parameters()
+    elif value == 'apodization':
+        return get_smooth_baseline_apodization_parameters()
+    elif value == 'rebin':
+        return get_smooth_baseline_rebin_parameters()
+    elif value == 'fast_change':
+        return get_smooth_baseline_fast_change_parameters()
+    elif value == 'median':
+        return get_smooth_baseline_median_parameters()
+
+
+@app.callback(Output('remove_baseline_method_parameters', 'children'),
+              [Input('edit_preprocessing_parameters', 'n_clicks'),
+               Input('remove_baseline_method', 'value')])
+def toggle_remove_baseline_method_parameters(n_clicks, value):
+    if value == 'SNIP':
+        return get_remove_baseline_snip_parameters()
+    elif value == 'TopHat':
+        return get_remove_baseline_tophat_parameters()
+    elif value == 'Median':
+        return get_remove_baseline_median_parameters()
+    elif value == 'ZhangFit':
+        return get_remove_baseline_zhangfit_parameters()
+    elif value == 'ModPoly':
+        return get_remove_baseline_modpoly_parameters()
+    elif value == 'IModPoly':
+        return get_remove_baseline_imodpoly_parameters()
+
+
+@app.callback(Output('peak_picking_method_parameters', 'children'),
+              [Input('edit_preprocessing_parameters', 'n_clicks'),
+               Input('peak_picking_method', 'value')])
+def toggle_peak_picking_method_parameters(n_clicks, value):
+    if value == 'locmax':
+        return get_peak_picking_locmax_parameters()
+    elif value == 'cwt':
+        return get_peak_picking_cwt_parameters()
+
+
 @app.callback([Output('spectrum', 'children'),
                Output('store_plot', 'data')],
               Input('trim_spectrum', 'n_clicks'),
