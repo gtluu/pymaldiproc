@@ -65,6 +65,110 @@ def get_spectrum_plot_layout(fig):
     return spectrum_plot
 
 
+def get_preprocessing_parameters_layout():
+    trim_spectrum_parameters = html.Div([
+        html.H5('Spectrum Trimming Parameters')
+    ], style={'margin': '20px'})
+
+    transform_intensity_parameters = html.Div([
+        html.H5('Intensity Transformation Parameters'),
+        html.P('Method'),
+        dcc.RadioItems(
+            id='transform_options',
+            options=[
+                {'label': 'Sqrt', 'value': 'sqrt'},
+                {'label': 'Natural Log', 'value': 'ln'},
+                {'label': 'Log Base 2', 'value': 'log2'},
+                {'label': 'Log Base 10', 'value': 'log10'}
+            ],
+            value='sqrt',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+            inputStyle={'margin-right': '10px'}
+        )
+    ], style={'margin': '20px'})
+
+    smooth_baseline_parameters = html.Div([
+        html.H5('Baseline Smoothing Parameters'),
+        html.P('Method'),
+        dcc.RadioItems(
+            id='smooth_options',
+            options=[
+                {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
+                {'label': 'Apodization', 'value': 'apodization'},
+                {'label': 'Rebin', 'value': 'rebin'},
+                {'label': 'Fast Change', 'value': 'fast_change'},
+                {'label': 'Median', 'value': 'median'}
+            ],
+            value='SavitzkyGolay',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+            inputStyle={'margin-right': '10px'}
+        )
+    ], style={'margin': '20px'})
+
+    remove_baseline_parameters = html.Div([
+        html.H5('Baseline Removal Parameters'),
+        html.P('Method'),
+        dcc.RadioItems(
+            id='remove_options',
+            options=[
+                {'label': 'SNIP', 'value': 'SNIP'},
+                {'label': 'Top Hat', 'value': 'TopHat'},
+                {'label': 'Median', 'value': 'Median'},
+                {'label': 'Zhang Fit', 'value': 'ZhangFit'},
+                {'label': 'ModPoly', 'value': 'ModPoly'},
+                {'label': 'IModPoly', 'value': 'IModPoly'}
+            ],
+            value='SNIP',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+            inputStyle={'margin-right': '10px'}
+        )
+    ], style={'margin': '20px'})
+
+    normalize_intensity_parameters = html.Div([
+        html.H5('Intensity Normalization Parameters'),
+        html.P('Method'),
+        dcc.RadioItems(
+            id='normalize_options',
+            options=[
+                {'label': 'TIC', 'value': 'tic'},
+                {'label': 'RMS', 'value': 'rms'},
+                {'label': 'MAD', 'value': 'mad'},
+                {'label': 'Sqrt', 'value': 'sqrt'}
+            ],
+            value='tic',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+            inputStyle={'margin-right': '10px'}
+        )
+    ], style={'margin': '20px'})
+
+    bin_spectrum_parameters = html.Div([
+        html.H5('Spectrum Binning Parameters')
+    ], style={'margin': '20px'})
+
+    peak_picking_parameters = html.Div([
+        html.H5('Peak Picking Parameters'),
+        html.P('Method'),
+        dcc.RadioItems(
+            id='remove_options',
+            options=[
+                {'label': 'LocMax', 'value': 'locmax'},
+                {'label': 'CWT', 'value': 'cwt'}
+            ],
+            value='locmax',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+            inputStyle={'margin-right': '10px'}
+        )
+    ], style={'margin': '20px'})
+
+    return [trim_spectrum_parameters,
+            transform_intensity_parameters,
+            smooth_baseline_parameters,
+            remove_baseline_parameters,
+            normalize_intensity_parameters,
+            bin_spectrum_parameters,
+            peak_picking_parameters]
+
+
 def get_preprocessing_layout():
     preprocessing_title = html.Div(html.H1('Preprocessing', className='row'))
 
@@ -82,7 +186,7 @@ def get_preprocessing_layout():
         dbc.Button('Edit Preprocessing Parameters', id='edit_preprocessing_parameters', style={'margin': '5px'}),
         dbc.Modal([
             dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
-            dbc.ModalBody('placeholder text'),
+            dbc.ModalBody(get_preprocessing_parameters_layout()),
             dbc.ModalFooter(dbc.ButtonGroup([
                 dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
                 dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
@@ -97,84 +201,7 @@ def get_preprocessing_layout():
         dcc.Download(id='peak_list')
     ])
 
-    #move all into one div between buttons and spectrum
-    transform_options_div = html.Div([
-        html.H4("Transform Intensity Method:"),
-        dcc.RadioItems(
-            id='transform_options',
-            options=[
-                {'label': 'Sqrt', 'value': 'sqrt'},
-                {'label': 'Natural Log', 'value': 'ln'},
-                {'label': 'Log Base 2', 'value': 'log2'},
-                {'label': 'Log Base 10', 'value': 'log10'}
-            ],
-            value='sqrt',
-            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
-        )
-    ], style={'marginTop': '20px'})
-
-    smooth_options_div = html.Div([
-        html.H4("Smooth Baseline Method:"),
-        dcc.RadioItems(
-            id='smooth_options',
-            options=[
-                {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
-                {'label': 'Apodization', 'value': 'apodization'},
-                {'label': 'Rebin', 'value': 'rebin'},
-                {'label': 'Fast Change', 'value': 'fast_change'},
-                {'label': 'Median', 'value': 'median'}
-            ],
-            value='SavitzkyGolay',
-            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
-        )
-    ], style={'marginTop': '20px'})
-
-    remove_options_div = html.Div([
-        html.H4("Remove Baseline Method:"),
-        dcc.RadioItems(
-            id='remove_options',
-            options=[
-                {'label': 'SNIP', 'value': 'SNIP'},
-                {'label': 'Top Hat', 'value': 'TopHat'},
-                {'label': 'Median', 'value': 'Median'},
-                {'label': 'Zhang Fit', 'value': 'ZhangFit'},
-                {'label': 'ModPoly', 'value': 'ModPoly'},
-                {'label': 'IModPoly', 'value': 'IModPoly'}
-            ],
-            value='SNIP',
-            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
-        )
-    ], style={'marginTop': '20px'})
-
-    normalize_div = html.Div([
-        html.H4("Normalilze Intensity:"),
-        dcc.RadioItems(
-            id='remove_options',
-            options=[
-                {'label': 'TIC', 'value': 'tic'},
-                {'label': 'RMS', 'value': 'rms'},
-                {'label': 'MAD', 'value': 'mad'},
-                {'label': 'Sqrt', 'value': 'sqrt'}
-            ],
-            value='tic',
-            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
-        )
-    ], style={'marginTop': '20px'})
-
-    peak_picking_div = html.Div([
-        html.H4("Peak Picking:"),
-        dcc.RadioItems(
-            id='remove_options',
-            options=[
-                {'label': 'LocMax', 'value': 'locmax'},
-                {'label': 'CWT', 'value': 'cwt'}
-            ],
-            value='locmax',
-            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
-        )
-    ], style={'marginTop': '20px'})
-
-    return [preprocessing_title, preprocessing_buttons, transform_options_div, smooth_options_div, remove_options_div, normalize_div, peak_picking_div]
+    return [preprocessing_title, preprocessing_buttons]
 
 
 def get_dropdown_layout(data):
