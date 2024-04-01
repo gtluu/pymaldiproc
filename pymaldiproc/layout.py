@@ -34,20 +34,34 @@ def get_dashboard_layout():
                         'margin': '20px'
                     },
                     multiple=True
-                )
+                ),
+                id='upload_div',
             ),
 
             html.Div(
-                [
-                    html.Div(id='dropdown', className='one column')
-                ]
+                get_preprocessing_layout(),
+                id='preprocessing',
+                style={'width': '97%',
+                       'margin': '20px'}
+            ),
+
+            html.Div(
+                id='dropdown',
+                className='one column',
+                style={'width': '97%',
+                       'margin': '20px'}
             ),
 
             html.Div(
                 id='spectrum',
-                className='row'
+                className='row',
+                style={'width': '97%',
+                       'margin': '20px'}
             ),
-            dcc.Loading(dcc.Store(id='store_plot'))
+
+            dcc.Loading(
+                dcc.Store(id='store_plot')
+            )
         ]
     )
     return dashboard_layout
@@ -251,7 +265,7 @@ def get_dropdown_layout(data):
                          value=[i for i in data.keys()])
         )
     ]
-    return dropdown + get_preprocessing_layout()
+    return dropdown
 
 
 def get_spectrum(spectrum, label_peaks=False):
