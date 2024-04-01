@@ -17,7 +17,8 @@ if not os.path.exists(UPLOAD_DIR):
 
 # Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
 app = DashProxy(prevent_initial_callbacks=True,
-                transforms=[MultiplexerTransform(), ServersideOutputTransform()])
+                transforms=[MultiplexerTransform(), ServersideOutputTransform()],
+                external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = get_dashboard_layout()
 
 
