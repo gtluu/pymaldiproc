@@ -72,16 +72,18 @@ def get_preprocessing_parameters_layout():
         [
             html.H5('Spectrum Trimming Parameters')
         ],
-        style={'margin': '20px'})
+        id='trim_spectrum_parameters',
+        style={'margin': '20px'}
+    )
 
     transform_intensity_parameters = html.Div(
         [
             html.H5('Intensity Transformation Parameters'),
             html.P('Method'),
             dcc.RadioItems(
-                id='transform_options',
+                id='transform_intensity_method',
                 options=[
-                    {'label': 'Sqrt', 'value': 'sqrt'},
+                    {'label': 'Square Root', 'value': 'sqrt'},
                     {'label': 'Natural Log', 'value': 'ln'},
                     {'label': 'Log Base 2', 'value': 'log2'},
                     {'label': 'Log Base 10', 'value': 'log10'}
@@ -90,14 +92,17 @@ def get_preprocessing_parameters_layout():
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             )
-        ], style={'margin': '20px'})
+        ],
+        id='transform_intensity_parameters',
+        style={'margin': '20px'}
+    )
 
     smooth_baseline_parameters = html.Div(
         [
             html.H5('Baseline Smoothing Parameters'),
             html.P('Method'),
             dcc.RadioItems(
-                id='smooth_options',
+                id='smooth_baseline_method',
                 options=[
                     {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
                     {'label': 'Apodization', 'value': 'apodization'},
@@ -109,14 +114,17 @@ def get_preprocessing_parameters_layout():
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             )
-        ], style={'margin': '20px'})
+        ],
+        id='smooth_baseline_parameters',
+        style={'margin': '20px'}
+    )
 
     remove_baseline_parameters = html.Div(
         [
             html.H5('Baseline Removal Parameters'),
             html.P('Method'),
             dcc.RadioItems(
-                id='remove_options',
+                id='remove_baseline_method',
                 options=[
                     {'label': 'SNIP', 'value': 'SNIP'},
                     {'label': 'Top Hat', 'value': 'TopHat'},
@@ -129,14 +137,17 @@ def get_preprocessing_parameters_layout():
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             )
-        ], style={'margin': '20px'})
+        ],
+        id='remove_baseline_parameters',
+        style={'margin': '20px'}
+    )
 
     normalize_intensity_parameters = html.Div(
         [
             html.H5('Intensity Normalization Parameters'),
             html.P('Method'),
             dcc.RadioItems(
-                id='normalize_options',
+                id='normalize_intensity_method',
                 options=[
                     {'label': 'TIC', 'value': 'tic'},
                     {'label': 'RMS', 'value': 'rms'},
@@ -147,19 +158,25 @@ def get_preprocessing_parameters_layout():
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             )
-        ], style={'margin': '20px'})
+        ],
+        id='normalize_intensity_parameters',
+        style={'margin': '20px'}
+    )
 
     bin_spectrum_parameters = html.Div(
         [
             html.H5('Spectrum Binning Parameters')
-        ], style={'margin': '20px'})
+        ],
+        id='bin_spectrum_parameters',
+        style={'margin': '20px'}
+    )
 
     peak_picking_parameters = html.Div(
         [
             html.H5('Peak Picking Parameters'),
             html.P('Method'),
             dcc.RadioItems(
-                id='remove_options',
+                id='peak_picking_method',
                 options=[
                     {'label': 'LocMax', 'value': 'locmax'},
                     {'label': 'CWT', 'value': 'cwt'}
@@ -168,7 +185,10 @@ def get_preprocessing_parameters_layout():
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             )
-        ], style={'margin': '20px'})
+        ],
+        id='peak_picking_parameters',
+        style={'margin': '20px'}
+    )
 
     return [trim_spectrum_parameters,
             transform_intensity_parameters,
