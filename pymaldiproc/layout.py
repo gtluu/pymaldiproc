@@ -80,6 +80,16 @@ def get_preprocessing_layout():
         dbc.Button('Undo Preprocessing', id='undo_preprocessing', style={'margin': '5px'}),
         dbc.Button('Undo Peak Labeling', id='undo_peak_picking', style={'margin': '5px'}),
         dbc.Button('Edit Preprocessing Parameters', id='edit_preprocessing_parameters', style={'margin': '5px'}),
+        dbc.Modal([
+            dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
+            dbc.ModalBody('placeholder text'),
+            dbc.ModalFooter([
+                dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
+                dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
+            ])
+        ],
+        id='edit_processing_parameters_modal',
+        is_open=False),
         dcc.Download(id='peak_list')
     ])
 

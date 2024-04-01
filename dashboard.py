@@ -50,6 +50,21 @@ def plot_spectrum(value):
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
+@app.callback(Output('edit_processing_parameters_modal', 'is_open'),
+              [Input('edit_preprocessing_parameters', 'n_clicks'),
+               Input('edit_processing_parameters_save', 'n_clicks'),
+               Input('edit_processing_parameters_cancel', 'n_clicks')],
+              [State('edit_processing_parameters_modal', 'is_open')])
+def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n_clicks_cancel, is_open):
+    if n_clicks_button or n_clicks_save or n_clicks_cancel:
+        if n_clicks_save:
+            # TODO: add code to parse edited parameters.
+            # TODO: need a global dict to store processing parameters; use code from flex_maldi_dda_automation config file
+            pass
+        return not is_open
+    return is_open
+
+
 @app.callback([Output('spectrum', 'children'),
                Output('store_plot', 'data')],
               Input('trim_spectrum', 'n_clicks'),
