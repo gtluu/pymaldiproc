@@ -66,27 +66,100 @@ def get_spectrum_plot_layout(fig):
 
 
 def get_preprocessing_layout():
-    preprocessing_title = html.Div(
-        html.H1('Preprocessing', className='row')
-    )
+    preprocessing_title = html.Div(html.H1('Preprocessing', className='row'))
 
-    preprocessing_buttons = html.Div(
-        [
-            html.Button('Trim Spectrum', id='trim_spectrum'),
-            html.Button('Transform Intensity', id='transform_intensity'),
-            html.Button('Smooth Baseline', id='smooth_baseline'),
-            html.Button('Remove Baseline', id='remove_baseline'),
-            html.Button('Normalize Intensity', id='normalize_intensity'),
-            html.Button('Bin Spectrum', id='bin_spectrum'),
-            html.Button('Label Peaks', id='peak_picking'),
-            html.Button('Export Peak List from Labeled Peaks', id='export_peak_list'),
-            html.Button('Undo Preprocessing', id='undo_preprocessing'),
-            html.Button('Undo Peak Labeling', id='undo_peak_picking'),
-            dcc.Download(id='peak_list')
-        ]
-    )
+    preprocessing_buttons = html.Div([
+        html.Button('Trim Spectrum', id='trim_spectrum'),
+        html.Button('Transform Intensity', id='transform_intensity'),
+        html.Button('Smooth Baseline', id='smooth_baseline'),
+        html.Button('Remove Baseline', id='remove_baseline'),
+        html.Button('Normalize Intensity', id='normalize_intensity'),
+        html.Button('Bin Spectrum', id='bin_spectrum'),
+        html.Button('Label Peaks', id='peak_picking'),
+        html.Button('Export Peak List from Labeled Peaks', id='export_peak_list'),
+        html.Button('Undo Preprocessing', id='undo_preprocessing'),
+        html.Button('Undo Peak Labeling', id='undo_peak_picking'),
+        dcc.Download(id='peak_list')
+    ])
 
-    return [preprocessing_title, preprocessing_buttons]
+    #move all into one div between buttons and spectrum
+    transform_options_div = html.Div([
+        html.H4("Transform Intensity Method:"),
+        dcc.RadioItems(
+            id='transform_options',
+            options=[
+                {'label': 'Sqrt', 'value': 'sqrt'},
+                {'label': 'Natural Log', 'value': 'ln'},
+                {'label': 'Log Base 2', 'value': 'log2'},
+                {'label': 'Log Base 10', 'value': 'log10'}
+            ],
+            value='sqrt',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
+        )
+    ], style={'marginTop': '20px'})
+
+    smooth_options_div = html.Div([
+        html.H4("Smooth Baseline Method:"),
+        dcc.RadioItems(
+            id='smooth_options',
+            options=[
+                {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
+                {'label': 'Apodization', 'value': 'apodization'},
+                {'label': 'Rebin', 'value': 'rebin'},
+                {'label': 'Fast Change', 'value': 'fast_change'},
+                {'label': 'Median', 'value': 'median'}
+            ],
+            value='SavitzkyGolay',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
+        )
+    ], style={'marginTop': '20px'})
+
+    remove_options_div = html.Div([
+        html.H4("Remove Baseline Method:"),
+        dcc.RadioItems(
+            id='remove_options',
+            options=[
+                {'label': 'SNIP', 'value': 'SNIP'},
+                {'label': 'Top Hat', 'value': 'TopHat'},
+                {'label': 'Median', 'value': 'Median'},
+                {'label': 'Zhang Fit', 'value': 'ZhangFit'},
+                {'label': 'ModPoly', 'value': 'ModPoly'},
+                {'label': 'IModPoly', 'value': 'IModPoly'}
+            ],
+            value='SNIP',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
+        )
+    ], style={'marginTop': '20px'})
+
+    normalize_div = html.Div([
+        html.H4("Normalilze Intensity:"),
+        dcc.RadioItems(
+            id='remove_options',
+            options=[
+                {'label': 'TIC', 'value': 'tic'},
+                {'label': 'RMS', 'value': 'rms'},
+                {'label': 'MAD', 'value': 'mad'},
+                {'label': 'Sqrt', 'value': 'sqrt'}
+            ],
+            value='tic',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
+        )
+    ], style={'marginTop': '20px'})
+
+    peak_picking_div = html.Div([
+        html.H4("Peak Picking:"),
+        dcc.RadioItems(
+            id='remove_options',
+            options=[
+                {'label': 'LocMax', 'value': 'locmax'},
+                {'label': 'CWT', 'value': 'cwt'}
+            ],
+            value='locmax',
+            labelStyle={'display': 'inline-block', 'marginRight': '20px'}
+        )
+    ], style={'marginTop': '20px'})
+
+    return [preprocessing_title, preprocessing_buttons, transform_options_div, smooth_options_div, remove_options_div, normalize_div, peak_picking_div]
 
 
 def get_dropdown_layout(data):
