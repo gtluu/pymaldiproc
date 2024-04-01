@@ -69,16 +69,17 @@ def get_preprocessing_layout():
     preprocessing_title = html.Div(html.H1('Preprocessing', className='row'))
 
     preprocessing_buttons = html.Div([
-        html.Button('Trim Spectrum', id='trim_spectrum'),
-        html.Button('Transform Intensity', id='transform_intensity'),
-        html.Button('Smooth Baseline', id='smooth_baseline'),
-        html.Button('Remove Baseline', id='remove_baseline'),
-        html.Button('Normalize Intensity', id='normalize_intensity'),
-        html.Button('Bin Spectrum', id='bin_spectrum'),
-        html.Button('Label Peaks', id='peak_picking'),
-        html.Button('Export Peak List from Labeled Peaks', id='export_peak_list'),
-        html.Button('Undo Preprocessing', id='undo_preprocessing'),
-        html.Button('Undo Peak Labeling', id='undo_peak_picking'),
+        dbc.Button('Trim Spectrum', id='trim_spectrum', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Transform Intensity', id='transform_intensity', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Smooth Baseline', id='smooth_baseline', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Remove Baseline', id='remove_baseline', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Normalize Intensity', id='normalize_intensity', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Bin Spectrum', id='bin_spectrum', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Label Peaks', id='peak_picking', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Export Peak List from Labeled Peaks', id='export_peak_list', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Undo Preprocessing', id='undo_preprocessing', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Undo Peak Labeling', id='undo_peak_picking', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
+        dbc.Button('Edit Preprocessing Parameters', id='edit_preprocessing_parameters', style={'margin-left': '5px', 'margin-right': '5px', 'margin-top': '5px', 'margin-bottom': '5px'}),
         dcc.Download(id='peak_list')
     ])
 
