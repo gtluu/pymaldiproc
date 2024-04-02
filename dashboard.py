@@ -14,44 +14,51 @@ INDEXED_DATA = {}
 # default processing parameters from config file
 config = configparser.ConfigParser()
 config.read(os.path.join(os.path.dirname(__file__), 'etc', 'preprocessing.cfg'))
-PREPROCESSING_PARAMS = {'trim_spectrum_lower_mass_range': int(config['trim_spectrum']['lower_mass_range']),
-                        'trim_spectrum_upper_mass_range': int(config['trim_spectrum']['upper_mass_range']),
-                        'transform_intensity_method': config['transform_intensity']['method'],
-                        'smooth_baseline_method': config['smooth_baseline']['method'],
-                        'smooth_baseline_window_length': int(config['smooth_baseline']['window_length']),
-                        'smooth_baseline_polyorder': int(config['smooth_baseline']['polyorder']),
-                        'smooth_baseline_delta_mz': float(config['smooth_baseline']['delta_mz']),
-                        'smooth_baseline_diff_thresh': float(config['smooth_baseline']['diff_thresh']),
-                        'remove_baseline_method': config['remove_baseline']['method'],
-                        'remove_baseline_min_half_window': int(config['remove_baseline']['min_half_window']),
-                        'remove_baseline_max_half_window': int(config['remove_baseline']['max_half_window']),
-                        'remove_baseline_decreasing': config['remove_baseline'].getboolean('decreasing'),
-                        'remove_baseline_smooth_half_window': None,
-                        'remove_baseline_filter_order': int(config['remove_baseline']['filter_order']),
-                        'remove_baseline_sigma': None,
-                        'remove_baseline_increment': int(config['remove_baseline']['increment']),
-                        'remove_baseline_max_hits': int(config['remove_baseline']['max_hits']),
-                        'remove_baseline_window_tol': float(config['remove_baseline']['window_tol']),
-                        'remove_baseline_lambda_': int(config['remove_baseline']['lambda_']),
-                        'remove_baseline_porder': int(config['remove_baseline']['porder']),
-                        'remove_baseline_repetition': None,
-                        'remove_baseline_degree': int(config['remove_baseline']['degree']),
-                        'remove_baseline_gradient': float(config['remove_baseline']['gradient']),
-                        'normalize_intensity_method': config['normalize_intensity']['method'],
-                        'bin_spectrum_n_bins': int(config['bin_spectrum']['n_bins']),
-                        'bin_spectrum_lower_mass_range': int(config['bin_spectrum']['lower_mass_range']),
-                        'bin_spectrum_upper_mass_range': int(config['bin_spectrum']['upper_mass_range']),
-                        'peak_picking_method': config['peak_picking']['method'],
-                        'peak_picking_snr': int(config['peak_picking']['snr']),
-                        'peak_picking_widths': None}
+TRIM_SPECTRUM_PARAMS = {'lower_mass_range': int(config['trim_spectrum']['lower_mass_range']),
+                        'upper_mass_range': int(config['trim_spectrum']['upper_mass_range'])}
+TRANSFORM_INTENSITY_PARAMS = {'method': config['transform_intensity']['method']}
+SMOOTH_BASELINE_PARAMS = {'method': config['smooth_baseline']['method'],
+                          'window_length': int(config['smooth_baseline']['window_length']),
+                          'polyorder': int(config['smooth_baseline']['polyorder']),
+                          'delta_mz': float(config['smooth_baseline']['delta_mz']),
+                          'diff_thresh': float(config['smooth_baseline']['diff_thresh'])}
+REMOVE_BASELINE_PARAMS = {'method': config['remove_baseline']['method'],
+                          'min_half_window': int(config['remove_baseline']['min_half_window']),
+                          'max_half_window': int(config['remove_baseline']['max_half_window']),
+                          'decreasing': config['remove_baseline'].getboolean('decreasing'),
+                          'smooth_half_window': None,
+                          'filter_order': int(config['remove_baseline']['filter_order']),
+                          'sigma': None,
+                          'increment': int(config['remove_baseline']['increment']),
+                          'max_hits': int(config['remove_baseline']['max_hits']),
+                          'window_tol': float(config['remove_baseline']['window_tol']),
+                          'lambda_': int(config['remove_baseline']['lambda_']),
+                          'porder': int(config['remove_baseline']['porder']),
+                          'repetition': None,
+                          'degree': int(config['remove_baseline']['degree']),
+                          'gradient': float(config['remove_baseline']['gradient'])}
+NORMALIZE_INTENSITY_PARAMS = {'method': config['normalize_intensity']['method']}
+BIN_SPECTRUM_PARAMS = {'n_bins': int(config['bin_spectrum']['n_bins']),
+                       'lower_mass_range': int(config['bin_spectrum']['lower_mass_range']),
+                       'upper_mass_range': int(config['bin_spectrum']['upper_mass_range'])}
+PEAK_PICKING_PARAMS = {'method': config['peak_picking']['method'],
+                       'snr': int(config['peak_picking']['snr']),
+                       'widths': None}
 if config['remove_baseline']['smooth_half_window'] != 'None':
-    PREPROCESSING_PARAMS['remove_baseline_smooth_half_window'] = int(config['remove_baseline']['smooth_half_window'])
+    REMOVE_BASELINE_PARAMS['smooth_half_window'] = int(config['remove_baseline']['smooth_half_window'])
 if config['remove_baseline']['sigma'] != 'None':
-    PREPROCESSING_PARAMS['remove_baseline_sigma'] = float(config['rmeove_baseline']['sigma'])
+    REMOVE_BASELINE_PARAMS['sigma'] = float(config['rmeove_baseline']['sigma'])
 if config['remove_baseline']['repetition'] != 'None':
-    PREPROCESSING_PARAMS['remove_baseline_repetition'] = int(config['remove_baseline']['repetition'])
+    REMOVE_BASELINE_PARAMS['repetition'] = int(config['remove_baseline']['repetition'])
 if config['peak_picking']['widths'] != 'None':
-    PREPROCESSING_PARAMS['peak_picking_widths'] = int(config['peak_picking']['widths'])
+    PEAK_PICKING_PARAMS['widths'] = int(config['peak_picking']['widths'])
+PREPROCESSING_PARAMS = {'TRIM_SPECTRUM': TRIM_SPECTRUM_PARAMS,
+                        'TRANSFORM_INTENSITY': TRANSFORM_INTENSITY_PARAMS,
+                        'SMOOTH_BASELINE': SMOOTH_BASELINE_PARAMS,
+                        'REMOVE_BASELINE': REMOVE_BASELINE_PARAMS,
+                        'NORMALIZE_INTENSITY': NORMALIZE_INTENSITY_PARAMS,
+                        'BIN_SPECTRUM': BIN_SPECTRUM_PARAMS,
+                        'PEAK_PICKING': PEAK_PICKING_PARAMS}
 # relative path for directory where uploaded data is stored
 UPLOAD_DIR = 'data'
 if not os.path.exists(UPLOAD_DIR):
@@ -139,6 +146,7 @@ def toggle_smooth_baseline_method_parameters(n_clicks, value):
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('remove_baseline_method', 'value')])
 def toggle_remove_baseline_method_parameters(n_clicks, value):
+    global PREPROCESSING_PARAMS
     if value == 'SNIP':
         return get_remove_baseline_snip_parameters(PREPROCESSING_PARAMS)
     elif value == 'TopHat':
@@ -157,6 +165,7 @@ def toggle_remove_baseline_method_parameters(n_clicks, value):
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('peak_picking_method', 'value')])
 def toggle_peak_picking_method_parameters(n_clicks, value):
+    global PREPROCESSING_PARAMS
     if value == 'locmax':
         return get_peak_picking_locmax_parameters(PREPROCESSING_PARAMS)
     elif value == 'cwt':
@@ -169,7 +178,8 @@ def toggle_peak_picking_method_parameters(n_clicks, value):
               State('spectrum_id', 'value'))
 def trim_spectrum_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].trim_spectrum(100, 2000)
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].trim_spectrum(**PREPROCESSING_PARAMS['TRIM_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -182,7 +192,8 @@ def trim_spectrum_button(n_clicks, value):
               State('spectrum_id', 'value'))
 def transform_intensity_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].transform_intensity()
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].transform_intensity(**PREPROCESSING_PARAMS['TRANSFORM_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -195,7 +206,8 @@ def transform_intensity_button(n_clicks, value):
               State('spectrum_id', 'value'))
 def smooth_baseline_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].smooth_baseline()
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].smooth_baseline(**PREPROCESSING_PARAMS['SMOOTH_BASELINE'])
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -208,7 +220,9 @@ def smooth_baseline_button(n_clicks, value):
               State('spectrum_id', 'value'))
 def remove_baseline_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].remove_baseline()
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].remove_baseline(**PREPROCESSING_PARAMS['REMOVE_BASELINE'],
+                                        )
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -221,7 +235,8 @@ def remove_baseline_button(n_clicks, value):
               State('spectrum_id', 'value'))
 def normalize_intensity_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].normalize_intensity()
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].normalize_intensity(**PREPROCESSING_PARAMS['NORMALIZE_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -232,9 +247,10 @@ def normalize_intensity_button(n_clicks, value):
                Output('store_plot', 'data')],
               Input('bin_spectrum', 'n_clicks'),
               State('spectrum_id', 'value'))
-def normalize_intensity_button(n_clicks, value):
+def bin_spectrum_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].bin_spectrum(10000, 100, 2000)
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].bin_spectrum(**PREPROCESSING_PARAMS['BIN_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
@@ -247,7 +263,8 @@ def normalize_intensity_button(n_clicks, value):
               State('spectrum_id', 'value'))
 def peak_picking_button(n_clicks, value):
     global INDEXED_DATA
-    INDEXED_DATA[value].peak_picking()
+    global PREPROCESSING_PARAMS
+    INDEXED_DATA[value].peak_picking(**PREPROCESSING_PARAMS['PEAK_PICKING'])
     fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
     for filename in os.listdir('file_system_backend'):
         os.remove(os.path.join('file_system_backend', filename))
