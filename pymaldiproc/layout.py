@@ -109,7 +109,7 @@ def get_preprocessing_parameters_layout(param_dict):
                 id='transform_intensity_method',
                 options=[
                     {'label': 'Square Root', 'value': 'sqrt'},
-                    {'label': 'Natural Log', 'value': 'ln'},
+                    {'label': 'Natural Log', 'value': 'log'},
                     {'label': 'Log Base 2', 'value': 'log2'},
                     {'label': 'Log Base 10', 'value': 'log10'}
                 ],
