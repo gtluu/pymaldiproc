@@ -1,10 +1,11 @@
 from setuptools import setup
+from pymaldiproc import VERSION
 
-setup(name='pymaldiproc',
-      version='0.3.0',
+setup(name='pyMALDIproc',
+      version=VERSION,
       packages=['pymaldiproc'],
-      url='https://github.com/gtluu/pymaldiproc',
+      url='https://github.com/gtluu/pyMALDIproc',
       license='Apache License',
       author='Gordon T. Luu',
-      author_email='goluu@ucsc.edu',
-      description='pymaldiproc')
+      author_email='gtluu912@gmail.com',
+      description='pyMALDIproc: a Python package for working with MALDI mass spectrometry data')

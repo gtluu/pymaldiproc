@@ -40,3 +40,5 @@ from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 from pymaldiproc.layout import *
 from pymaldiproc.dashboard import *
+
+VERSION = '0.3.0'
