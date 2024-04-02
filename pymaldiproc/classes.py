@@ -5,15 +5,12 @@ import numpy as np
 import pandas as pd
 from uuid import uuid4
 from pyTDFSDK.classes import TsfSpectrum, TdfSpectrum
-from functools import reduce
 from scipy.signal import savgol_filter, find_peaks, find_peaks_cwt, peak_widths
-from scipy.stats import median_abs_deviation
-from pyMSpec.smoothing import sg_smooth, apodization, rebin, fast_change, median
+from pyMSpec.smoothing import apodization, rebin, fast_change, median
 from pybaselines.smooth import snip, noise_median
 from pybaselines.morphological import tophat
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
-from icoshift import icoshift
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -222,6 +219,7 @@ class PMPMethods(object):
             self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
+            self.data_processing['peak picking']['signal to noise ratio'] = snr
         elif method == 'cwt':
             # estimate peak widths if necessary
             if widths is None:
@@ -234,6 +232,7 @@ class PMPMethods(object):
             self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
+            self.data_processing['peak picking']['signal to noise ratio'] = snr
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
             self.data_processing['peak picking']['upper peak width'] = np.max(widths)
 
