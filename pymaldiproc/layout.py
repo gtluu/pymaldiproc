@@ -61,6 +61,11 @@ def get_dashboard_layout(param_dict):
 
             dcc.Loading(
                 dcc.Store(id='store_plot')
+            ),
+
+            html.Div(
+                id='dummy',
+                children=[]
             )
         ]
     )
@@ -87,8 +92,11 @@ def get_smooth_baseline_savitzky_golay_parameters(param_dict):
             [
                 dbc.InputGroupText('Window Length'),
                 dbc.Input(id='smooth_baseline_window_length',
-                          placeholder=str(param_dict['SMOOTH_BASELINE']['window_length']),
-                          value=param_dict['SMOOTH_BASELINE']['window_length'])
+                          placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
+                          value=param_dict['SMOOTH_BASELINE']['window_length'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -96,8 +104,11 @@ def get_smooth_baseline_savitzky_golay_parameters(param_dict):
             [
                 dbc.InputGroupText('Polyorder'),
                 dbc.Input(id='smooth_baseline_polyorder',
-                          placeholder=str(param_dict['SMOOTH_BASELINE']['polyorder']),
-                          value=param_dict['SMOOTH_BASELINE']['polyorder'])
+                          placeholder=param_dict['SMOOTH_BASELINE']['polyorder'],
+                          value=param_dict['SMOOTH_BASELINE']['polyorder'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         )
@@ -110,8 +121,11 @@ def get_smooth_baseline_apodization_parameters(param_dict):
             [
                 dbc.InputGroupText('Window Length'),
                 dbc.Input(id='smooth_baseline_window_length',
-                          placeholder=str(param_dict['SMOOTH_BASELINE']['window_length']),
-                          value=param_dict['SMOOTH_BASELINE']['window_length'])
+                          placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
+                          value=param_dict['SMOOTH_BASELINE']['window_length'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         )
@@ -124,8 +138,11 @@ def get_smooth_baseline_rebin_parameters(param_dict):
             [
                 dbc.InputGroupText('Delta m/z'),
                 dbc.Input(id='smooth_baseline_delta_mz',
-                          placeholder=str(param_dict['SMOOTH_BASELINE']['delta_mz']),
-                          value=param_dict['SMOOTH_BASELINE']['delta_mz'])
+                          placeholder=param_dict['SMOOTH_BASELINE']['delta_mz'],
+                          value=param_dict['SMOOTH_BASELINE']['delta_mz'],
+                          type='number',
+                          min=0,
+                          step=0.001)
             ],
             style={'margin': '10px'}
         )
@@ -138,8 +155,11 @@ def get_smooth_baseline_fast_change_parameters(param_dict):
             [
                 dbc.InputGroupText('Difference Threshold'),
                 dbc.Input(id='smooth_baseline_diff_thresh',
-                          placeholder=str(param_dict['SMOOTH_BASELINE']['diff_thresh']),
-                          value=param_dict['SMOOTH_BASELINE']['diff_thresh'])
+                          placeholder=param_dict['SMOOTH_BASELINE']['diff_thresh'],
+                          value=param_dict['SMOOTH_BASELINE']['diff_thresh'],
+                          type='number',
+                          min=0,
+                          step=0.001)
             ],
             style={'margin': '10px'}
         )
@@ -152,8 +172,11 @@ def get_smooth_baseline_median_parameters(param_dict):
             [
                 dbc.InputGroupText('Window Length'),
                 dbc.Input(id='smooth_baseline_window_length',
-                          placeholder=str(param_dict['SMOOTH_BASELINE']['window_length']),
-                          value=param_dict['SMOOTH_BASELINE']['window_length'])
+                          placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
+                          value=param_dict['SMOOTH_BASELINE']['window_length'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         )
@@ -177,8 +200,11 @@ def get_remove_baseline_snip_parameters(param_dict):
             [
                 dbc.InputGroupText('Maximum Half Window'),
                 dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['max_half_window']),
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'])
+                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -186,8 +212,11 @@ def get_remove_baseline_snip_parameters(param_dict):
             [
                 dbc.InputGroupText('Smoothing Half Window'),
                 dbc.Input(id='remove_baseline_smooth_half_window',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['smooth_half_window']),
-                          value=param_dict['REMOVE_BASELINE']['smooth_half_window'])
+                          placeholder=param_dict['REMOVE_BASELINE']['smooth_half_window'],
+                          value=param_dict['REMOVE_BASELINE']['smooth_half_window'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -195,8 +224,11 @@ def get_remove_baseline_snip_parameters(param_dict):
             [
                 dbc.InputGroupText('Filter Order'),
                 dbc.Input(id='remove_baseline_filter_order',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['filter_order']),
-                          value=param_dict['REMOVE_BASELINE']['filter_order'])
+                          placeholder=param_dict['REMOVE_BASELINE']['filter_order'],
+                          value=param_dict['REMOVE_BASELINE']['filter_order'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         )
@@ -209,8 +241,11 @@ def get_remove_baseline_tophat_parameters(param_dict):
             [
                 dbc.InputGroupText('Minimum Half Window'),
                 dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['max_half_window']),
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'])
+                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -218,8 +253,11 @@ def get_remove_baseline_tophat_parameters(param_dict):
             [
                 dbc.InputGroupText('Maximum Half Window'),
                 dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['max_half_window']),
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'])
+                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -227,8 +265,11 @@ def get_remove_baseline_tophat_parameters(param_dict):
             [
                 dbc.InputGroupText('Increment'),
                 dbc.Input(id='remove_baseline_increment',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['increment']),
-                          value=param_dict['REMOVE_BASELINE']['increment'])
+                          placeholder=param_dict['REMOVE_BASELINE']['increment'],
+                          value=param_dict['REMOVE_BASELINE']['increment'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -236,8 +277,11 @@ def get_remove_baseline_tophat_parameters(param_dict):
             [
                 dbc.InputGroupText('Max Hits'),
                 dbc.Input(id='remove_baseline_max_hits',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['max_hits']),
-                          value=param_dict['REMOVE_BASELINE']['max_hits'])
+                          placeholder=param_dict['REMOVE_BASELINE']['max_hits'],
+                          value=param_dict['REMOVE_BASELINE']['max_hits'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -245,8 +289,11 @@ def get_remove_baseline_tophat_parameters(param_dict):
             [
                 dbc.InputGroupText('Window Tolerance'),
                 dbc.Input(id='remove_baseline_window_tolerance',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['window_tolerance']),
-                          value=param_dict['REMOVE_BASELINE']['window_tolerance'])
+                          placeholder=param_dict['REMOVE_BASELINE']['window_tol'],
+                          value=param_dict['REMOVE_BASELINE']['window_tol'],
+                          type='number',
+                          min=0,
+                          step=0.000001)
             ],
             style={'margin': '10px'}
         )
@@ -259,8 +306,11 @@ def get_remove_baseline_median_parameters(param_dict):
             [
                 dbc.InputGroupText('Maximum Half Window'),
                 dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['max_half_window']),
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'])
+                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -268,8 +318,11 @@ def get_remove_baseline_median_parameters(param_dict):
             [
                 dbc.InputGroupText('Smoothing Half Window'),
                 dbc.Input(id='remove_baseline_smooth_half_window',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['smooth_half_window']),
-                          value=param_dict['REMOVE_BASELINE']['smooth_half_window'])
+                          placeholder=param_dict['REMOVE_BASELINE']['smooth_half_window'],
+                          value=param_dict['REMOVE_BASELINE']['smooth_half_window'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -277,8 +330,11 @@ def get_remove_baseline_median_parameters(param_dict):
             [
                 dbc.InputGroupText('Sigma'),
                 dbc.Input(id='remove_baseline_sigma',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['sigma']),
-                          value=param_dict['REMOVE_BASELINE']['sigma'])
+                          placeholder=param_dict['REMOVE_BASELINE']['sigma'],
+                          value=param_dict['REMOVE_BASELINE']['sigma'],
+                          type='number',
+                          min=0,
+                          step=0.001)
             ],
             style={'margin': '10px'}
         )
@@ -290,9 +346,12 @@ def get_remove_baseline_zhangfit_parameters(param_dict):
         dbc.InputGroup(
             [
                 dbc.InputGroupText('Lambda'),
-                dbc.Input(id='remove_baseline_lambda',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['lambda_']),
-                          value=param_dict['REMOVE_BASELINE']['lambda_'])
+                dbc.Input(id='remove_baseline_lambda_',
+                          placeholder=param_dict['REMOVE_BASELINE']['lambda_'],
+                          value=param_dict['REMOVE_BASELINE']['lambda_'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -300,8 +359,11 @@ def get_remove_baseline_zhangfit_parameters(param_dict):
             [
                 dbc.InputGroupText('p-order'),
                 dbc.Input(id='remove_baseline_porder',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['porder']),
-                          value=param_dict['REMOVE_BASELINE']['porder'])
+                          placeholder=param_dict['REMOVE_BASELINE']['porder'],
+                          value=param_dict['REMOVE_BASELINE']['porder'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -309,8 +371,11 @@ def get_remove_baseline_zhangfit_parameters(param_dict):
             [
                 dbc.InputGroupText('Repetition'),
                 dbc.Input(id='remove_baseline_repetition',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['repetition']),
-                          value=param_dict['REMOVE_BASELINE']['repetition'])
+                          placeholder=param_dict['REMOVE_BASELINE']['repetition'],
+                          value=param_dict['REMOVE_BASELINE']['repetition'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         )
@@ -323,8 +388,11 @@ def get_remove_baseline_modpoly_parameters(param_dict):
             [
                 dbc.InputGroupText('Degree'),
                 dbc.Input(id='remove_baseline_degree',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['degree']),
-                          value=param_dict['REMOVE_BASELINE']['degree'])
+                          placeholder=param_dict['REMOVE_BASELINE']['degree'],
+                          value=param_dict['REMOVE_BASELINE']['degree'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -332,8 +400,11 @@ def get_remove_baseline_modpoly_parameters(param_dict):
             [
                 dbc.InputGroupText('Repetition'),
                 dbc.Input(id='remove_baseline_repetition',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['repetition']),
-                          value=param_dict['REMOVE_BASELINE']['repetition'])
+                          placeholder=param_dict['REMOVE_BASELINE']['repetition'],
+                          value=param_dict['REMOVE_BASELINE']['repetition'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -341,8 +412,11 @@ def get_remove_baseline_modpoly_parameters(param_dict):
             [
                 dbc.InputGroupText('Gradient'),
                 dbc.Input(id='remove_baseline_gradient',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['gradient']),
-                          value=param_dict['REMOVE_BASELINE']['gradient'])
+                          placeholder=param_dict['REMOVE_BASELINE']['gradient'],
+                          value=param_dict['REMOVE_BASELINE']['gradient'],
+                          type='number',
+                          min=0,
+                          step=0.001)
             ],
             style={'margin': '10px'}
         )
@@ -355,8 +429,11 @@ def get_remove_baseline_imodpoly_parameters(param_dict):
             [
                 dbc.InputGroupText('Degree'),
                 dbc.Input(id='remove_baseline_degree',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['degree']),
-                          value=param_dict['REMOVE_BASELINE']['degree'])
+                          placeholder=param_dict['REMOVE_BASELINE']['degree'],
+                          value=param_dict['REMOVE_BASELINE']['degree'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -364,8 +441,11 @@ def get_remove_baseline_imodpoly_parameters(param_dict):
             [
                 dbc.InputGroupText('Repetition'),
                 dbc.Input(id='remove_baseline_repetition',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['repetition']),
-                          value=param_dict['REMOVE_BASELINE']['repetition'])
+                          placeholder=param_dict['REMOVE_BASELINE']['repetition'],
+                          value=param_dict['REMOVE_BASELINE']['repetition'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -373,8 +453,11 @@ def get_remove_baseline_imodpoly_parameters(param_dict):
             [
                 dbc.InputGroupText('Gradient'),
                 dbc.Input(id='remove_baseline_gradient',
-                          placeholder=str(param_dict['REMOVE_BASELINE']['gradient']),
-                          value=param_dict['REMOVE_BASELINE']['gradient'])
+                          placeholder=param_dict['REMOVE_BASELINE']['gradient'],
+                          value=param_dict['REMOVE_BASELINE']['gradient'],
+                          type='number',
+                          min=0,
+                          step=0.001)
             ],
             style={'margin': '10px'}
         )
@@ -387,8 +470,11 @@ def get_peak_picking_locmax_parameters(param_dict):
             [
                 dbc.InputGroupText('Signal-to-Noise Ratio'),
                 dbc.Input(id='peak_picking_snr',
-                          placeholder=str(param_dict['PEAK_PICKING']['snr']),
-                          value=param_dict['PEAK_PICKING']['snr'])
+                          placeholder=param_dict['PEAK_PICKING']['snr'],
+                          value=param_dict['PEAK_PICKING']['snr'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         )
@@ -401,8 +487,11 @@ def get_peak_picking_cwt_parameters(param_dict):
             [
                 dbc.InputGroupText('Signal-to-Noise Ratio'),
                 dbc.Input(id='peak_picking_snr',
-                          placeholder=str(param_dict['PEAK_PICKING']['snr']),
-                          value=param_dict['PEAK_PICKING']['snr'])
+                          placeholder=param_dict['PEAK_PICKING']['snr'],
+                          value=param_dict['PEAK_PICKING']['snr'],
+                          type='number',
+                          min=0,
+                          step=1)
             ],
             style={'margin': '10px'}
         ),
@@ -410,8 +499,11 @@ def get_peak_picking_cwt_parameters(param_dict):
             [
                 dbc.InputGroupText('Widths (Optional)'),
                 dbc.Input(id='peak_picking_widths',
-                          placeholder=str(param_dict['PEAK_PICKING']['widths']),
-                          value=param_dict['PEAK_PICKING']['widths'])
+                          placeholder=param_dict['PEAK_PICKING']['widths'],
+                          value=param_dict['PEAK_PICKING']['widths'],
+                          type='number',
+                          min=0,
+                          step=0.001)
             ],
             style={'margin': '10px'}
         )
@@ -427,8 +519,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 [
                     dbc.InputGroupText('Lower Mass Range'),
                     dbc.Input(id='trim_spectrum_lower_mass_range',
-                              placeholder=str(param_dict['TRIM_SPECTRUM']['lower_mass_range']),
-                              value=param_dict['TRIM_SPECTRUM']['lower_mass_range'])
+                              placeholder=param_dict['TRIM_SPECTRUM']['lower_mass_range'],
+                              value=param_dict['TRIM_SPECTRUM']['lower_mass_range'],
+                              type='number',
+                              min=0,
+                              step=1)
                 ],
                 style={'margin': '10px'}
             ),
@@ -436,8 +531,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 [
                     dbc.InputGroupText('Upper Mass Range'),
                     dbc.Input(id='trim_spectrum_upper_mass_range',
-                              placeholder=str(param_dict['TRIM_SPECTRUM']['upper_mass_range']),
-                              value=param_dict['TRIM_SPECTRUM']['upper_mass_range'])
+                              placeholder=param_dict['TRIM_SPECTRUM']['upper_mass_range'],
+                              value=param_dict['TRIM_SPECTRUM']['upper_mass_range'],
+                              type='number',
+                              min=0,
+                              step=1)
                 ],
                 style={'margin': '10px'}
             )
@@ -527,10 +625,10 @@ def get_preprocessing_parameters_layout(param_dict):
             dcc.RadioItems(
                 id='normalize_intensity_method',
                 options=[
-                    {'label': 'TIC', 'value': 'tic'},
-                    {'label': 'RMS', 'value': 'rms'},
-                    {'label': 'MAD', 'value': 'mad'},
-                    {'label': 'Sqrt', 'value': 'sqrt'}
+                    {'label': 'Total Ion Count', 'value': 'tic'},
+                    {'label': 'Root Mean Square', 'value': 'rms'},
+                    {'label': 'Mean Absolute Deviation', 'value': 'mad'},
+                    {'label': 'Square Root', 'value': 'sqrt'}
                 ],
                 value=param_dict['NORMALIZE_INTENSITY']['method'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
@@ -548,8 +646,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 [
                     dbc.InputGroupText('Number of Bins'),
                     dbc.Input(id='bin_spectrum_n_bins',
-                              placeholder=str(param_dict['BIN_SPECTRUM']['n_bins']),
-                              value=param_dict['BIN_SPECTRUM']['n_bins'])
+                              placeholder=param_dict['BIN_SPECTRUM']['n_bins'],
+                              value=param_dict['BIN_SPECTRUM']['n_bins'],
+                              type='number',
+                              min=0,
+                              step=100)
                 ],
                 style={'margin': '10px'}
             ),
@@ -557,8 +658,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 [
                     dbc.InputGroupText('Lower Mass Range'),
                     dbc.Input(id='bin_spectrum_lower_mass_range',
-                              placeholder=str(param_dict['BIN_SPECTRUM']['lower_mass_range']),
-                              value=param_dict['BIN_SPECTRUM']['lower_mass_range'])
+                              placeholder=param_dict['BIN_SPECTRUM']['lower_mass_range'],
+                              value=param_dict['BIN_SPECTRUM']['lower_mass_range'],
+                              type='number',
+                              min=0,
+                              step=1)
                 ],
                 style={'margin': '10px'}
             ),
@@ -566,8 +670,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 [
                     dbc.InputGroupText('Upper Mass Range'),
                     dbc.Input(id='bin_spectrum_upper_mass_range',
-                              placeholder=str(param_dict['BIN_SPECTRUM']['upper_mass_range']),
-                              value=param_dict['BIN_SPECTRUM']['upper_mass_range'])
+                              placeholder=param_dict['BIN_SPECTRUM']['upper_mass_range'],
+                              value=param_dict['BIN_SPECTRUM']['upper_mass_range'],
+                              type='number',
+                              min=0,
+                              step=1)
                 ],
                 style={'margin': '10px'}
             )
