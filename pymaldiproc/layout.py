@@ -7,6 +7,7 @@ from dash import Dash, dcc, html, State, callback_context
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
 import dash_bootstrap_components as dbc
 import base64
+from tkinter.filedialog import askopenfilenames, asksaveasfilename, askdirectory
 
 
 # barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
@@ -609,7 +610,9 @@ def get_preprocessing_layout(param_dict):
                 is_open=False
             ),
             dcc.Download(id='peak_list')
-        ]
+        ],
+        style={'justify-content': 'center',
+               'display': 'flex'}
     )
 
     return [preprocessing_title, preprocessing_buttons]

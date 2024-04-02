@@ -82,6 +82,7 @@ def upload_data(list_of_contents, list_of_filenames):
             decoded = base64.b64decode(content_string)
             with open(os.path.join(UPLOAD_DIR, filename), 'w') as mzml_file:
                 mzml_file.write(decoded.decode('utf-8'))
+            # TODO: add support for tsf and tdf
             data = import_mzml(os.path.join(UPLOAD_DIR, filename))
             for spectrum in data:
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
