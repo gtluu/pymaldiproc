@@ -25,7 +25,7 @@ def schema_detection(bruker_dot_d_file):
         return 'BAF'
 
 
-def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclude_mobility=False):
+def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclude_mobility=True):
     # find Bruker .d directories
     if input_path.endswith('.d'):
         input_files = [input_path]

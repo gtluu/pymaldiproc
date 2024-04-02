@@ -8,6 +8,8 @@ from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransfor
 import dash_bootstrap_components as dbc
 import base64
 import configparser
+import tkinter
+from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
 # will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
@@ -72,18 +74,27 @@ app.layout = get_dashboard_layout(PREPROCESSING_PARAMS)
 
 
 @app.callback(Output('dropdown', 'children'),
-              Input('upload', 'contents'),
-              State('upload', 'filename'))
-def upload_data(list_of_contents, list_of_filenames):
+              [Input('upload_mzml', 'n_clicks'),
+               Input('upload_d', 'n_clicks')])
+def upload_data(n_clicks_mzml, n_clicks_d):
     global INDEXED_DATA
-    if list_of_contents is not None:
-        for contents, filename in zip(list_of_contents, list_of_filenames):
-            content_type, content_string = contents.split(',')
-            decoded = base64.b64decode(content_string)
-            with open(os.path.join(UPLOAD_DIR, filename), 'w') as mzml_file:
-                mzml_file.write(decoded.decode('utf-8'))
-            # TODO: add support for tsf and tdf
-            data = import_mzml(os.path.join(UPLOAD_DIR, filename))
+    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
+    if changed_id == 'upload_mzml.n_clicks':
+        main_tk_window = tkinter.Tk()
+        main_tk_window.attributes('-topmost', True, '-alpha', 0)
+        filenames = askopenfilenames(filetypes=[('mzML Files', '*.mzML')])
+        main_tk_window.destroy()
+        for filename in filenames:
+            data = import_mzml(filename)
+            for spectrum in data:
+                INDEXED_DATA[spectrum.spectrum_id] = spectrum
+    elif changed_id == 'upload_d.n_clicks':
+        main_tk_window = tkinter.Tk()
+        main_tk_window.attributes('-topmost', True, '-alpha', 0)
+        dirname = askdirectory(mustexist=True)
+        main_tk_window.destroy()
+        if dirname.endswith('.d'):
+            data = import_timstof_raw_data(dirname, mode='profile')
             for spectrum in data:
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
     return get_dropdown_layout(INDEXED_DATA)
@@ -543,4 +554,4 @@ def resample_spectrum(relayoutdata: dict, fig: FigureResampler):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

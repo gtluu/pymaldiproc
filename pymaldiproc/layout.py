@@ -7,7 +7,6 @@ from dash import Dash, dcc, html, State, callback_context
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
 import dash_bootstrap_components as dbc
 import base64
-from tkinter.filedialog import askopenfilenames, asksaveasfilename, askdirectory
 
 
 # barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
@@ -15,30 +14,13 @@ def get_dashboard_layout(param_dict):
     dashboard_layout = html.Div(
         [
             html.Div(
-                # TODO: replace this with a button that gets a file path for input.
-                dcc.Upload(
-                    id='upload',
-                    children=html.Div(
-                        [
-                            'Drag and Drop or ',
-                            html.A('Select mzML Files')
-                        ]
-                    ),
-                    style={
-                        'width': '97%',
-                        'height': '100px',
-                        'lineHeight': '100px',
-                        'borderWidth': '1px',
-                        'borderStyle': 'dashed',
-                        'borderRadius': '5px',
-                        'textAlign': 'center',
-                        'margin': '20px'
-                    },
-                    multiple=True
-                ),
-                id='upload_div',
+                [
+                    dbc.Button('Upload *.mzML File', id='upload_mzml', style={'margin': '50px'}),
+                    dbc.Button('Upload Bruker *.d File', id='upload_d', style={'margin': '50px'})
+                ],
+                style={'justify-content': 'center',
+                       'display': 'flex'}
             ),
-
             html.Div(
                 get_preprocessing_layout(param_dict),
                 id='preprocessing',
@@ -658,9 +640,5 @@ def get_spectrum(spectrum, label_peaks=False):
                                                   'Intensity': ':.1f'}))
     fig.update_layout(xaxis_tickformat='d',
                       yaxis_tickformat='~e')
-
-    # TODO: add code to add peak labels
-    if spectrum.peak_picked_mz_array is not None and spectrum.peak_picked_intensity_array is not None:
-        pass
 
     return fig
