@@ -71,7 +71,6 @@ def get_spectrum_plot_layout(fig):
 
 
 def get_preprocessing_parameters_layout(param_dict):
-    # TODO: change RadioItems to dbc.ButtonGroups?
     trim_spectrum_parameters = html.Div(
         [
             html.H5('Spectrum Trimming Parameters'),
@@ -110,7 +109,7 @@ def get_preprocessing_parameters_layout(param_dict):
         [
             html.H5('Intensity Transformation Parameters'),
             html.P('Method'),
-            dcc.RadioItems(
+            dbc.RadioItems(
                 id='transform_intensity_method',
                 options=[
                     {'label': 'Square Root', 'value': 'sqrt'},
@@ -120,7 +119,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 ],
                 value=param_dict['TRANSFORM_INTENSITY']['method'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
-                inputStyle={'margin-right': '10px'}
+                inputStyle={'margin-right': '10px'},
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
             )
         ],
         id='transform_intensity_parameters',
@@ -131,7 +134,7 @@ def get_preprocessing_parameters_layout(param_dict):
         [
             html.H5('Baseline Smoothing Parameters'),
             html.P('Method'),
-            dcc.RadioItems(
+            dbc.RadioItems(
                 id='smooth_baseline_method',
                 options=[
                     {'label': 'Savitzky-Golay', 'value': 'SavitzkyGolay'},
@@ -142,7 +145,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 ],
                 value=param_dict['SMOOTH_BASELINE']['method'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
-                inputStyle={'margin-right': '10px'}
+                inputStyle={'margin-right': '10px'},
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
             ),
             dbc.InputGroup(
                 [
@@ -209,7 +216,7 @@ def get_preprocessing_parameters_layout(param_dict):
         [
             html.H5('Baseline Removal Parameters'),
             html.P('Method'),
-            dcc.RadioItems(
+            dbc.RadioItems(
                 id='remove_baseline_method',
                 options=[
                     {'label': 'SNIP', 'value': 'SNIP'},
@@ -221,9 +228,13 @@ def get_preprocessing_parameters_layout(param_dict):
                 ],
                 value=param_dict['REMOVE_BASELINE']['method'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
-                inputStyle={'margin-right': '10px'}
+                inputStyle={'margin-right': '10px'},
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
             ),
-            dcc.RadioItems(
+            dbc.RadioItems(
                 id='remove_baseline_decreasing',
                 options=[
                     {'label': 'Use Decreasing Iterative Window Sizes', 'value': True},
@@ -232,6 +243,10 @@ def get_preprocessing_parameters_layout(param_dict):
                 value=param_dict['REMOVE_BASELINE']['decreasing'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'},
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
                 style={'margin': '10px',
                        'display': 'flex'}
             ),
@@ -427,7 +442,7 @@ def get_preprocessing_parameters_layout(param_dict):
         [
             html.H5('Intensity Normalization Parameters'),
             html.P('Method'),
-            dcc.RadioItems(
+            dbc.RadioItems(
                 id='normalize_intensity_method',
                 options=[
                     {'label': 'Total Ion Count', 'value': 'tic'},
@@ -437,7 +452,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 ],
                 value=param_dict['NORMALIZE_INTENSITY']['method'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
-                inputStyle={'margin-right': '10px'}
+                inputStyle={'margin-right': '10px'},
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
             )
         ],
         id='normalize_intensity_parameters',
@@ -495,7 +514,7 @@ def get_preprocessing_parameters_layout(param_dict):
         [
             html.H5('Peak Picking Parameters'),
             html.P('Method'),
-            dcc.RadioItems(
+            dbc.RadioItems(
                 id='peak_picking_method',
                 options=[
                     {'label': 'Local Maxima', 'value': 'locmax'},
@@ -503,7 +522,11 @@ def get_preprocessing_parameters_layout(param_dict):
                 ],
                 value=param_dict['PEAK_PICKING']['method'],
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
-                inputStyle={'margin-right': '10px'}
+                inputStyle={'margin-right': '10px'},
+                className='btn-group',
+                inputClassName='btn-check',
+                labelClassName='btn btn-outline-primary',
+                labelCheckedClassName='active',
             ),
             dbc.InputGroup(
                 [
@@ -575,7 +598,7 @@ def get_preprocessing_layout(param_dict):
                     ]))
                 ],
                 id='edit_processing_parameters_modal',
-                size='lg',
+                fullscreen=True,
                 backdrop='static',
                 scrollable=True,
                 centered=True,
