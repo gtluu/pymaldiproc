@@ -11,7 +11,8 @@ a = Analysis(
 		('C:\\Users\\bass\\.conda\\envs\\pymaldiproc_dashboard\\Lib\\site-packages\\dash_core_components', 'dash_core_components'),
 		('C:\\Users\\bass\\.conda\\envs\\pymaldiproc_dashboard\\Lib\\site-packages\\dash_extensions', 'dash_extensions'),
 		('C:\\Users\\bass\\.conda\\envs\\pymaldiproc_dashboard\\Lib\\site-packages\\dash_html_components', 'dash_html_components'),
-		('C:\\Users\\bass\\.conda\\envs\\pymaldiproc_dashboard\\Lib\\site-packages\\dash_table', 'dash_table')
+		('C:\\Users\\bass\\.conda\\envs\\pymaldiproc_dashboard\\Lib\\site-packages\\dash_table', 'dash_table'),
+		('C:\\Users\\bass\\code\\pyMALDIproc\\etc\\preprocessing.cfg', 'etc')
 	],
     hiddenimports=[],
     hookspath=[],
@@ -38,6 +39,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    contents_directory='.'
 )
 coll = COLLECT(
     exe,

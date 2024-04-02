@@ -11,8 +11,8 @@ def get_dashboard_layout(param_dict):
         [
             html.Div(
                 [
-                    dbc.Button('Upload *.mzML File', id='upload_mzml', style={'margin': '50px'}),
-                    dbc.Button('Upload Bruker *.d File', id='upload_d', style={'margin': '50px'})
+                    dbc.Button('Load *.mzML File', id='upload_mzml', style={'margin': '50px'}),
+                    dbc.Button('Load Bruker *.d File', id='upload_d', style={'margin': '50px'})
                 ],
                 style={'justify-content': 'center',
                        'display': 'flex'}
