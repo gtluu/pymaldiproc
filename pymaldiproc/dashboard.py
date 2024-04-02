@@ -15,7 +15,7 @@ from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 INDEXED_DATA = {}
 # default processing parameters from config file
 config = configparser.ConfigParser()
-config.read(os.path.join(os.path.dirname(__file__), 'etc', 'preprocessing.cfg'))
+config.read(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'etc', 'preprocessing.cfg'))
 TRIM_SPECTRUM_PARAMS = {'lower_mass_range': int(config['trim_spectrum']['lower_mass_range']),
                         'upper_mass_range': int(config['trim_spectrum']['upper_mass_range'])}
 TRANSFORM_INTENSITY_PARAMS = {'method': config['transform_intensity']['method']}
@@ -62,7 +62,7 @@ PREPROCESSING_PARAMS = {'TRIM_SPECTRUM': TRIM_SPECTRUM_PARAMS,
                         'BIN_SPECTRUM': BIN_SPECTRUM_PARAMS,
                         'PEAK_PICKING': PEAK_PICKING_PARAMS}
 # relative path for directory where uploaded data is stored
-UPLOAD_DIR = 'data'
+UPLOAD_DIR = '../data'
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
@@ -106,8 +106,8 @@ def upload_data(n_clicks_mzml, n_clicks_d):
 def plot_spectrum(value):
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'), filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -410,8 +410,9 @@ def trim_spectrum_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].trim_spectrum(**PREPROCESSING_PARAMS['TRIM_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -424,8 +425,9 @@ def transform_intensity_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].transform_intensity(**PREPROCESSING_PARAMS['TRANSFORM_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -438,8 +440,9 @@ def smooth_baseline_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].smooth_baseline(**PREPROCESSING_PARAMS['SMOOTH_BASELINE'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -453,8 +456,9 @@ def remove_baseline_button(n_clicks, value):
     INDEXED_DATA[value].remove_baseline(**PREPROCESSING_PARAMS['REMOVE_BASELINE'],
                                         )
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -467,8 +471,9 @@ def normalize_intensity_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].normalize_intensity(**PREPROCESSING_PARAMS['NORMALIZE_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -481,8 +486,9 @@ def bin_spectrum_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].bin_spectrum(**PREPROCESSING_PARAMS['BIN_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -495,8 +501,9 @@ def peak_picking_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].peak_picking(**PREPROCESSING_PARAMS['PEAK_PICKING'])
     fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -512,8 +519,9 @@ def undo_peak_picking(n_clicks, value):
     del INDEXED_DATA[value].data_processing['peak picking']
     gc.collect()
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -544,8 +552,9 @@ def undo_preprocessing(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].undo_all_processing()
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir('file_system_backend'):
-        os.remove(os.path.join('file_system_backend', filename))
+    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
