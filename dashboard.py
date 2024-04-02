@@ -517,7 +517,7 @@ def undo_peak_picking(n_clicks, value):
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
-@app.callback(Output('peak_list', 'data'),
+@app.callback(Output('dummy', 'children'),
               Input('export_peak_list', 'n_clicks'),
               State('spectrum_id', 'value'))
 def export_peak_list(n_clicks, value):
@@ -526,7 +526,14 @@ def export_peak_list(n_clicks, value):
         INDEXED_DATA[value].peak_picking()
     spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
                                      'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
-    return dcc.send_data_frame(spectrum_df.to_csv, value + '|peak_list.csv', index=False)
+    main_tk_window = tkinter.Tk()
+    main_tk_window.attributes('-topmost', True, '-alpha', 0)
+    csv_filename = asksaveasfilename(confirmoverwrite=True,
+                                     filetypes=[('Comma Separated Values', '*.csv')],
+                                     defaultextension='csv')
+    main_tk_window.destroy()
+    spectrum_df.to_csv(csv_filename, index=False)
+    return []
 
 
 @app.callback([Output('spectrum', 'children'),

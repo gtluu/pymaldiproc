@@ -48,7 +48,8 @@ def get_dashboard_layout(param_dict):
 
             html.Div(
                 id='dummy',
-                children=[]
+                children=[],
+                style={'display': 'none'}
             )
         ]
     )
