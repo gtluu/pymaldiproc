@@ -1,12 +1,8 @@
-from pymaldiproc.classes import *
-from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 import plotly.express as px
-from plotly_resampler import register_plotly_resampler, FigureResampler
-from dash import Dash, dcc, html, State, callback_context
-from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform
+from plotly_resampler import FigureResampler
+from dash import dcc, html
 import dash_bootstrap_components as dbc
-import base64
 
 
 # barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly

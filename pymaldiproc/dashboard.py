@@ -1,13 +1,11 @@
-from pymaldiproc.classes import *
-from pymaldiproc.data_import import *
-from pymaldiproc.preprocessing import *
+import os
+import gc
+import configparser
+from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
 from pymaldiproc.layout import *
-import plotly.express as px
-from dash import Dash, dcc, html, State, callback_context, no_update
+from dash import State, callback_context, no_update
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
 import dash_bootstrap_components as dbc
-import base64
-import configparser
 import tkinter
 from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
@@ -61,10 +59,6 @@ PREPROCESSING_PARAMS = {'TRIM_SPECTRUM': TRIM_SPECTRUM_PARAMS,
                         'NORMALIZE_INTENSITY': NORMALIZE_INTENSITY_PARAMS,
                         'BIN_SPECTRUM': BIN_SPECTRUM_PARAMS,
                         'PEAK_PICKING': PEAK_PICKING_PARAMS}
-# relative path for directory where uploaded data is stored
-UPLOAD_DIR = '../data'
-if not os.path.exists(UPLOAD_DIR):
-    os.makedirs(UPLOAD_DIR)
 
 # Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
 app = DashProxy(prevent_initial_callbacks=True,
@@ -107,7 +101,8 @@ def plot_spectrum(value):
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
     for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'), filename))
+        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
+                               filename))
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
