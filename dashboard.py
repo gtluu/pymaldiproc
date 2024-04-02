@@ -102,15 +102,108 @@ def plot_spectrum(value):
 @app.callback(Output('edit_processing_parameters_modal', 'is_open'),
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('edit_processing_parameters_save', 'n_clicks'),
-               Input('edit_processing_parameters_cancel', 'n_clicks')],
+               Input('edit_processing_parameters_cancel', 'n_clicks'),
+               Input('trim_spectrum_lower_mass_range_value', 'value'),
+               Input('trim_spectrum_upper_mass_range_value', 'value'),
+               Input('transform_intensity_method', 'value'),
+               Input('smooth_baseline_method', 'value'),
+               Input('smooth_baseline_window_length_value', 'value'),
+               Input('smooth_baseline_polyorder_value', 'value'),
+               Input('smooth_baseline_delta_mz_value', 'value'),
+               Input('smooth_baseline_diff_thresh_value', 'value'),
+               Input('remove_baseline_method', 'value'),
+               Input('remove_baseline_min_half_window_value', 'value'),
+               Input('remove_baseline_max_half_window_value', 'value'),
+               Input('remove_baseline_decreasing', 'value'),
+               Input('remove_baseline_smooth_half_window_value', 'value'),
+               Input('remove_baseline_filter_order_value', 'value'),
+               Input('remove_baseline_sigma_value', 'value'),
+               Input('remove_baseline_increment_value', 'value'),
+               Input('remove_baseline_max_hits_value', 'value'),
+               Input('remove_baseline_window_tol_value', 'value'),
+               Input('remove_baseline_lambda__value', 'value'),
+               Input('remove_baseline_porder_value', 'value'),
+               Input('remove_baseline_repetition_value', 'value'),
+               Input('remove_baseline_degree_value', 'value'),
+               Input('remove_baseline_gradient_value', 'value'),
+               Input('normalize_intensity_method', 'value'),
+               Input('bin_spectrum_n_bins_value', 'value'),
+               Input('bin_spectrum_lower_mass_range_value', 'value'),
+               Input('bin_spectrum_upper_mass_range_value', 'value'),
+               Input('peak_picking_method', 'value'),
+               Input('peak_picking_snr_value', 'value'),
+               Input('peak_picking_widths_value', 'value')],
               State('edit_processing_parameters_modal', 'is_open'))
-def toggle_edit_preprocessing_parameters_modal(n_clicks_button, n_clicks_save, n_clicks_cancel, is_open):
+def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
+                                               n_clicks_save,
+                                               n_clicks_cancel,
+                                               trim_spectrum_lower_mass_range,
+                                               trim_spectrum_upper_mass_range,
+                                               transform_intensity_method,
+                                               smooth_baseline_method,
+                                               smooth_baseline_window_length,
+                                               smooth_baseline_polyorder,
+                                               smooth_baseline_delta_mz,
+                                               smooth_baseline_diff_thresh,
+                                               remove_baseline_method,
+                                               remove_baseline_min_half_window,
+                                               remove_baseline_max_half_window,
+                                               remove_baseline_decreasing,
+                                               remove_baseline_smooth_half_window,
+                                               remove_baseline_filter_order,
+                                               remove_baseline_sigma,
+                                               remove_baseline_increment,
+                                               remove_baseline_max_hits,
+                                               remove_baseline_window_tol,
+                                               remove_baseline_lambda_,
+                                               remove_baseline_porder,
+                                               remove_baseline_repetition,
+                                               remove_baseline_degree,
+                                               remove_baseline_gradient,
+                                               normalize_intensity_method,
+                                               bin_spectrum_n_bins,
+                                               bin_spectrum_lower_mass_range,
+                                               bin_spectrum_upper_mass_range,
+                                               peak_picking_method,
+                                               peak_picking_snr,
+                                               peak_picking_widths,
+                                               is_open):
+    global PREPROCESSING_PARAMS
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
-    if n_clicks_button or n_clicks_save or n_clicks_cancel:
+    if (changed_id == 'edit_preprocessing_parameters.n_clicks' or
+            changed_id == 'edit_processing_parameters_save.n_clicks' or
+            changed_id == 'edit_processing_parameters_cancel.n_clicks'):
         if changed_id == 'edit_processing_parameters_save.n_clicks':
-            # TODO: add code to parse edited parameters.
-            # TODO: need a global dict to store processing parameters; use code from flex_maldi_dda_automation config file
-            print('save')
+            PREPROCESSING_PARAMS['TRIM_SPECTRUM']['lower_mass_range'] = trim_spectrum_lower_mass_range
+            PREPROCESSING_PARAMS['TRIM_SPECTRUM']['upper_mass_range'] = trim_spectrum_upper_mass_range
+            PREPROCESSING_PARAMS['TRANSFORM_INTENSITY']['method'] = transform_intensity_method
+            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['method'] = smooth_baseline_method
+            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['window_length'] = smooth_baseline_window_length
+            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['polyorder'] = smooth_baseline_polyorder
+            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['delta_mz'] = smooth_baseline_delta_mz
+            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['diff_thresh'] = smooth_baseline_diff_thresh
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['method'] = remove_baseline_method
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['min_half_window'] = remove_baseline_min_half_window
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['max_half_window'] = remove_baseline_max_half_window
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['decreasing'] = remove_baseline_decreasing
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['smooth_half_window'] = remove_baseline_smooth_half_window
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['filter_order'] = remove_baseline_filter_order
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['sigma'] = remove_baseline_sigma
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['increment'] = remove_baseline_increment
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['max_hits'] = remove_baseline_max_hits
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['window_tol'] = remove_baseline_window_tol
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['lambda_'] = remove_baseline_lambda_
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['porder'] = remove_baseline_porder
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['repetition'] = remove_baseline_repetition
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['degree'] = remove_baseline_degree
+            PREPROCESSING_PARAMS['REMOVE_BASELINE']['gradient'] = remove_baseline_gradient
+            PREPROCESSING_PARAMS['NORMALIZE_INTENSITY']['method'] = normalize_intensity_method
+            PREPROCESSING_PARAMS['BIN_SPECTRUM']['n_bins'] = bin_spectrum_n_bins
+            PREPROCESSING_PARAMS['BIN_SPECTRUM']['lower_mass_range'] = bin_spectrum_lower_mass_range
+            PREPROCESSING_PARAMS['BIN_SPECTRUM']['upper_mass_range'] = bin_spectrum_upper_mass_range
+            PREPROCESSING_PARAMS['PEAK_PICKING']['method'] = peak_picking_method
+            PREPROCESSING_PARAMS['PEAK_PICKING']['snr'] = peak_picking_snr
+            PREPROCESSING_PARAMS['PEAK_PICKING']['widths'] = peak_picking_widths
         return not is_open
     return is_open
 
@@ -125,51 +218,175 @@ def toggle_edit_processing_parameters_saved_modal(n_clicks_save, n_clicks_close,
     return is_open
 
 
-@app.callback(Output('smooth_baseline_method_parameters', 'children'),
+@app.callback([Output('smooth_baseline_window_length', 'style'),
+               Output('smooth_baseline_polyorder', 'style'),
+               Output('smooth_baseline_delta_mz', 'style'),
+               Output('smooth_baseline_diff_thresh', 'style')],
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('smooth_baseline_method', 'value')])
 def toggle_smooth_baseline_method_parameters(n_clicks, value):
     global PREPROCESSING_PARAMS
+    shown = {'margin': '10px',
+             'display': 'flex'}
+    hidden = {'margin': '10px',
+              'display': 'none'}
     if value == 'SavitzkyGolay':
-        return get_smooth_baseline_savitzky_golay_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
     elif value == 'apodization':
-        return get_smooth_baseline_apodization_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
     elif value == 'rebin':
-        return get_smooth_baseline_rebin_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden)]
     elif value == 'fast_change':
-        return get_smooth_baseline_fast_change_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown)]
     elif value == 'median':
-        return get_smooth_baseline_median_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
 
 
-@app.callback(Output('remove_baseline_method_parameters', 'children'),
+@app.callback([Output('remove_baseline_min_half_window', 'style'),
+               Output('remove_baseline_max_half_window', 'style'),
+               Output('remove_baseline_decreasing', 'style'),
+               Output('remove_baseline_smooth_half_window', 'style'),
+               Output('remove_baseline_filter_order', 'style'),
+               Output('remove_baseline_sigma', 'style'),
+               Output('remove_baseline_increment', 'style'),
+               Output('remove_baseline_max_hits', 'style'),
+               Output('remove_baseline_window_tol', 'style'),
+               Output('remove_baseline_lambda_', 'style'),
+               Output('remove_baseline_porder', 'style'),
+               Output('remove_baseline_repetition', 'style'),
+               Output('remove_baseline_degree', 'style'),
+               Output('remove_baseline_gradient', 'style')],
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('remove_baseline_method', 'value')])
 def toggle_remove_baseline_method_parameters(n_clicks, value):
     global PREPROCESSING_PARAMS
+    shown = {'margin': '10px',
+             'display': 'flex'}
+    hidden = {'margin': '10px',
+              'display': 'none'}
     if value == 'SNIP':
-        return get_remove_baseline_snip_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
     elif value == 'TopHat':
-        return get_remove_baseline_tophat_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
     elif value == 'Median':
-        return get_remove_baseline_median_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
     elif value == 'ZhangFit':
-        return get_remove_baseline_zhangfit_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden)]
     elif value == 'ModPoly':
-        return get_remove_baseline_modpoly_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown)]
     elif value == 'IModPoly':
-        return get_remove_baseline_imodpoly_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(hidden),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown),
+                copy.deepcopy(shown)]
 
 
-@app.callback(Output('peak_picking_method_parameters', 'children'),
+@app.callback([Output('peak_picking_snr', 'style'),
+               Output('peak_picking_widths', 'Style')],
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('peak_picking_method', 'value')])
 def toggle_peak_picking_method_parameters(n_clicks, value):
     global PREPROCESSING_PARAMS
+    shown = {'margin': '10px',
+             'display': 'flex'}
+    hidden = {'margin': '10px',
+              'display': 'none'}
     if value == 'locmax':
-        return get_peak_picking_locmax_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(shown),
+                copy.deepcopy(hidden)]
     elif value == 'cwt':
-        return get_peak_picking_cwt_parameters(PREPROCESSING_PARAMS)
+        return [copy.deepcopy(shown),
+                copy.deepcopy(shown)]
 
 
 @app.callback([Output('spectrum', 'children'),
@@ -325,4 +542,4 @@ def resample_spectrum(relayoutdata: dict, fig: FigureResampler):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)

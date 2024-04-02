@@ -86,430 +86,6 @@ def get_spectrum_plot_layout(fig):
     return spectrum_plot
 
 
-def get_smooth_baseline_savitzky_golay_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Window Length'),
-                dbc.Input(id='smooth_baseline_window_length',
-                          placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
-                          value=param_dict['SMOOTH_BASELINE']['window_length'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Polyorder'),
-                dbc.Input(id='smooth_baseline_polyorder',
-                          placeholder=param_dict['SMOOTH_BASELINE']['polyorder'],
-                          value=param_dict['SMOOTH_BASELINE']['polyorder'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_smooth_baseline_apodization_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Window Length'),
-                dbc.Input(id='smooth_baseline_window_length',
-                          placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
-                          value=param_dict['SMOOTH_BASELINE']['window_length'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_smooth_baseline_rebin_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Delta m/z'),
-                dbc.Input(id='smooth_baseline_delta_mz',
-                          placeholder=param_dict['SMOOTH_BASELINE']['delta_mz'],
-                          value=param_dict['SMOOTH_BASELINE']['delta_mz'],
-                          type='number',
-                          min=0,
-                          step=0.001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_smooth_baseline_fast_change_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Difference Threshold'),
-                dbc.Input(id='smooth_baseline_diff_thresh',
-                          placeholder=param_dict['SMOOTH_BASELINE']['diff_thresh'],
-                          value=param_dict['SMOOTH_BASELINE']['diff_thresh'],
-                          type='number',
-                          min=0,
-                          step=0.001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_smooth_baseline_median_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Window Length'),
-                dbc.Input(id='smooth_baseline_window_length',
-                          placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
-                          value=param_dict['SMOOTH_BASELINE']['window_length'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_remove_baseline_snip_parameters(param_dict):
-    return [
-        html.P('Use Decreasing Iterative Window Sizes', style={'margin': '10px'}),
-        dcc.RadioItems(
-            id='remove_baseline_decreasing',
-            options=[
-                {'label': 'True', 'value': True},
-                {'label': 'False', 'value': False}
-            ],
-            value=param_dict['REMOVE_BASELINE']['decreasing'],
-            labelStyle={'display': 'inline-block', 'marginRight': '20px'},
-            inputStyle={'margin-right': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Maximum Half Window'),
-                dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Smoothing Half Window'),
-                dbc.Input(id='remove_baseline_smooth_half_window',
-                          placeholder=param_dict['REMOVE_BASELINE']['smooth_half_window'],
-                          value=param_dict['REMOVE_BASELINE']['smooth_half_window'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Filter Order'),
-                dbc.Input(id='remove_baseline_filter_order',
-                          placeholder=param_dict['REMOVE_BASELINE']['filter_order'],
-                          value=param_dict['REMOVE_BASELINE']['filter_order'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_remove_baseline_tophat_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Minimum Half Window'),
-                dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Maximum Half Window'),
-                dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Increment'),
-                dbc.Input(id='remove_baseline_increment',
-                          placeholder=param_dict['REMOVE_BASELINE']['increment'],
-                          value=param_dict['REMOVE_BASELINE']['increment'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Max Hits'),
-                dbc.Input(id='remove_baseline_max_hits',
-                          placeholder=param_dict['REMOVE_BASELINE']['max_hits'],
-                          value=param_dict['REMOVE_BASELINE']['max_hits'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Window Tolerance'),
-                dbc.Input(id='remove_baseline_window_tolerance',
-                          placeholder=param_dict['REMOVE_BASELINE']['window_tol'],
-                          value=param_dict['REMOVE_BASELINE']['window_tol'],
-                          type='number',
-                          min=0,
-                          step=0.000001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_remove_baseline_median_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Maximum Half Window'),
-                dbc.Input(id='remove_baseline_max_half_window',
-                          placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          value=param_dict['REMOVE_BASELINE']['max_half_window'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Smoothing Half Window'),
-                dbc.Input(id='remove_baseline_smooth_half_window',
-                          placeholder=param_dict['REMOVE_BASELINE']['smooth_half_window'],
-                          value=param_dict['REMOVE_BASELINE']['smooth_half_window'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Sigma'),
-                dbc.Input(id='remove_baseline_sigma',
-                          placeholder=param_dict['REMOVE_BASELINE']['sigma'],
-                          value=param_dict['REMOVE_BASELINE']['sigma'],
-                          type='number',
-                          min=0,
-                          step=0.001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_remove_baseline_zhangfit_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Lambda'),
-                dbc.Input(id='remove_baseline_lambda_',
-                          placeholder=param_dict['REMOVE_BASELINE']['lambda_'],
-                          value=param_dict['REMOVE_BASELINE']['lambda_'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('p-order'),
-                dbc.Input(id='remove_baseline_porder',
-                          placeholder=param_dict['REMOVE_BASELINE']['porder'],
-                          value=param_dict['REMOVE_BASELINE']['porder'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Repetition'),
-                dbc.Input(id='remove_baseline_repetition',
-                          placeholder=param_dict['REMOVE_BASELINE']['repetition'],
-                          value=param_dict['REMOVE_BASELINE']['repetition'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_remove_baseline_modpoly_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Degree'),
-                dbc.Input(id='remove_baseline_degree',
-                          placeholder=param_dict['REMOVE_BASELINE']['degree'],
-                          value=param_dict['REMOVE_BASELINE']['degree'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Repetition'),
-                dbc.Input(id='remove_baseline_repetition',
-                          placeholder=param_dict['REMOVE_BASELINE']['repetition'],
-                          value=param_dict['REMOVE_BASELINE']['repetition'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Gradient'),
-                dbc.Input(id='remove_baseline_gradient',
-                          placeholder=param_dict['REMOVE_BASELINE']['gradient'],
-                          value=param_dict['REMOVE_BASELINE']['gradient'],
-                          type='number',
-                          min=0,
-                          step=0.001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_remove_baseline_imodpoly_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Degree'),
-                dbc.Input(id='remove_baseline_degree',
-                          placeholder=param_dict['REMOVE_BASELINE']['degree'],
-                          value=param_dict['REMOVE_BASELINE']['degree'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Repetition'),
-                dbc.Input(id='remove_baseline_repetition',
-                          placeholder=param_dict['REMOVE_BASELINE']['repetition'],
-                          value=param_dict['REMOVE_BASELINE']['repetition'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Gradient'),
-                dbc.Input(id='remove_baseline_gradient',
-                          placeholder=param_dict['REMOVE_BASELINE']['gradient'],
-                          value=param_dict['REMOVE_BASELINE']['gradient'],
-                          type='number',
-                          min=0,
-                          step=0.001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_peak_picking_locmax_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Signal-to-Noise Ratio'),
-                dbc.Input(id='peak_picking_snr',
-                          placeholder=param_dict['PEAK_PICKING']['snr'],
-                          value=param_dict['PEAK_PICKING']['snr'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
-def get_peak_picking_cwt_parameters(param_dict):
-    return [
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Signal-to-Noise Ratio'),
-                dbc.Input(id='peak_picking_snr',
-                          placeholder=param_dict['PEAK_PICKING']['snr'],
-                          value=param_dict['PEAK_PICKING']['snr'],
-                          type='number',
-                          min=0,
-                          step=1)
-            ],
-            style={'margin': '10px'}
-        ),
-        dbc.InputGroup(
-            [
-                dbc.InputGroupText('Widths (Optional)'),
-                dbc.Input(id='peak_picking_widths',
-                          placeholder=param_dict['PEAK_PICKING']['widths'],
-                          value=param_dict['PEAK_PICKING']['widths'],
-                          type='number',
-                          min=0,
-                          step=0.001)
-            ],
-            style={'margin': '10px'}
-        )
-    ]
-
-
 def get_preprocessing_parameters_layout(param_dict):
     # TODO: change RadioItems to dbc.ButtonGroups?
     trim_spectrum_parameters = html.Div(
@@ -518,25 +94,27 @@ def get_preprocessing_parameters_layout(param_dict):
             dbc.InputGroup(
                 [
                     dbc.InputGroupText('Lower Mass Range'),
-                    dbc.Input(id='trim_spectrum_lower_mass_range',
+                    dbc.Input(id='trim_spectrum_lower_mass_range_value',
                               placeholder=param_dict['TRIM_SPECTRUM']['lower_mass_range'],
                               value=param_dict['TRIM_SPECTRUM']['lower_mass_range'],
                               type='number',
                               min=0,
                               step=1)
                 ],
+                id='trim_spectrum_lower_mass_range',
                 style={'margin': '10px'}
             ),
             dbc.InputGroup(
                 [
                     dbc.InputGroupText('Upper Mass Range'),
-                    dbc.Input(id='trim_spectrum_upper_mass_range',
+                    dbc.Input(id='trim_spectrum_upper_mass_range_value',
                               placeholder=param_dict['TRIM_SPECTRUM']['upper_mass_range'],
                               value=param_dict['TRIM_SPECTRUM']['upper_mass_range'],
                               type='number',
                               min=0,
                               step=1)
                 ],
+                id='trim_spectrum_upper_mass_range',
                 style={'margin': '10px'}
             )
         ],
@@ -582,9 +160,61 @@ def get_preprocessing_parameters_layout(param_dict):
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             ),
-            html.Div(
-                id='smooth_baseline_method_parameters',
-                children=[]
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Window Length'),
+                    dbc.Input(id='smooth_baseline_window_length_value',
+                              placeholder=param_dict['SMOOTH_BASELINE']['window_length'],
+                              value=param_dict['SMOOTH_BASELINE']['window_length'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='smooth_baseline_window_length',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Polyorder'),
+                    dbc.Input(id='smooth_baseline_polyorder_value',
+                              placeholder=param_dict['SMOOTH_BASELINE']['polyorder'],
+                              value=param_dict['SMOOTH_BASELINE']['polyorder'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='smooth_baseline_polyorder',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Delta m/z'),
+                    dbc.Input(id='smooth_baseline_delta_mz_value',
+                              placeholder=param_dict['SMOOTH_BASELINE']['delta_mz'],
+                              value=param_dict['SMOOTH_BASELINE']['delta_mz'],
+                              type='number',
+                              min=0,
+                              step=0.001)
+                ],
+                id='smooth_baseline_delta_mz',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Difference Threshold'),
+                    dbc.Input(id='smooth_baseline_diff_thresh_value',
+                              placeholder=param_dict['SMOOTH_BASELINE']['diff_thresh'],
+                              value=param_dict['SMOOTH_BASELINE']['diff_thresh'],
+                              type='number',
+                              min=0,
+                              step=0.001)
+                ],
+                id='smooth_baseline_diff_thresh',
+                style={'margin': '10px',
+                       'display': 'flex'}
             )
         ],
         id='smooth_baseline_parameters',
@@ -609,9 +239,200 @@ def get_preprocessing_parameters_layout(param_dict):
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             ),
-            html.Div(
-                id='remove_baseline_method_parameters',
-                children=[]
+            dcc.RadioItems(
+                id='remove_baseline_decreasing',
+                options=[
+                    {'label': 'Use Decreasing Iterative Window Sizes', 'value': True},
+                    {'label': 'Do Not Use Decreasing Iterative Window Sizes', 'value': False}
+                ],
+                value=param_dict['REMOVE_BASELINE']['decreasing'],
+                labelStyle={'display': 'inline-block', 'marginRight': '20px'},
+                inputStyle={'margin-right': '10px'},
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Minimum Half Window'),
+                    dbc.Input(id='remove_baseline_min_half_window_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
+                              value=param_dict['REMOVE_BASELINE']['max_half_window'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_min_half_window',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Maximum Half Window'),
+                    dbc.Input(id='remove_baseline_max_half_window_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['max_half_window'],
+                              value=param_dict['REMOVE_BASELINE']['max_half_window'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_max_half_window',
+
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Smoothing Half Window'),
+                    dbc.Input(id='remove_baseline_smooth_half_window_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['smooth_half_window'],
+                              value=param_dict['REMOVE_BASELINE']['smooth_half_window'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_smooth_half_window',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Filter Order'),
+                    dbc.Input(id='remove_baseline_filter_order_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['filter_order'],
+                              value=param_dict['REMOVE_BASELINE']['filter_order'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_filter_order',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Sigma'),
+                    dbc.Input(id='remove_baseline_sigma_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['sigma'],
+                              value=param_dict['REMOVE_BASELINE']['sigma'],
+                              type='number',
+                              min=0,
+                              step=0.001)
+                ],
+                id='remove_baseline_sigma',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Increment'),
+                    dbc.Input(id='remove_baseline_increment_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['increment'],
+                              value=param_dict['REMOVE_BASELINE']['increment'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_increment',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Max Hits'),
+                    dbc.Input(id='remove_baseline_max_hits_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['max_hits'],
+                              value=param_dict['REMOVE_BASELINE']['max_hits'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_max_hits',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Window Tolerance'),
+                    dbc.Input(id='remove_baseline_window_tol_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['window_tol'],
+                              value=param_dict['REMOVE_BASELINE']['window_tol'],
+                              type='number',
+                              min=0,
+                              step=0.000001)
+                ],
+                id='remove_baseline_window_tol',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Lambda'),
+                    dbc.Input(id='remove_baseline_lambda__value',
+                              placeholder=param_dict['REMOVE_BASELINE']['lambda_'],
+                              value=param_dict['REMOVE_BASELINE']['lambda_'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_lambda_',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('p-order'),
+                    dbc.Input(id='remove_baseline_porder_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['porder'],
+                              value=param_dict['REMOVE_BASELINE']['porder'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_porder',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Repetition'),
+                    dbc.Input(id='remove_baseline_repetition_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['repetition'],
+                              value=param_dict['REMOVE_BASELINE']['repetition'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_repetition',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Degree'),
+                    dbc.Input(id='remove_baseline_degree_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['degree'],
+                              value=param_dict['REMOVE_BASELINE']['degree'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='remove_baseline_degree',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Gradient'),
+                    dbc.Input(id='remove_baseline_gradient_value',
+                              placeholder=param_dict['REMOVE_BASELINE']['gradient'],
+                              value=param_dict['REMOVE_BASELINE']['gradient'],
+                              type='number',
+                              min=0,
+                              step=0.001)
+                ],
+                id='remove_baseline_gradient',
+                style={'margin': '10px',
+                       'display': 'flex'}
             )
         ],
         id='remove_baseline_parameters',
@@ -645,37 +466,40 @@ def get_preprocessing_parameters_layout(param_dict):
             dbc.InputGroup(
                 [
                     dbc.InputGroupText('Number of Bins'),
-                    dbc.Input(id='bin_spectrum_n_bins',
+                    dbc.Input(id='bin_spectrum_n_bins_value',
                               placeholder=param_dict['BIN_SPECTRUM']['n_bins'],
                               value=param_dict['BIN_SPECTRUM']['n_bins'],
                               type='number',
                               min=0,
                               step=100)
                 ],
+                id='bin_spectrum_n_bins',
                 style={'margin': '10px'}
             ),
             dbc.InputGroup(
                 [
                     dbc.InputGroupText('Lower Mass Range'),
-                    dbc.Input(id='bin_spectrum_lower_mass_range',
+                    dbc.Input(id='bin_spectrum_lower_mass_range_value',
                               placeholder=param_dict['BIN_SPECTRUM']['lower_mass_range'],
                               value=param_dict['BIN_SPECTRUM']['lower_mass_range'],
                               type='number',
                               min=0,
                               step=1)
                 ],
+                id='bin_spectrum_lower_mass_range',
                 style={'margin': '10px'}
             ),
             dbc.InputGroup(
                 [
                     dbc.InputGroupText('Upper Mass Range'),
-                    dbc.Input(id='bin_spectrum_upper_mass_range',
+                    dbc.Input(id='bin_spectrum_upper_mass_range_value',
                               placeholder=param_dict['BIN_SPECTRUM']['upper_mass_range'],
                               value=param_dict['BIN_SPECTRUM']['upper_mass_range'],
                               type='number',
                               min=0,
                               step=1)
                 ],
+                id='bin_spectrum_upper_mass_range',
                 style={'margin': '10px'}
             )
         ],
@@ -697,9 +521,33 @@ def get_preprocessing_parameters_layout(param_dict):
                 labelStyle={'display': 'inline-block', 'marginRight': '20px'},
                 inputStyle={'margin-right': '10px'}
             ),
-            html.Div(
-                id='peak_picking_method_parameters',
-                children=[]
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Signal-to-Noise Ratio'),
+                    dbc.Input(id='peak_picking_snr_value',
+                              placeholder=param_dict['PEAK_PICKING']['snr'],
+                              value=param_dict['PEAK_PICKING']['snr'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='peak_picking_snr',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Widths (Optional)'),
+                    dbc.Input(id='peak_picking_widths_value',
+                              placeholder=param_dict['PEAK_PICKING']['widths'],
+                              value=param_dict['PEAK_PICKING']['widths'],
+                              type='number',
+                              min=0,
+                              step=0.001)
+                ],
+                id='peak_picking_widths',
+                style={'margin': '10px',
+                       'display': 'flex'}
             )
         ],
         id='peak_picking_parameters',
