@@ -41,4 +41,4 @@ from pymaldiproc.preprocessing import *
 from pymaldiproc.layout import *
 from pymaldiproc.dashboard import *
 
-VERSION = '0.3.0a0'
+VERSION = '0.3.0a1'

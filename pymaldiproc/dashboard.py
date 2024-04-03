@@ -1,6 +1,8 @@
 import os
 import gc
+import copy
 import configparser
+import pandas as pd
 from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
 from pymaldiproc.layout import *
 from dash import State, callback_context, no_update
