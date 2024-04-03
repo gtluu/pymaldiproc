@@ -7,53 +7,6 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 
 
-# barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
-def get_dashboard_layout(param_dict):
-    dashboard_layout = html.Div(
-        [
-            html.Div(
-                [
-                    dbc.Button('Load *.mzML File', id='upload_mzml', style={'margin': '50px'}),
-                    dbc.Button('Load Bruker *.d File', id='upload_d', style={'margin': '50px'})
-                ],
-                style={'justify-content': 'center',
-                       'display': 'flex'}
-            ),
-            html.Div(
-                get_preprocessing_layout(param_dict),
-                id='preprocessing',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            html.Div(
-                id='dropdown',
-                className='one column',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            html.Div(
-                id='spectrum',
-                className='row',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            dcc.Loading(
-                dcc.Store(id='store_plot')
-            ),
-
-            html.Div(
-                id='dummy',
-                children=[],
-                style={'display': 'none'}
-            )
-        ]
-    )
-    return dashboard_layout
-
-
 def get_spectrum_plot_layout(fig):
     spectrum_plot = html.Div(
         dcc.Graph(
@@ -612,8 +565,7 @@ def get_preprocessing_layout(param_dict):
                 id='edit_processing_parameters_modal_saved',
                 centered=True,
                 is_open=False
-            ),
-            dcc.Download(id='peak_list')
+            )
         ],
         style={'justify-content': 'center',
                'display': 'flex'}
@@ -631,36 +583,54 @@ def get_dropdown_layout(data):
             dcc.Dropdown(id='spectrum_id',
                          multi=False,
                          options=[{'label': i, 'value': i} for i in data.keys()],
-                         # options=[{'label': '|'.join(i.split('|')[:-1]), 'value': i} for i in data.keys()],
                          value=[i for i in data.keys()])
         )
     ]
     return dropdown
 
 
-def get_spectrum(spectrum, label_peaks=False):
-    spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
-                                'Intensity': copy.deepcopy(spectrum.preprocessed_intensity_array)})
+# barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
+def get_dashboard_layout(param_dict):
+    dashboard_layout = html.Div(
+        [
+            html.Div(
+                [
+                    dbc.Button('Load *.mzML File', id='upload_mzml', style={'margin': '50px'}),
+                    dbc.Button('Load Bruker *.d File', id='upload_d', style={'margin': '50px'})
+                ],
+                style={'justify-content': 'center',
+                       'display': 'flex'}
+            ),
+            html.Div(
+                get_preprocessing_layout(param_dict),
+                id='preprocessing',
+                style={'width': '97%',
+                       'margin': '20px'}
+            ),
 
-    if label_peaks:
-        labels = copy.deepcopy(np.round(copy.deepcopy(spectrum.preprocessed_mz_array), decimals=4).astype(str))
-        mask = np.ones(labels.size, dtype=bool)
-        mask[spectrum.peak_picking_indices] = False
-        labels[mask] = ''
-        fig = FigureResampler(px.line(data_frame=spectrum_df,
-                                      x='m/z',
-                                      y='Intensity',
-                                      hover_data={'m/z': ':.4f',
-                                                  'Intensity': ':.1f'},
-                                      text=labels))
-        fig.update_traces(textposition='top center')
-    else:
-        fig = FigureResampler(px.line(data_frame=spectrum_df,
-                                      x='m/z',
-                                      y='Intensity',
-                                      hover_data={'m/z': ':.4f',
-                                                  'Intensity': ':.1f'}))
-    fig.update_layout(xaxis_tickformat='d',
-                      yaxis_tickformat='~e')
+            html.Div(
+                id='dropdown',
+                className='one column',
+                style={'width': '97%',
+                       'margin': '20px'}
+            ),
 
-    return fig
+            html.Div(
+                id='spectrum',
+                className='row',
+                style={'width': '97%',
+                       'margin': '20px'}
+            ),
+
+            dcc.Loading(
+                dcc.Store(id='store_plot')
+            ),
+
+            html.Div(
+                id='dummy',
+                children=[],
+                style={'display': 'none'}
+            )
+        ]
+    )
+    return dashboard_layout

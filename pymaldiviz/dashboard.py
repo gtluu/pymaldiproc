@@ -1,10 +1,9 @@
 import os
 import gc
-import copy
 import configparser
-import pandas as pd
 from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
-from pymaldiproc.layout import *
+from pymaldiviz.layout import *
+from pymaldiviz.util import *
 from dash import State, callback_context, no_update
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
 import dash_bootstrap_components as dbc
@@ -14,53 +13,7 @@ from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 # will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
 # default processing parameters from config file
-config = configparser.ConfigParser()
-config.read(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'etc', 'preprocessing.cfg'))
-TRIM_SPECTRUM_PARAMS = {'lower_mass_range': int(config['trim_spectrum']['lower_mass_range']),
-                        'upper_mass_range': int(config['trim_spectrum']['upper_mass_range'])}
-TRANSFORM_INTENSITY_PARAMS = {'method': config['transform_intensity']['method']}
-SMOOTH_BASELINE_PARAMS = {'method': config['smooth_baseline']['method'],
-                          'window_length': int(config['smooth_baseline']['window_length']),
-                          'polyorder': int(config['smooth_baseline']['polyorder']),
-                          'delta_mz': float(config['smooth_baseline']['delta_mz']),
-                          'diff_thresh': float(config['smooth_baseline']['diff_thresh'])}
-REMOVE_BASELINE_PARAMS = {'method': config['remove_baseline']['method'],
-                          'min_half_window': int(config['remove_baseline']['min_half_window']),
-                          'max_half_window': int(config['remove_baseline']['max_half_window']),
-                          'decreasing': config['remove_baseline'].getboolean('decreasing'),
-                          'smooth_half_window': None,
-                          'filter_order': int(config['remove_baseline']['filter_order']),
-                          'sigma': None,
-                          'increment': int(config['remove_baseline']['increment']),
-                          'max_hits': int(config['remove_baseline']['max_hits']),
-                          'window_tol': float(config['remove_baseline']['window_tol']),
-                          'lambda_': int(config['remove_baseline']['lambda_']),
-                          'porder': int(config['remove_baseline']['porder']),
-                          'repetition': None,
-                          'degree': int(config['remove_baseline']['degree']),
-                          'gradient': float(config['remove_baseline']['gradient'])}
-NORMALIZE_INTENSITY_PARAMS = {'method': config['normalize_intensity']['method']}
-BIN_SPECTRUM_PARAMS = {'n_bins': int(config['bin_spectrum']['n_bins']),
-                       'lower_mass_range': int(config['bin_spectrum']['lower_mass_range']),
-                       'upper_mass_range': int(config['bin_spectrum']['upper_mass_range'])}
-PEAK_PICKING_PARAMS = {'method': config['peak_picking']['method'],
-                       'snr': int(config['peak_picking']['snr']),
-                       'widths': None}
-if config['remove_baseline']['smooth_half_window'] != 'None':
-    REMOVE_BASELINE_PARAMS['smooth_half_window'] = int(config['remove_baseline']['smooth_half_window'])
-if config['remove_baseline']['sigma'] != 'None':
-    REMOVE_BASELINE_PARAMS['sigma'] = float(config['rmeove_baseline']['sigma'])
-if config['remove_baseline']['repetition'] != 'None':
-    REMOVE_BASELINE_PARAMS['repetition'] = int(config['remove_baseline']['repetition'])
-if config['peak_picking']['widths'] != 'None':
-    PEAK_PICKING_PARAMS['widths'] = int(config['peak_picking']['widths'])
-PREPROCESSING_PARAMS = {'TRIM_SPECTRUM': TRIM_SPECTRUM_PARAMS,
-                        'TRANSFORM_INTENSITY': TRANSFORM_INTENSITY_PARAMS,
-                        'SMOOTH_BASELINE': SMOOTH_BASELINE_PARAMS,
-                        'REMOVE_BASELINE': REMOVE_BASELINE_PARAMS,
-                        'NORMALIZE_INTENSITY': NORMALIZE_INTENSITY_PARAMS,
-                        'BIN_SPECTRUM': BIN_SPECTRUM_PARAMS,
-                        'PEAK_PICKING': PEAK_PICKING_PARAMS}
+PREPROCESSING_PARAMS = get_preprocessing_params()
 
 # Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
 app = DashProxy(prevent_initial_callbacks=True,
@@ -102,9 +55,7 @@ def upload_data(n_clicks_mzml, n_clicks_d):
 def plot_spectrum(value):
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -234,36 +185,16 @@ def toggle_edit_processing_parameters_saved_modal(n_clicks_save, n_clicks_close,
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('smooth_baseline_method', 'value')])
 def toggle_smooth_baseline_method_parameters(n_clicks, value):
-    global PREPROCESSING_PARAMS
-    shown = {'margin': '10px',
-             'display': 'flex'}
-    hidden = {'margin': '10px',
-              'display': 'none'}
     if value == 'SavitzkyGolay':
-        return [copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_savitzky_golay_style()
     elif value == 'apodization':
-        return [copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_apodization_style()
     elif value == 'rebin':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden)]
+        return toggle_rebin_style()
     elif value == 'fast_change':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown)]
+        return toggle_fast_change_style()
     elif value == 'median':
-        return [copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_smoothing_median_style()
 
 
 @app.callback([Output('remove_baseline_min_half_window', 'style'),
@@ -283,101 +214,18 @@ def toggle_smooth_baseline_method_parameters(n_clicks, value):
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('remove_baseline_method', 'value')])
 def toggle_remove_baseline_method_parameters(n_clicks, value):
-    global PREPROCESSING_PARAMS
-    shown = {'margin': '10px',
-             'display': 'flex'}
-    hidden = {'margin': '10px',
-              'display': 'none'}
     if value == 'SNIP':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_snip_style()
     elif value == 'TopHat':
-        return [copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_tophat_style()
     elif value == 'Median':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_removal_median_style()
     elif value == 'ZhangFit':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden)]
+        return toggle_zhangfit_style()
     elif value == 'ModPoly':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown)]
+        return toggle_modpoly_style()
     elif value == 'IModPoly':
-        return [copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(hidden),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown),
-                copy.deepcopy(shown)]
+        return toggle_imodpoly_style()
 
 
 @app.callback([Output('peak_picking_snr', 'style'),
@@ -385,17 +233,10 @@ def toggle_remove_baseline_method_parameters(n_clicks, value):
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('peak_picking_method', 'value')])
 def toggle_peak_picking_method_parameters(n_clicks, value):
-    global PREPROCESSING_PARAMS
-    shown = {'margin': '10px',
-             'display': 'flex'}
-    hidden = {'margin': '10px',
-              'display': 'none'}
     if value == 'locmax':
-        return [copy.deepcopy(shown),
-                copy.deepcopy(hidden)]
+        return toggle_locmax_style()
     elif value == 'cwt':
-        return [copy.deepcopy(shown),
-                copy.deepcopy(shown)]
+        return toggle_cwt_style()
 
 
 @app.callback([Output('spectrum', 'children'),
@@ -407,9 +248,7 @@ def trim_spectrum_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].trim_spectrum(**PREPROCESSING_PARAMS['TRIM_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -422,9 +261,7 @@ def transform_intensity_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].transform_intensity(**PREPROCESSING_PARAMS['TRANSFORM_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -437,9 +274,7 @@ def smooth_baseline_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].smooth_baseline(**PREPROCESSING_PARAMS['SMOOTH_BASELINE'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -453,9 +288,7 @@ def remove_baseline_button(n_clicks, value):
     INDEXED_DATA[value].remove_baseline(**PREPROCESSING_PARAMS['REMOVE_BASELINE'],
                                         )
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -468,9 +301,7 @@ def normalize_intensity_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].normalize_intensity(**PREPROCESSING_PARAMS['NORMALIZE_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -483,9 +314,7 @@ def bin_spectrum_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].bin_spectrum(**PREPROCESSING_PARAMS['BIN_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -498,9 +327,7 @@ def peak_picking_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].peak_picking(**PREPROCESSING_PARAMS['PEAK_PICKING'])
     fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -516,9 +343,7 @@ def undo_peak_picking(n_clicks, value):
     del INDEXED_DATA[value].data_processing['peak picking']
     gc.collect()
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 
@@ -549,9 +374,7 @@ def undo_preprocessing(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].undo_all_processing()
     fig = get_spectrum(INDEXED_DATA[value])
-    for filename in os.listdir(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend')):
-        os.remove(os.path.join(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'file_system_backend'),
-                               filename))
+    cleanup_file_system_backend()
     return [get_spectrum_plot_layout(fig)], Serverside(fig)
 
 

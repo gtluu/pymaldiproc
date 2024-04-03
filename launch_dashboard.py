@@ -1,7 +1,7 @@
 from contextlib import redirect_stdout
 from io import StringIO
 import webview
-from pymaldiproc.dashboard import app
+from pymaldiviz.dashboard import app
 from pymaldiproc import VERSION
 
 

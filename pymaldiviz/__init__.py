@@ -35,8 +35,8 @@ import webview
 import tkinter
 from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
-from pymaldiproc.classes import *
-from pymaldiproc.data_import import *
-from pymaldiproc.preprocessing import *
+from pymaldiviz.layout import *
+from pymaldiviz.dashboard import *
+from pymaldiviz.util import *
 
 VERSION = '0.3.0a2'
