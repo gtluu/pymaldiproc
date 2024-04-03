@@ -71,27 +71,8 @@ app.layout = get_dashboard_layout(PREPROCESSING_PARAMS)
               [Input('upload_mzml', 'n_clicks'),
                Input('upload_d', 'n_clicks')])
 def upload_data(n_clicks_mzml, n_clicks_d):
-    global INDEXED_DATA
-    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
-    if changed_id == 'upload_mzml.n_clicks':
-        main_tk_window = tkinter.Tk()
-        main_tk_window.attributes('-topmost', True, '-alpha', 0)
-        filenames = askopenfilenames(filetypes=[('mzML Files', '*.mzML')])
-        main_tk_window.destroy()
-        for filename in filenames:
-            data = import_mzml(filename)
-            for spectrum in data:
-                INDEXED_DATA[spectrum.spectrum_id] = spectrum
-    elif changed_id == 'upload_d.n_clicks':
-        main_tk_window = tkinter.Tk()
-        main_tk_window.attributes('-topmost', True, '-alpha', 0)
-        dirname = askdirectory(mustexist=True)
-        main_tk_window.destroy()
-        if dirname.endswith('.d'):
-            data = import_timstof_raw_data(dirname, mode='profile')
-            for spectrum in data:
-                INDEXED_DATA[spectrum.spectrum_id] = spectrum
-    return get_dropdown_layout(INDEXED_DATA)
+    # TODO: replace dropdown with analysis list table
+    return get_dropdown(INDEXED_DATA)
 
 
 @app.callback([Output('spectrum', 'children'),

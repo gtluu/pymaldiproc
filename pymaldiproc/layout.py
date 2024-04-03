@@ -5,67 +5,6 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 
 
-# barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
-def get_dashboard_layout(param_dict):
-    dashboard_layout = html.Div(
-        [
-            html.Div(
-                [
-                    dbc.Button('Load *.mzML File', id='upload_mzml', style={'margin': '50px'}),
-                    dbc.Button('Load Bruker *.d File', id='upload_d', style={'margin': '50px'})
-                ],
-                style={'justify-content': 'center',
-                       'display': 'flex'}
-            ),
-            html.Div(
-                get_preprocessing_layout(param_dict),
-                id='preprocessing',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            html.Div(
-                id='dropdown',
-                className='one column',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            html.Div(
-                id='spectrum',
-                className='row',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            dcc.Loading(
-                dcc.Store(id='store_plot')
-            ),
-
-            html.Div(
-                id='dummy',
-                children=[],
-                style={'display': 'none'}
-            )
-        ]
-    )
-    return dashboard_layout
-
-
-def get_spectrum_plot_layout(fig):
-    spectrum_plot = html.Div(
-        dcc.Graph(
-            id='spectrum_plot',
-            figure=fig,
-            style={
-                'width': '100%',
-                'height': '600px'
-            }
-        )
-    )
-    return spectrum_plot
-
-
 def get_preprocessing_parameters_layout(param_dict):
     trim_spectrum_parameters = html.Div(
         [
@@ -566,74 +505,26 @@ def get_preprocessing_parameters_layout(param_dict):
             peak_picking_parameters]
 
 
-def get_preprocessing_layout(param_dict):
-    preprocessing_title = html.Div(
-        html.H1('Preprocessing', className='row')
-    )
-
-    preprocessing_buttons = html.Div(
-        [
-            dbc.Button('Trim Spectrum', id='trim_spectrum', style={'margin': '5px'}),
-            dbc.Button('Transform Intensity', id='transform_intensity', style={'margin': '5px'}),
-            dbc.Button('Smooth Baseline', id='smooth_baseline', style={'margin': '5px'}),
-            dbc.Button('Remove Baseline', id='remove_baseline', style={'margin': '5px'}),
-            dbc.Button('Normalize Intensity', id='normalize_intensity', style={'margin': '5px'}),
-            dbc.Button('Bin Spectrum', id='bin_spectrum', style={'margin': '5px'}),
-            dbc.Button('Label Peaks', id='peak_picking', style={'margin': '5px'}),
-            dbc.Button('Export Peak List from Labeled Peaks', id='export_peak_list', style={'margin': '5px'}),
-            dbc.Button('Undo Preprocessing', id='undo_preprocessing', style={'margin': '5px'}),
-            dbc.Button('Undo Peak Labeling', id='undo_peak_picking', style={'margin': '5px'}),
-            dbc.Button('Edit Preprocessing Parameters', id='edit_preprocessing_parameters', style={'margin': '5px'}),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
-                    dbc.ModalBody(get_preprocessing_parameters_layout(param_dict)),
-                    dbc.ModalFooter(dbc.ButtonGroup([
-                        dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
-                        dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
-                    ]))
-                ],
-                id='edit_processing_parameters_modal',
-                fullscreen=True,
-                backdrop='static',
-                scrollable=True,
-                centered=True,
-                is_open=False
-            ),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing parameters have been saved.')),
-                    dbc.ModalFooter(dbc.Button('Close',
-                                               id='edit_processing_parameters_modal_saved_close',
-                                               className='ms-auto'))
-                ],
-                id='edit_processing_parameters_modal_saved',
-                centered=True,
-                is_open=False
-            ),
-            dcc.Download(id='peak_list')
-        ],
-        style={'justify-content': 'center',
-               'display': 'flex'}
-    )
-
-    return [preprocessing_title, preprocessing_buttons]
-
-
-def get_dropdown_layout(data):
-    dropdown = [
-        html.Div(
-            html.H1('Spectrum ID', className='row')
-        ),
-        html.Div(
-            dcc.Dropdown(id='spectrum_id',
-                         multi=False,
-                         options=[{'label': i, 'value': i} for i in data.keys()],
-                         # options=[{'label': '|'.join(i.split('|')[:-1]), 'value': i} for i in data.keys()],
-                         value=[i for i in data.keys()])
+def get_spectrum_plot_layout(fig):
+    spectrum_plot = html.Div(
+        dcc.Graph(
+            id='spectrum_plot',
+            figure=fig,
+            style={
+                'width': '100%',
+                'height': '600px'
+            }
         )
-    ]
-    return dropdown
+    )
+    return spectrum_plot
+
+
+def get_dropdown(data):
+    dropdown = dcc.Dropdown(id='spectrum_id',
+                            multi=False,
+                            options=[{'label': i, 'value': i} for i in data.keys()],
+                            value=[i for i in data.keys()])
+    return [html.H1('Spectra List'), dropdown]
 
 
 def get_spectrum(spectrum, label_peaks=False):
@@ -662,3 +553,68 @@ def get_spectrum(spectrum, label_peaks=False):
                       yaxis_tickformat='~e')
 
     return fig
+
+
+# barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
+def get_dashboard_layout(param_dict):
+    dashboard_layout = html.Div(
+        children=[
+            html.Div(
+                children=[
+                    html.H1('Spectra List'),
+                    dcc.Dropdown(id='spectrum_id',
+                                 multi=False,
+                                 options=[],
+                                 value=[])
+                ],
+                id='spectra_list',
+                className='one column',
+                style={'width': '97%',
+                       'margin': '20px'}
+            ),
+
+            html.Div(
+                children=[],
+                id='spectrum',
+                className='row',
+                style={'width': '97%',
+                       'margin': '20px'}
+            ),
+
+            dbc.Modal(
+                children=[
+                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
+                    dbc.ModalBody(get_preprocessing_parameters_layout(param_dict)),
+                    dbc.ModalFooter(dbc.ButtonGroup([
+                        dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
+                        dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
+                    ]))
+                ],
+                id='edit_processing_parameters_modal',
+                fullscreen=True,
+                backdrop='static',
+                scrollable=True,
+                centered=True,
+                is_open=False
+            ),
+
+            dbc.Modal(
+                children=[
+                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing parameters have been saved.')),
+                    dbc.ModalFooter(dbc.Button('Close',
+                                               id='edit_processing_parameters_modal_saved_close',
+                                               className='ms-auto'))
+                ],
+                id='edit_processing_parameters_modal_saved',
+                centered=True,
+                is_open=False
+            ),
+
+            dcc.Loading(
+                dcc.Store(id='store_plot'),
+                id='loading'
+            )
+        ],
+        id='app'
+    )
+    return dashboard_layout
