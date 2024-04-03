@@ -3,7 +3,7 @@ from pymaldiproc import VERSION
 
 setup(name='pyMALDIproc',
       version=VERSION,
-      packages=['pymaldiproc'],
+      packages=['pymaldiproc', 'pymaldiviz'],
       url='https://github.com/gtluu/pyMALDIproc',
       license='Apache License',
       author='Gordon T. Luu',
