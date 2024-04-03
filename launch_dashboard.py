@@ -54,6 +54,10 @@ def bin_spectrum():
     pass
 
 
+def align_spectra():
+    pass
+
+
 def label_peaks():
     pass
 
@@ -95,6 +99,7 @@ def get_pymaldiproc_menu():
                 wm.MenuAction('Remove Baseline', remove_baseline),
                 wm.MenuAction('Normalize Intensity', normalize_intensity),
                 wm.MenuAction('Bin Spectrum', bin_spectrum),
+                wm.MenuAction('Align Spectra', align_spectra),
                 wm.MenuAction('Label Peaks', label_peaks),
                 wm.MenuSeparator(),
                 wm.MenuAction('Undo Preprocessing', undo_preprocessing),
