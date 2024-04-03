@@ -5,6 +5,8 @@
 pyMALDIproc is a library designed for mass spectrometrists that aggregates methods from different libraries to allow 
 users to easily process and work with MALDI-TOF dried droplet data, similar to the [MALDIquant](https://cran.r-project.org/web/packages/MALDIquant/index.html) R package.
 
+Included software components: Copyright © 2022 by Bruker Daltonics GmbH & Co. KG. All rights reserved
+
 ## Installation
 
 #### Install Anaconda and Git on Windows.
@@ -45,9 +47,9 @@ conda activate pymaldiproc
 ```
 pip install -r https://raw.githubusercontent.com/gtluu/pymaldiproc/main/requirements.txt
 ```
-7. Install pyMALDIproc.
+7. Install pyMALDIproc. Currently, [v0.2.1](https://github.com/gtluu/pymaldiproc/releases/tag/v0.2.1) is the latest version compatible with existing examples below. [v0.3.0a0](https://github.com/gtluu/pymaldiproc/releases/tag/v0.3.0a0) is currently under development and contains an early stage dashboard for data visualization (more documentation to come).
 ```
-pip install git+https://github.com/gtluu/pymaldiproc
+pip install git+https://github.com/gtluu/pymaldiproc@v0.2.1
 ```
 
 ## Usage
