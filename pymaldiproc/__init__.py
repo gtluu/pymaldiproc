@@ -31,6 +31,7 @@ from dash import State, callback_context, no_update, dcc, html
 from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
 import dash_bootstrap_components as dbc
 import webview
+import webview.menu as wm
 
 import tkinter
 from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
