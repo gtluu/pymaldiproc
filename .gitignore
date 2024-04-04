@@ -6,3 +6,5 @@
 /venv
 /data
 /pymaldiproc.egg-info
+config.bat
+node_modules
