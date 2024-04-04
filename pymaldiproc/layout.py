@@ -203,10 +203,5 @@ def get_spectrum(spectrum, label_peaks=False):
     fig.update_layout(xaxis_tickformat='d',
                       yaxis_tickformat='~e')
 
-    # TODO: add code to add peak labels
-    if spectrum.peak_picked_mz_array is not None and spectrum.peak_picked_intensity_array is not None:
-        pass
-
-    # plot_layout = dcc.Graph(id='spectrum_plot', figure=fig, style={'width': '100%', 'height': '600px'})
-    # preprocessing_layout = get_preprocessing_layout()
     return fig
+    

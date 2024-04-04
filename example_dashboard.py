@@ -1,3 +1,5 @@
+import utils.transport
+import utils.session
 from pymaldiproc.classes import *
 from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
