@@ -41,7 +41,7 @@ def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_valu
     # get a consensus m/z array
     peak_picked_mz_arrays = [copy.deepcopy(spectrum.peak_picked_mz_array) for spectrum in list_of_spectra]
     peak_picked_consensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(peak_picked_mz_arrays))}).sort_values(by='mz')
-    preprocessed_mz_arrays = [copy.deepcopy(spectrum.get_mz_array()) for spectrum in list_of_spectra]
+    preprocessed_mz_arrays = [copy.deepcopy(spectrum.preprocessed_mz_array) for spectrum in list_of_spectra]
     preprocessed_concensus = pd.DataFrame(data={'mz': np.unique(np.concatenate(preprocessed_mz_arrays))}).sort_values(by='mz')
 
     spectra_dfs_peak_picked = [peak_picked_consensus]
