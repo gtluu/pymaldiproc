@@ -48,9 +48,9 @@ def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_valu
     spectra_dfs_preprocessed = [preprocessed_concensus]
     for spectrum in list_of_spectra:
         spectra_dfs_peak_picked.append(pd.DataFrame(data={'mz': spectrum.peak_picked_mz_array,
-                                                          spectrum.spectrum_id: spectrum.get_intensity_array()}))
-        spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.get_mz_array(),
-                                                           spectrum.spectrum_id: spectrum.get_intensity_array()}))
+                                                          spectrum.spectrum_id: spectrum.peak_picked_intensity_array}))
+        spectra_dfs_preprocessed.append(pd.DataFrame(data={'mz': spectrum.preprocessed_mz_array,
+                                                           spectrum.spectrum_id: spectrum.preprocessed_intensity_array}))
     feature_matrix = reduce(lambda x, y: pd.merge_asof(x,
                                                        y,
                                                        on='mz',
