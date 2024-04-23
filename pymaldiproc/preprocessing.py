@@ -35,7 +35,6 @@ def align_spectra(list_of_spectra, method='average', inter='whole', n='f', scale
     return list_of_spectra
 
 
-# TODO: look for pandas version that still accepts floats for merge_asof.
 def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_value_imputation=True):
     print('Creating feature intensity matrix')
     # get a consensus m/z array
@@ -73,7 +72,8 @@ def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_valu
                                        direction='nearest')
                 feature_matrix[colname] = tmp_df.drop('mz', axis=1).mean(axis=1).values
     feature_matrix = feature_matrix.fillna(0)
-    feature_matrix = feature_matrix.round({'mz': decimals})
+    feature_matrix = feature_matrix.groupby(feature_matrix.columns[1:].values.tolist()).mean()
+    feature_matrix = feature_matrix.sort_values(by='mz').round(decimals).reset_index()
     feature_matrix = feature_matrix.groupby(['mz'], as_index=False).aggregate(sum)
     return feature_matrix
 
