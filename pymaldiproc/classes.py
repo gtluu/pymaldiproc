@@ -13,6 +13,7 @@ from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pyopenms import *
 
 
 class PMPMethods(object):
@@ -207,7 +208,10 @@ class PMPMethods(object):
         widths = peak_widths(copy.deepcopy(self.preprocessed_intensity_array), peak_indices)
         return widths[0]
 
-    def peak_picking(self, method='cwt', widths=None, snr=3):
+    def peak_picking(self, method='cwt', widths=None, snr=3, deisotope=False, fragment_tolerance=0.05,
+                     fragment_unit_ppm=False, min_charge=1, max_charge=1, keep_only_deisotoped=False, min_isopeaks=2,
+                     max_isopeaks=10, make_single_charged=True, annotate_charge=False, annotate_iso_peak_count=False,
+                     use_decreasing_model=True, start_intensity_check=1, add_up_intensity=False):
         # check method
         if method not in ['locmax', 'cwt']:
             raise Exception('Method must be "locmax" or "cwt"')
@@ -235,6 +239,30 @@ class PMPMethods(object):
             self.data_processing['peak picking']['signal to noise ratio'] = snr
             self.data_processing['peak picking']['lower peak width'] = np.min(widths)
             self.data_processing['peak picking']['upper peak width'] = np.max(widths)
+
+        if deisotope:
+            poms_spec = MSSpectrum()
+            poms_spec.set_peaks((copy.deepcopy(self.peak_picked_mz_array),
+                                 copy.deepcopy(self.peak_picked_intensity_array)))
+            Deisotoper.deisotopeAndSingleCharge(poms_spec,
+                                                fragment_tolerance,
+                                                fragment_unit_ppm,
+                                                min_charge,
+                                                max_charge,
+                                                keep_only_deisotoped,
+                                                min_isopeaks,
+                                                max_isopeaks,
+                                                make_single_charged,
+                                                annotate_charge,
+                                                annotate_iso_peak_count,
+                                                use_decreasing_model,
+                                                start_intensity_check,
+                                                add_up_intensity)
+            poms_spec_mz, poms_spec_intensity = poms_spec.get_peaks()
+            self.peak_picking_indices = np.searchsorted(copy.deepcopy(self.preprocessed_mz_array),
+                                                        copy.deepcopy(poms_spec_mz))
+            self.peak_picked_mz_array = copy.deepcopy(poms_spec_mz)
+            self.peak_picked_intensity_array = copy.deepcopy(poms_spec_intensity)
 
         gc.collect()
 
