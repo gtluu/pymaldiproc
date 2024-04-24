@@ -45,7 +45,21 @@ def get_preprocessing_params():
                            'upper_mass_range': int(config['bin_spectrum']['upper_mass_range'])}
     peak_picking_params = {'method': config['peak_picking']['method'],
                            'snr': int(config['peak_picking']['snr']),
-                           'widths': None}
+                           'widths': None,
+                           'deisotope': config['peak_picking'].getboolean('deisotope'),
+                           'fragment_tolerance': float(config['peak_picking']['fragment_tolerance']),
+                           'fragment_unit_ppm': config['peak_picking'].getboolean('fragment_unit_ppm'),
+                           'min_charge': int(config['peak_picking']['min_charge']),
+                           'max_charge': int(config['peak_picking']['max_charge']),
+                           'keep_only_deisotoped': config['peak_picking'].getboolean('keep_only_deisotoped'),
+                           'min_isopeaks': int(config['peak_picking']['min_isopeaks']),
+                           'max_isopeaks': int(config['peak_picking']['max_isopeaks']),
+                           'make_single_charged': config['peak_picking'].getboolean('make_single_charged'),
+                           'annotate_charge': config['peak_picking'].getboolean('annotate_charge'),
+                           'annotate_iso_peak_count': config['peak_picking'].getboolean('annotate_iso_peak_count'),
+                           'use_decreasing_model': config['peak_picking'].getboolean('use_decreasing_model'),
+                           'start_intensity_check': int(config['peak_picking']['start_intensity_check']),
+                           'add_up_intensity': config['peak_picking'].getboolean('add_up_intensity')}
     if config['remove_baseline']['smooth_half_window'] != 'None':
         remove_baseline_params['smooth_half_window'] = int(config['remove_baseline']['smooth_half_window'])
     if config['remove_baseline']['sigma'] != 'None':
@@ -242,3 +256,37 @@ def toggle_locmax_style():
 def toggle_cwt_style():
     return [copy.deepcopy(SHOWN),
             copy.deepcopy(SHOWN)]
+
+
+def toggle_deisotope_on_style():
+    return [copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN),
+            copy.deepcopy(SHOWN)]
+
+
+def toggle_deisotope_off_style():
+    return [copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN),
+            copy.deepcopy(HIDDEN)]
