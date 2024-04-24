@@ -271,7 +271,7 @@ def toggle_remove_baseline_method_parameters(n_clicks, value):
 
 
 @app.callback([Output('peak_picking_snr', 'style'),
-               Output('peak_picking_widths', 'Style')],
+               Output('peak_picking_widths', 'style')],
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('peak_picking_method', 'value')])
 def toggle_peak_picking_method_parameters(n_clicks, value):
