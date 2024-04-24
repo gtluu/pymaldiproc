@@ -26,6 +26,25 @@ def schema_detection(bruker_dot_d_file):
 
 
 def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclude_mobility=True):
+    """
+    Import spectra from Bruker TSF and TDF files. Due to incompatibility with current preprocessing methods, ion
+    mobility data is not parsed by default.
+
+    :param input_path: Path to the directory to be searched. If the path is a Bruker .d directory, spectra from that
+        dataset will be imported. If the path is a directory containing multiple Bruker TSF/TDF files, all data will be
+        loaded.
+    :type input_path: str
+    :param mode: Data array mode, either "profile", "centroid", or "raw".
+    :type mode: str
+    :param profile_bins: Number of bins to bin spectrum to.
+    :type profile_bins: int
+    :param encoding: Encoding bit mode, either "64" or "32"
+    :type encoding: int
+    :param exclude_mobility: Whether to include mobility data in the output files, defaults to True.
+    :type exclude_mobility: bool | None
+    :return: List of spectra.
+    :rtype: list[pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMPTdfSpectrum]
+    """
     # find Bruker .d directories
     if input_path.endswith('.d'):
         input_files = [input_path]
@@ -49,6 +68,15 @@ def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclu
 
 
 def import_mzml(input_path):
+    """
+    Import spectra from mzML files.
+
+    :param input_path: Path to the directory to be searched. If the path is an mzML file, spectra from that dataset
+        will be imported. If the path is a directory containing multiple mzML files, all data will be loaded.
+    :type input_path: str
+    :return: List of spectra.
+    :rtype: list[pymaldiproc.classes.OpenMALDISpectrum]
+    """
     # find mzML files
     if input_path.endswith('.mzML'):
         input_files = [input_path]
@@ -66,6 +94,15 @@ def import_mzml(input_path):
 
 
 def import_mzxml(input_path):
+    """
+    Import spectra from mzXML files.
+
+    :param input_path: Path to the directory to be searched. If the path is an mzXML file, spectra from that dataset
+        will be imported. If the path is a directory containing multiple mzXML files, all data will be loaded.
+    :type input_path: str
+    :return: List of spectra.
+    :rtype: list[pymaldiproc.classes.OpenMALDISpectrum]
+    """
     # find mzML files
     if input_path.endswith('.mzXML'):
         input_files = [input_path]

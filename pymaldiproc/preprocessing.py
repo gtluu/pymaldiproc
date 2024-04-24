@@ -5,6 +5,7 @@ from functools import reduce
 from icoshift import icoshift
 
 
+"""align_spectra currently not functioning
 def align_spectra(list_of_spectra, method='average', inter='whole', n='f', scale=None, coshift_preprocessing=False,
                   coshift_preprocessing_max_shift=None, fill_with_previous=True, average2_multiplier=3):
     print('Aligning spectra')
@@ -32,10 +33,25 @@ def align_spectra(list_of_spectra, method='average', inter='whole', n='f', scale
         spectrum.data_processing['spectra alignment']['fill_with_previous'] = fill_with_previous
         spectrum.data_processing['spectra alignment']['average2_multiplier'] = average2_multiplier
 
-    return list_of_spectra
+    return list_of_spectra"""
 
 
 def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_value_imputation=True):
+    """
+    Create a feature matrix from two or more preprocessed spectra in which peak picking has been performed.
+
+    :param list_of_spectra: List of spectrum objects.
+    :type list_of_spectra: list[pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMPTdfSpectrum]
+    :param tolerance: Tolerance in Da used to consider whether features from different spectra are the same feature.
+    :type tolerance: float
+    :param decimals: Number of decimal places to report for m/z values.
+    :type decimals: int
+    :param missing_value_imputation: Whether to perform missing value imputation for peak picked features missing a
+        corresponding intensity value. Missing values are obtained from corresponding preprocessed intensity arrays.
+    :type missing_value_imputation: bool
+    :return: Feature matrix with intensity values from each spectrum.
+    :rtype: pandas.DataFrame
+    """
     print('Creating feature intensity matrix')
     # get a consensus m/z array
     peak_picked_mz_arrays = [copy.deepcopy(spectrum.peak_picked_mz_array) for spectrum in list_of_spectra]
@@ -79,5 +95,13 @@ def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_valu
 
 
 def export_feature_matrix(feature_matrix, output):
+    """
+    Export a feature matrix to a CSV file.
+
+    :param feature_matrix: Feature matrix with intensity values from each spectrum.
+    :type feature_matrix: pandas.DataFrame
+    :param output: Output CSV file path.
+    :type output: str
+    """
     print('Exporting feature matrix to ' + output)
     feature_matrix.to_csv(output, index=False)
