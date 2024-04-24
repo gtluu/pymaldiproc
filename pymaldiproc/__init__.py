@@ -21,6 +21,7 @@ from pybaselines.morphological import tophat
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
 from icoshift import icoshift
+from pyopenms import *
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -39,4 +40,4 @@ from pymaldiproc.classes import *
 from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 
-VERSION = '0.3.0a8'
+VERSION = '0.3.0a9'

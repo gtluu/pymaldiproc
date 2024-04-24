@@ -1,6 +1,4 @@
-import os
 import gc
-import configparser
 from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
 from pymaldiviz.layout import *
 from pymaldiviz.util import *

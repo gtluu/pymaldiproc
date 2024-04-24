@@ -1,7 +1,6 @@
 import os
 import copy
 import gc
-import numpy as np
 import pandas as pd
 from uuid import uuid4
 from pyTDFSDK.classes import TsfSpectrum, TdfSpectrum
