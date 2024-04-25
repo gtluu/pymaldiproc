@@ -325,7 +325,7 @@ class PMPMethods(object):
         :param method: Method to use for peak picking. Either local maxima ('locmax') or continuous wavelet
             transformation ('cwt').
         :type method: str
-        :param widths: Required width of peaks in samples. If using 'cwt' method, used for calculating the CWT matrix
+        :param widths: Required width of peaks in samples. If using 'cwt' method, used for calculating the CWT matrix.
             Range should cover the expected width of peaks of interest.
         :type widths: float | None
         :param snr: Minimum signal-to-noise ratio required to consider peak.
@@ -355,7 +355,7 @@ class PMPMethods(object):
         :param annotate_iso_peak_count: Whether to annotate the number of isotopic peaks in a pattern for each
             monoisotopic peak in pyopenms.MSSpectrum.IntegerDataArray: 'iso_peak_count'.
         :type annotate_iso_peak_count: bool
-        :param use_decreasing_model: Whether to use a simple averagine model that expects heavier isotopes to ahve less
+        :param use_decreasing_model: Whether to use a simple averagine model that expects heavier isotopes to have less
             intensity. If False, no intensity checks are applied.
         :type use_decreasing_model: bool
         :param start_intensity_check: Number of the isotopic peak from which the decreasing model should be applied.

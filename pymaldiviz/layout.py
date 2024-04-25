@@ -3,6 +3,12 @@ import dash_bootstrap_components as dbc
 
 
 def get_spectrum_plot_layout(fig):
+    """
+    Obtain the layout for the spectrum plot.
+
+    :param fig: plotly.express.line figure wrapped using plotly_resampler.FigureResampler.
+    :return: Div containing the layout for the spectrum plot.
+    """
     spectrum_plot = html.Div(
         dcc.Graph(
             id='spectrum_plot',
@@ -17,6 +23,12 @@ def get_spectrum_plot_layout(fig):
 
 
 def get_preprocessing_parameters_layout(param_dict):
+    """
+    Obtain the layout for the preprocessing parameters modal window body.
+
+    :param param_dict: Dictionary of parameters used to populate default values.
+    :return: List of divs containing the layout for the preprocessing parameters modal window.
+    """
     trim_spectrum_parameters = html.Div(
         [
             html.H5('Spectrum Trimming Parameters'),
@@ -733,6 +745,12 @@ def get_preprocessing_parameters_layout(param_dict):
 
 
 def get_preprocessing_layout(param_dict):
+    """
+    Obtain the layout for the preprocessing section of the main dashboard.
+
+    :param param_dict: Dictionary of parameters used to populate default values.
+    :return: List of divs containing the layout for the preprocessing section of the main dashboard.
+    """
     preprocessing_title = html.Div(
         html.H1('Preprocessing', className='row')
     )
@@ -786,6 +804,12 @@ def get_preprocessing_layout(param_dict):
 
 
 def get_dropdown_layout(data):
+    """
+    Obtain the layout for the dropdown menu used to select spectra for viewing in the main dashboard.
+
+    :param data: Data that has been uploaded into memory used to populate the dropdown menu.
+    :return: List of divs containing the layout for the dropdown menu in the main dashboard.
+    """
     dropdown = [
         html.Div(
             html.H1('Spectrum ID', className='row')
@@ -800,8 +824,14 @@ def get_dropdown_layout(data):
     return dropdown
 
 
-# barebones initial app layout. html "children" elements returned by callback functions and added to this on the fly
 def get_dashboard_layout(param_dict):
+    """
+    Obtain the main dashboard layout. html.Div children elements are returned by various callback functions and added
+    to the layout on the fly.
+
+    :param param_dict: Dictionary of parameters used to populate default values.
+    :return: Div containing the main dashboard layout.
+    """
     dashboard_layout = html.Div(
         [
             html.Div(
