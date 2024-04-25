@@ -28,8 +28,8 @@ def upload_data(n_clicks_mzml, n_clicks_d):
     Dash callback for upload data buttons. Obtains path to Bruker .d directory or mzML file and loads all spectra to a
     global variable INDEXED_DATA.
 
-    :param n_clicks_mzml: Input signal when upload_mzml button is clicked.
-    :param n_clicks_d: Input signal when upload_d button is clicked.
+    :param n_clicks_mzml: Input signal if the upload_mzml button is clicked.
+    :param n_clicks_d: Input signal if the upload_d button is clicked.
     :return: spectrum_id dropdown layout to select a spectrum to display.
     """
     global INDEXED_DATA
@@ -63,7 +63,7 @@ def plot_spectrum(value):
     Dash callback to plot the spectrum selected from the spectrum_id dropdown using plotly.express and
     plotly_resampler.FigureResampler.
 
-    :param value: Input signal spectrum_id used as key in INDEXED_DATA.
+    :param value: Input signal spectrum_id used as the key in INDEXED_DATA.
     :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
@@ -332,7 +332,7 @@ def toggle_edit_processing_parameters_saved_modal(n_clicks_save, n_clicks_close,
                Input('smooth_baseline_method', 'value')])
 def toggle_smooth_baseline_method_parameters(n_clicks, value):
     """
-    Dash callback to toggle which baseline smooth parameters are visible depending on the baseline smoothing method
+    Dash callback to toggle which baseline smoothing parameters are visible depending on the baseline smoothing method
     selected in the preprocessing parameters modal window.
 
     :param n_clicks: Input signal if the edit_preprocessing_parameters button is clicked.
