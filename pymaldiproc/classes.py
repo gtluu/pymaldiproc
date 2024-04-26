@@ -450,7 +450,7 @@ class PMPMethods(object):
 class OpenMALDISpectrum(PMPMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
-    spectra in *.mzML and *.mzXML files. Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.
+    spectra in .mzML and .mzXML files. Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.
 
     :param pyteomics_dict: Dictionary containing spectrum metadata obtained from pyteomics.mzml.read or
         pyteomics.mzxml.read
