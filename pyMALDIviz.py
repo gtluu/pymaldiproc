@@ -8,6 +8,7 @@ from pymaldiproc import VERSION
 def main():
     stream = StringIO()
     with redirect_stdout(stream):
+        webview.settings['ALLOW_DOWNLOADS'] = True
         window = webview.create_window(f'pyMALDIproc Dashboard {VERSION}', app.server)
         webview.start()
 
