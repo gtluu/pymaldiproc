@@ -29,7 +29,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='launch_dashboard',
+    name='pyMALDIviz',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
