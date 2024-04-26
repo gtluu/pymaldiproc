@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pymaldiproc package &#8212; pyMALDIproc 0.3.0a9 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=4bb7ac7a"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pymaldiviz package" href="pymaldiviz.html" />
+    <link rel="prev" title="pyMALDIviz Usage" href="pymaldiviz_usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pymaldiproc-package">
+<h1>pymaldiproc package<a class="headerlink" href="#pymaldiproc-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-pymaldiproc.classes">
+<span id="pymaldiproc-classes-module"></span><h2>pymaldiproc.classes module<a class="headerlink" href="#module-pymaldiproc.classes" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pymaldiproc.classes.OpenMALDISpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pymaldiproc.classes.</span></span><span class="sig-name descname"><span class="pre">OpenMALDISpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyteomics_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.OpenMALDISpectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pymaldiproc.classes.PMPMethods" title="pymaldiproc.classes.PMPMethods"><code class="xref py py-class docutils literal notranslate"><span class="pre">PMPMethods</span></code></a></p>
+<p>Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
+spectra in <a href="#id1"><span class="problematic" id="id2">*</span></a>.mzML and <a href="#id3"><span class="problematic" id="id4">*</span></a>.mzXML files. Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pyteomics_dict</strong> (<em>dict</em>) – Dictionary containing spectrum metadata obtained from pyteomics.mzml.read or
+pyteomics.mzxml.read</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Path to the source file.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.OpenMALDISpectrum.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.OpenMALDISpectrum.info" title="Link to this definition">¶</a></dt>
+<dd><p>Get basic spectrum metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.OpenMALDISpectrum.parse_pyteomics_dict">
+<span class="sig-name descname"><span class="pre">parse_pyteomics_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pyteomics_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.OpenMALDISpectrum.parse_pyteomics_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Parse metadata and spectral data from dictionary obtained from pyteomics.mzml.read or pyteomics.mzxml.read.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pyteomics_dict</strong> (<em>dict</em>) – Dictionary containing spectrum metadata obtained from pyteomics.mzml.read or
+pyteomics.mzxml.read</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pymaldiproc.classes.</span></span><span class="sig-name descname"><span class="pre">PMPMethods</span></span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class containing preprocessing methods for MALDI-TOF and MALDI-qTOF mass spectra.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.bin_spectrum">
+<span class="sig-name descname"><span class="pre">bin_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_mass_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_mass_range</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.bin_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Bin spectrum to N bins between a user specified lower and upper mass range (inclusive).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_bins</strong> (<em>int</em>) – Number of bins to use.</p></li>
+<li><p><strong>lower_mass_range</strong> (<em>int</em>) – Mass in daltons to use for the lower mass range.</p></li>
+<li><p><strong>upper_mass_range</strong> (<em>int</em>) – Mass in Daltons to use for the upper mass range.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.estimate_peak_widths">
+<span class="sig-name descname"><span class="pre">estimate_peak_widths</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.estimate_peak_widths" title="Link to this definition">¶</a></dt>
+<dd><p>Estimate peaks widths using a first pass at peak picking via scipy.signal.peak_widths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The widths for each peak in samples.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.get_peak_list">
+<span class="sig-name descname"><span class="pre">get_peak_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.get_peak_list" title="Link to this definition">¶</a></dt>
+<dd><p>Obtain a peak picked (centroided) peak list. Performs peak picking if no peak list is found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pandas DataFrame containing m/z and intensity values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.normalize_intensity">
+<span class="sig-name descname"><span class="pre">normalize_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.normalize_intensity" title="Link to this definition">¶</a></dt>
+<dd><p>Apply normalization to intensity values in the intensity array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em>) – Method to use for normalizaton. Either total ion count (‘tic’), root mean squared (‘rms’),
+median absolute deviation (‘mad’), or square root (‘sqrt’).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.peak_picking">
+<span class="sig-name descname"><span class="pre">peak_picking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cwt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deisotope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragment_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragment_unit_ppm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_only_deisotoped</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_isopeaks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_isopeaks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_single_charged</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_iso_peak_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_decreasing_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_intensity_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_up_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.peak_picking" title="Link to this definition">¶</a></dt>
+<dd><p>Perform peak picking on mass spectrum. Documentation for various parameters is taken from their respective
+documentation pages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em>) – Method to use for peak picking. Either local maxima (‘locmax’) or continuous wavelet
+transformation (‘cwt’).</p></li>
+<li><p><strong>widths</strong> (<em>float</em><em> | </em><em>None</em>) – Required width of peaks in samples. If using ‘cwt’ method, used for calculating the CWT matrix.
+Range should cover the expected width of peaks of interest.</p></li>
+<li><p><strong>snr</strong> (<em>int</em>) – Minimum signal-to-noise ratio required to consider peak.</p></li>
+<li><p><strong>deisotope</strong> (<em>bool</em>) – Whether to perform deisotoping/ion deconvolution. Deisotoping performed using
+pyopenms.Deisotoper.</p></li>
+<li><p><strong>fragment_tolerance</strong> (<em>float</em>) – The tolerance used to match isotopic peaks.</p></li>
+<li><p><strong>fragment_unit_ppm</strong> (<em>bool</em>) – Whether ppm or m/z is used as tolerance.</p></li>
+<li><p><strong>min_charge</strong> (<em>int</em>) – The minimum charge considered.</p></li>
+<li><p><strong>max_charge</strong> (<em>int</em>) – The maximum charge considered.</p></li>
+<li><p><strong>keep_only_deisotoped</strong> (<em>bool</em>) – If True, only monoisotopic peaks of fragments with isotopic pattern are retained.</p></li>
+<li><p><strong>min_isopeaks</strong> (<em>int</em>) – The minimum number of isotopic peaks (at least 2) required for an isotopic cluster.</p></li>
+<li><p><strong>max_isopeaks</strong> (<em>int</em>) – The maximum number of isotopic peaks (at least 2) required for an isotopic cluster.</p></li>
+<li><p><strong>make_single_charged</strong> (<em>bool</em>) – Whether to convert deisotoped monoisotopic peak to single charge.</p></li>
+<li><p><strong>annotate_charge</strong> (<em>bool</em>) – Whether to annotate the charge to the peaks in pyopenms.MSSpectrum.IntegerDataArray:
+‘charge’.</p></li>
+<li><p><strong>annotate_iso_peak_count</strong> (<em>bool</em>) – Whether to annotate the number of isotopic peaks in a pattern for each
+monoisotopic peak in pyopenms.MSSpectrum.IntegerDataArray: ‘iso_peak_count’.</p></li>
+<li><p><strong>use_decreasing_model</strong> (<em>bool</em>) – Whether to use a simple averagine model that expects heavier isotopes to have less
+intensity. If False, no intensity checks are applied.</p></li>
+<li><p><strong>start_intensity_check</strong> (<em>int</em>) – Number of the isotopic peak from which the decreasing model should be applied.
+&lt;= 1 will force the monoisotopic peak to be most intense. 2 will allow the monoisotopic peak to be less
+intense than the 2nd peak. 3 will allow the monoisotopic peak and the 2nd peak to be less intense than the
+3rd, etc. A number higher than max_isopeaks will effectively disable use_decreasing_model completely.</p></li>
+<li><p><strong>add_up_intensity</strong> (<em>bool</em>) – Whether to sum up the total intensity of each isotopic pattern into the intensity of
+the reported monoisotopic peak.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.plot_spectrum">
+<span class="sig-name descname"><span class="pre">plot_spectrum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.plot_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Plot and show a basic spectrum into a basic seaborn.lineplot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.remove_baseline">
+<span class="sig-name descname"><span class="pre">remove_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SNIP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_half_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_half_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decreasing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_half_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">porder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repetition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.remove_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Perform baseline removal. Documentation for each algorithm is taken from their respective documentation pages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em>) – Method to use for baseline removal. Either statistics-sensitive non-linear iterative
+peak-clipping (‘SNIP’), TopHat (‘TopHat’), median (‘Median’), ZhangFit (‘ZhangFit’), modified polynomial
+fit (‘ModPoly’), or improved modified polynomial fit (‘IModPoly’).</p></li>
+<li><p><strong>min_half_window</strong> (<em>int</em>) – The minimum half window size used for morphological operations.</p></li>
+<li><p><strong>max_half_window</strong> (<em>int</em>) – The maximum number of iterations/maximum half window size used for morphological
+operations. Should be (w-1)/2 where w is the index-based width of feature or peak.</p></li>
+<li><p><strong>decreasing</strong> (<em>bool</em>) – If False, will iterate through window sizes from 1 to max_half_window. If True, will reverse
+the order and iterate from max_half_window to 1 (gives smoother baseline).</p></li>
+<li><p><strong>smooth_half_window</strong> (<em>int</em><em> | </em><em>None</em>) – The half window to use for smoothing the data. If greater than 0, will perform a
+moving average smooth on the data for each window to give better results for noisy data.</p></li>
+<li><p><strong>filter_order</strong> (<em>int</em>) – If the measured data has a more complicated baseline consisting of other elements such as
+Compton edges, thena  higher filter_order should be selected.</p></li>
+<li><p><strong>sigma</strong> (<em>float</em><em> | </em><em>None</em>) – The standard deviation of the smoothing Gaussian kernal. If None, uses
+(2 * smooth_half_window + 1) / 6.</p></li>
+<li><p><strong>increment</strong> (<em>int</em>) – The step size for iterating half windows.</p></li>
+<li><p><strong>max_hits</strong> (<em>int</em>) – The number of consecutive half windows that must produce the same morphological opening before
+accepting the half window as the optimum value.</p></li>
+<li><p><strong>window_tol</strong> (<em>float</em>) – The tolerance value for considering two morphological openings as equivalent.</p></li>
+<li><p><strong>lambda</strong> (<em>int</em>) – Affects smoothness of the resulting background. The larger the lambda, the smoother the
+background.</p></li>
+<li><p><strong>porder</strong> (<em>int</em>) – Adaptive iteratively reweighted penalized least squares for baseline fitting.</p></li>
+<li><p><strong>repetition</strong> (<em>int</em><em> | </em><em>None</em>) – How many iterations to run.</p></li>
+<li><p><strong>degree</strong> (<em>int</em>) – Polynomial degree.</p></li>
+<li><p><strong>gradient</strong> (<em>float</em>) – Gradient for polynomial loss. Measures incremental gain over each iteration. If gain in any
+iteration is less than this, further improvement will stop.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.smooth_baseline">
+<span class="sig-name descname"><span class="pre">smooth_baseline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SavitzkyGolay'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polyorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.smooth_baseline" title="Link to this definition">¶</a></dt>
+<dd><p>Perform baseline smoothing. Documentation for each algorithm is taken from their respective documentation pages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em>) – Method to use for baseline smoothing. Either Savitzky Golay (‘SavitzkyGolay’), apodization
+(‘apodization’), rebin (‘rebin’), fast change (‘fast_change’), or median (‘median’).</p></li>
+<li><p><strong>window_length</strong> (<em>int</em>) – The length of the filter window (i.e. number of coefficients).</p></li>
+<li><p><strong>polyorder</strong> (<em>int</em>) – The order of the polynomial used to fit the samples. Must be less than window_length.</p></li>
+<li><p><strong>delta_mz</strong> (<em>float</em>) – New m/z dimension bin width.</p></li>
+<li><p><strong>diff_thresh</strong> (<em>float</em>) – Numeric change to remove.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.transform_intensity">
+<span class="sig-name descname"><span class="pre">transform_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sqrt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.transform_intensity" title="Link to this definition">¶</a></dt>
+<dd><p>Apply a mathematical transformation to intensity values in the intensity array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em>) – Method to use for intensity transformation. Either square root (‘sqrt’), natural log (‘log’),
+log2 (‘log2’), or log10 (‘log10’) transformation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.trim_spectrum">
+<span class="sig-name descname"><span class="pre">trim_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower_mass_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_mass_range</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.trim_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Trim the mass spectrum to only include features between the user specified lower and upper mass ranges
+(inclusive). m/z and intensity arrays are stored in PMPMethods.preprocessed_mz_array and
+PMP.preprocessed_intensity_array, respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower_mass_range</strong> (<em>int</em>) – Mass in daltons to use for the lower mass range.</p></li>
+<li><p><strong>upper_mass_range</strong> (<em>int</em>) – Mass in Daltons to use for the upper mass range.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPMethods.undo_all_processing">
+<span class="sig-name descname"><span class="pre">undo_all_processing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPMethods.undo_all_processing" title="Link to this definition">¶</a></dt>
+<dd><p>Undo all processing that has been performed up to this and clear PMPMethods.data_processing dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPTdfSpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pymaldiproc.classes.</span></span><span class="sig-name descname"><span class="pre">PMPTdfSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tdf_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diapasef_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_mobility</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPTdfSpectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TdfSpectrum</span></code>, <a class="reference internal" href="#pymaldiproc.classes.PMPMethods" title="pymaldiproc.classes.PMPMethods"><code class="xref py py-class docutils literal notranslate"><span class="pre">PMPMethods</span></code></a></p>
+<p>Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TIMS-TOF and MALDI-TIMS-qTOF
+mass spectra in Bruker TDF files. Data parsing methods are inherited from pyTDFSDK.classes.TdfSpectrum.
+Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tdf_data</strong> (<em>pyTDFSDK.classes.TdfData</em>) – TdfData object containing metadata from analysis.tdf database.</p></li>
+<li><p><strong>frame</strong> (<em>int</em>) – ID of the frame of interest.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Data array mode, either “profile”, “centroid”, or “raw”.</p></li>
+<li><p><strong>precursor</strong> (<em>int</em>) – ID of the precursor of interest for ddaPASEF data. If specified, overrides the frame ID during
+data parsing.</p></li>
+<li><p><strong>diapasef_window</strong> (<em>dict</em>) – Dictionary containing a row of metadata from the
+pyTDFSDK.classesTdfData.analysis[‘DiaFrameMsMsWindows’] table required for parsing diaPASEF data.</p></li>
+<li><p><strong>profile_bins</strong> (<em>int</em>) – Number of bins to bin spectrum to.</p></li>
+<li><p><strong>encoding</strong> (<em>int</em>) – Encoding bit mode, either “64” or “32”</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPTdfSpectrum.get_spectrum_metadata">
+<span class="sig-name descname"><span class="pre">get_spectrum_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPTdfSpectrum.get_spectrum_metadata" title="Link to this definition">¶</a></dt>
+<dd><p>Obtain the name of a spectrum and generate an ID based on a spectrum’s name, position on the target plate, and
+ID.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPTdfSpectrum.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPTdfSpectrum.info" title="Link to this definition">¶</a></dt>
+<dd><p>Get basic spectrum metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPTsfSpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pymaldiproc.classes.</span></span><span class="sig-name descname"><span class="pre">PMPTsfSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tsf_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPTsfSpectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TsfSpectrum</span></code>, <a class="reference internal" href="#pymaldiproc.classes.PMPMethods" title="pymaldiproc.classes.PMPMethods"><code class="xref py py-class docutils literal notranslate"><span class="pre">PMPMethods</span></code></a></p>
+<p>Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
+spectra in Bruker TSF files. Data parsing methods are inherited from pyTDFSDK.classes.TsfSpectrum. Preprocessing
+methods are inherited from pymaldiproc.classes.PMPMethods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tsf_data</strong> (<em>pyTDFSDK.classes.TsfData</em>) – TsfData object containing metadata from analysis.tsf database.</p></li>
+<li><p><strong>frame</strong> (<em>int</em>) – ID of the frame of interest.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Data array mode, either “profile”, “centroid”, or “raw”.</p></li>
+<li><p><strong>profile_bins</strong> (<em>int</em>) – Number of bins to bin spectrum to.</p></li>
+<li><p><strong>encoding</strong> (<em>int</em>) – Encoding bit mode, either “64” or “32”</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPTsfSpectrum.get_spectrum_metadata">
+<span class="sig-name descname"><span class="pre">get_spectrum_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPTsfSpectrum.get_spectrum_metadata" title="Link to this definition">¶</a></dt>
+<dd><p>Obtain the name of a spectrum and generate an ID based on a spectrum’s name, position on the target plate, and
+ID.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pymaldiproc.classes.PMPTsfSpectrum.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.classes.PMPTsfSpectrum.info" title="Link to this definition">¶</a></dt>
+<dd><p>Get basic spectrum metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pymaldiproc.data_import">
+<span id="pymaldiproc-data-import-module"></span><h2>pymaldiproc.data_import module<a class="headerlink" href="#module-pymaldiproc.data_import" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pymaldiproc.data_import.import_mzml">
+<span class="sig-prename descclassname"><span class="pre">pymaldiproc.data_import.</span></span><span class="sig-name descname"><span class="pre">import_mzml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.data_import.import_mzml" title="Link to this definition">¶</a></dt>
+<dd><p>Import spectra from mzML files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_path</strong> (<em>str</em>) – Path to the directory to be searched. If the path is an mzML file, spectra from that dataset
+will be imported. If the path is a directory containing multiple mzML files, all data will be loaded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of spectra.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#pymaldiproc.classes.OpenMALDISpectrum" title="pymaldiproc.classes.OpenMALDISpectrum">pymaldiproc.classes.OpenMALDISpectrum</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pymaldiproc.data_import.import_mzxml">
+<span class="sig-prename descclassname"><span class="pre">pymaldiproc.data_import.</span></span><span class="sig-name descname"><span class="pre">import_mzxml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.data_import.import_mzxml" title="Link to this definition">¶</a></dt>
+<dd><p>Import spectra from mzXML files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_path</strong> (<em>str</em>) – Path to the directory to be searched. If the path is an mzXML file, spectra from that dataset
+will be imported. If the path is a directory containing multiple mzXML files, all data will be loaded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of spectra.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#pymaldiproc.classes.OpenMALDISpectrum" title="pymaldiproc.classes.OpenMALDISpectrum">pymaldiproc.classes.OpenMALDISpectrum</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pymaldiproc.data_import.import_timstof_raw_data">
+<span class="sig-prename descclassname"><span class="pre">pymaldiproc.data_import.</span></span><span class="sig-name descname"><span class="pre">import_timstof_raw_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_mobility</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.data_import.import_timstof_raw_data" title="Link to this definition">¶</a></dt>
+<dd><p>Import spectra from Bruker TSF and TDF files. Due to incompatibility with current preprocessing methods, ion
+mobility data is not parsed by default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> (<em>str</em>) – Path to the directory to be searched. If the path is a Bruker .d directory, spectra from that
+dataset will be imported. If the path is a directory containing multiple Bruker TSF/TDF files, all data will be
+loaded.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Data array mode, either “profile”, “centroid”, or “raw”.</p></li>
+<li><p><strong>profile_bins</strong> (<em>int</em>) – Number of bins to bin spectrum to.</p></li>
+<li><p><strong>encoding</strong> (<em>int</em>) – Encoding bit mode, either “64” or “32”</p></li>
+<li><p><strong>exclude_mobility</strong> (<em>bool</em><em> | </em><em>None</em>) – Whether to include mobility data in the output files, defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of spectra.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#pymaldiproc.classes.PMPTsfSpectrum" title="pymaldiproc.classes.PMPTsfSpectrum">pymaldiproc.classes.PMPTsfSpectrum</a>|<a class="reference internal" href="#pymaldiproc.classes.PMPTdfSpectrum" title="pymaldiproc.classes.PMPTdfSpectrum">pymaldiproc.classes.PMPTdfSpectrum</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pymaldiproc.data_import.schema_detection">
+<span class="sig-prename descclassname"><span class="pre">pymaldiproc.data_import.</span></span><span class="sig-name descname"><span class="pre">schema_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bruker_dot_d_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.data_import.schema_detection" title="Link to this definition">¶</a></dt>
+<dd><p>Detect the schema used by the raw data in the Bruker .d directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bruker_dot_d_file</strong> – Path to the .d directory of interest.</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Capitalized schema extension (TDF, TSF, or BAF).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pymaldiproc.preprocessing">
+<span id="pymaldiproc-preprocessing-module"></span><h2>pymaldiproc.preprocessing module<a class="headerlink" href="#module-pymaldiproc.preprocessing" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pymaldiproc.preprocessing.export_feature_matrix">
+<span class="sig-prename descclassname"><span class="pre">pymaldiproc.preprocessing.</span></span><span class="sig-name descname"><span class="pre">export_feature_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.preprocessing.export_feature_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Export a feature matrix to a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_matrix</strong> (<em>pandas.DataFrame</em>) – Feature matrix with intensity values from each spectrum.</p></li>
+<li><p><strong>output</strong> (<em>str</em>) – Output CSV file path.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pymaldiproc.preprocessing.get_feature_matrix">
+<span class="sig-prename descclassname"><span class="pre">pymaldiproc.preprocessing.</span></span><span class="sig-name descname"><span class="pre">get_feature_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_spectra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_value_imputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pymaldiproc.preprocessing.get_feature_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Create a feature matrix from two or more preprocessed spectra in which peak picking has been performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_of_spectra</strong> (<em>list</em><em>[</em><a class="reference internal" href="#pymaldiproc.classes.OpenMALDISpectrum" title="pymaldiproc.classes.OpenMALDISpectrum"><em>pymaldiproc.classes.OpenMALDISpectrum</em></a><em>|</em><a class="reference internal" href="#pymaldiproc.classes.PMPTsfSpectrum" title="pymaldiproc.classes.PMPTsfSpectrum"><em>pymaldiproc.classes.PMPTsfSpectrum</em></a><em>|</em><a class="reference internal" href="#pymaldiproc.classes.PMPTdfSpectrum" title="pymaldiproc.classes.PMPTdfSpectrum"><em>pymaldiproc.classes.PMPTdfSpectrum</em></a><em>]</em>) – List of spectrum objects.</p></li>
+<li><p><strong>tolerance</strong> (<em>float</em>) – Tolerance in Da used to consider whether features from different spectra are the same feature.</p></li>
+<li><p><strong>decimals</strong> (<em>int</em>) – Number of decimal places to report for m/z values.</p></li>
+<li><p><strong>missing_value_imputation</strong> (<em>bool</em>) – Whether to perform missing value imputation for peak picked features missing a
+corresponding intensity value. Missing values are obtained from corresponding preprocessed intensity arrays.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Feature matrix with intensity values from each spectrum.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pymaldiproc">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pymaldiproc" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pyMALDIproc</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pymaldiproc_usage.html">pyMALDIproc Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pymaldiviz_usage.html">pyMALDIviz Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pyMALDIproc Source Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pymaldiproc.classes">pymaldiproc.classes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pymaldiproc.data_import">pymaldiproc.data_import module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pymaldiproc.preprocessing">pymaldiproc.preprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pymaldiproc">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pymaldiviz.html">pyMALDIviz Source Code</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pymaldiproc package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pymaldiviz.html">pymaldiviz package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="pymaldiviz_usage.html" title="previous chapter">pyMALDIviz Usage</a></li>
+      <li>Next: <a href="pymaldiviz.html" title="next chapter">pymaldiviz package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Gordon T. Luu.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/pymaldiproc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

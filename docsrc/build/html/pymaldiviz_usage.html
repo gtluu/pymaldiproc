@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyMALDIviz Usage &#8212; pyMALDIproc 0.3.0a9 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=4bb7ac7a"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pymaldiproc package" href="pymaldiproc.html" />
+    <link rel="prev" title="pyMALDIproc Usage" href="pymaldiproc_usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="pymaldiviz-usage">
+<h1>pyMALDIviz Usage<a class="headerlink" href="#pymaldiviz-usage" title="Link to this heading">¶</a></h1>
+<p>pyMALDIviz provides a simple Dash dashboard that can be used to visualize MALDI data.</p>
+<p>pyMALDIviz can be launched by downloading the compiled package from _____ and starting <code class="docutils literal notranslate"><span class="pre">pyMALDIviz.exe</span></code>.
+Alternatively, after installing pyMALDIproc and pyMALDIviz as detailed in the
+<a class="reference internal" href="installation.html"><span class="doc">installation instructions</span></a>, pyMALDIviz can be launched from the command line via the
+<code class="docutils literal notranslate"><span class="pre">pyMALDIviz</span></code> command with the appropriate <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment activated.</p>
+<p>Once loaded, you will see the main pyMALDIviz window. Buttons to load in data, perform preprocessing, and edit
+preprocessing parameters are present.</p>
+<img alt="pyMALDIviz Main Window" src="_images/pymaldiviz_01.png" />
+<p>Data can be loaded by clicking on the <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">*.mzML</span> <span class="pre">File</span></code> or <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">Bruker</span> <span class="pre">*.d</span> <span class="pre">File</span></code> buttons, which will open one of
+the file dialogues shown below to open an <a href="#id1"><span class="problematic" id="id2">*</span></a>.mzML file or <a href="#id3"><span class="problematic" id="id4">*</span></a>.d directory, respectively.</p>
+<img alt="mzML File Selection Dialogue Window" src="_images/pymaldiviz_02.png" />
+<img alt="Bruker .d Directory Selection Dialogue Window" src="_images/pymaldiviz_03.png" />
+<p>The selected MALDI data will be loaded into pyMALDIviz, and a dropdown menu will appear where the loaded spectra can be
+selected.</p>
+<img alt="Spectrum Selection Dropdown Menu" src="_images/pymaldiviz_04.png" />
+<p>Selecting a spectrum from the dropdown can will load an interactive spectrum plot. The zoom level can be adjusted by
+clicking and dragging or reset using the controls on the upper right hand corner of the plot. The controls also provide
+various options, including saving the current plot to a <a href="#id5"><span class="problematic" id="id6">*</span></a>.png file.</p>
+<img alt="Interactive Spectrum Plot" src="_images/pymaldiviz_05.png" />
+<p>Preprocessing can be applied to spectra by clicking on the any of the preprocessing buttons above the spectrum plot.
+The preprocessing parameters can be edited via the <code class="docutils literal notranslate"><span class="pre">Edit</span> <span class="pre">Preprocessing</span> <span class="pre">Parameters</span></code> button, which will open another
+window with preprocessing parameters for each step.</p>
+<img alt="Preprocessing Parameters Part 1" src="_images/pymaldiviz_06.png" />
+<img alt="Preprocessing Parameters Part 2" src="_images/pymaldiviz_07.png" />
+<p>Any edited parameters can be saved by clicking the <code class="docutils literal notranslate"><span class="pre">Save</span></code> button, and a confirmation message will appear once the
+parameters have been saved.</p>
+<img alt="Edit Preprocessing Parameters Save Confirmation Message" src="_images/pymaldiviz_08.png" />
+<p>Once preprocessing and peak picking has been applied, a spectrum will similar to the spectrum shown below. In this
+example, spectrum trimming, baseline smoothing, baseline removal, intensity normalization, and peak picking with
+deisotoping has been applied to the spectrum.</p>
+<img alt="Preprocessed and Peak Picked Spectrum" src="_images/pymaldiviz_09.png" />
+<p>If at any point, the applied preprocessing proves to be unsatisfactory, preprocessing can be cleared using the
+<code class="docutils literal notranslate"><span class="pre">Undo</span> <span class="pre">Preprocessing</span> <span class="pre">Button</span></code>, which will reset the spectrum plot to its default state in which the raw data is
+displayed.</p>
+<img alt="Reset Spectrum Plot with Undo Preprocessing Button" src="_images/pymaldiviz_05.png" />
+<p>In addition to being visualized, the peak list seen in the spectrum plot can also be saved to a CSV file for use with
+downstream analysis platforms/pipelines by clicking the <code class="docutils literal notranslate"><span class="pre">Export</span> <span class="pre">Peak</span> <span class="pre">List</span> <span class="pre">from</span> <span class="pre">Labeled</span> <span class="pre">Peaks</span></code> button, which will
+open a dialogue to save the CSV file.</p>
+<img alt="Export Peak List File Dialogue" src="_images/pymaldiviz_10.png" />
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pyMALDIproc</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pymaldiproc_usage.html">pyMALDIproc Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pyMALDIviz Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pymaldiproc.html">pyMALDIproc Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pymaldiviz.html">pyMALDIviz Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="pymaldiproc_usage.html" title="previous chapter">pyMALDIproc Usage</a></li>
+      <li>Next: <a href="pymaldiproc.html" title="next chapter">pymaldiproc package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Gordon T. Luu.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/pymaldiviz_usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
