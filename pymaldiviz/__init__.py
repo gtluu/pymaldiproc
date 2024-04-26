@@ -1,6 +1,7 @@
 import os
 import copy
 import gc
+import tempfile
 import configparser
 import numpy as np
 import pandas as pd
@@ -29,7 +30,8 @@ import plotly.express as px
 from plotly_resampler import FigureResampler
 
 from dash import State, callback_context, no_update, dcc, html
-from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
+from dash_extensions.enrich import (Input, Output, DashProxy, MultiplexerTransform, Serverside,
+                                    ServersideOutputTransform, FileSystemBackend)
 import dash_bootstrap_components as dbc
 import webview
 
@@ -39,5 +41,7 @@ from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 from pymaldiviz.layout import *
 from pymaldiviz.dashboard import *
 from pymaldiviz.util import *
+from pymaldiviz.tmpdir import *
+from pymaldiviz.launch_dashboard import *
 
-VERSION = '0.3.0a10'
+VERSION = '0.3.0a11'

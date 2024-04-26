@@ -1,6 +1,7 @@
 import os
 import copy
 import gc
+import tempfile
 import configparser
 import numpy as np
 import pandas as pd
@@ -29,7 +30,8 @@ import plotly.express as px
 from plotly_resampler import FigureResampler
 
 from dash import State, callback_context, no_update, dcc, html
-from dash_extensions.enrich import Input, Output, DashProxy, MultiplexerTransform, Serverside, ServersideOutputTransform
+from dash_extensions.enrich import (Input, Output, DashProxy, MultiplexerTransform, Serverside,
+                                    ServersideOutputTransform, FileSystemBackend)
 import dash_bootstrap_components as dbc
 import webview
 
@@ -40,4 +42,4 @@ from pymaldiproc.classes import *
 from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 
-VERSION = '0.3.0a10'
+VERSION = '0.3.0a11'

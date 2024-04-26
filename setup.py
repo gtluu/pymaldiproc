@@ -21,5 +21,6 @@ setup(name='pyMALDIproc',
       include_package_data=True,
       package_data={'': ['*.cfg']},
       description='pyMALDIproc: a Python package for working with MALDI mass spectrometry data',
+      entry_points={'console_scripts': ['pymaldiviz=pymaldiviz.launch_dashboard:main']},
       install_requires=install_requires,
       setup_requires=install_requires)
