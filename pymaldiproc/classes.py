@@ -517,6 +517,20 @@ class OpenMALDISpectrum(PMPMethods):
         self.preprocessed_mz_array = pyteomics_dict['m/z array']
         self.preprocessed_intensity_array = pyteomics_dict['intensity array']
 
+    def info(self):
+        """
+        Get basic spectrum metadata.
+
+        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
+        :rtype: dict
+        """
+        return {'Name': self.name,
+                'Coordinate': self.coord,
+                'MS Level': self.ms_level,
+                'Mode': 'Centroid' if self.centroided else 'Profile',
+                'Source File': self.source,
+                'UUID': self.uuid}
+
 
 class PMPTsfSpectrum(TsfSpectrum, PMPMethods):
     """
@@ -561,6 +575,20 @@ class PMPTsfSpectrum(TsfSpectrum, PMPMethods):
         """
         self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
         self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
+
+    def info(self):
+        """
+        Get basic spectrum metadata.
+
+        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
+        :rtype: dict
+        """
+        return {'Name': self.name,
+                'Coordinate': self.coord,
+                'MS Level': self.ms_level,
+                'Mode': 'Centroid' if self.centroided else 'Profile',
+                'Source File': self.source,
+                'UUID': self.uuid}
 
 
 class PMPTdfSpectrum(TdfSpectrum, PMPMethods):
@@ -613,3 +641,17 @@ class PMPTdfSpectrum(TdfSpectrum, PMPMethods):
         """
         self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
         self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
+
+    def info(self):
+        """
+        Get basic spectrum metadata.
+
+        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
+        :rtype: dict
+        """
+        return {'Name': self.name,
+                'Coordinate': self.coord,
+                'MS Level': self.ms_level,
+                'Mode': 'Centroid' if self.centroided else 'Profile',
+                'Source File': self.source,
+                'UUID': self.uuid}
