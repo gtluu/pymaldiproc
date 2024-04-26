@@ -11,7 +11,8 @@ Contents
 .. toctree::
    Introduction <introduction>
    Installation <installation>
-   Usage <usage>
+   pyMALDIproc Usage <pymaldiproc_usage>
+   pyMALDIviz Usage <pymaldiviz_usage>
    pyMALDIproc Source Code <pymaldiproc>
    pyMALDIviz Source Code <pymaldiviz>
    Modules <modules>

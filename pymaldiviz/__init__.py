@@ -40,4 +40,4 @@ from pymaldiviz.layout import *
 from pymaldiviz.dashboard import *
 from pymaldiviz.util import *
 
-VERSION = '0.3.0a9'
+VERSION = '0.3.0a10'
