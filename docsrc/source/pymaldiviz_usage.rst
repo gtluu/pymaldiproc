@@ -2,8 +2,9 @@ pyMALDIviz Usage
 =================
 pyMALDIviz provides a simple Dash dashboard that can be used to visualize MALDI data.
 
-pyMALDIviz can be launched by downloading the compiled package from _____ and starting ``pyMALDIviz.exe``.
-Alternatively, after installing pyMALDIproc and pyMALDIviz as detailed in the
+pyMALDIviz can be launched by downloading the compiled package from
+`Github <https://github.com/gtluu/pymaldiproc/releases/download/v0.3.0a12/pyMALDIviz_0.3.0a12.zip>`_ and starting
+``pyMALDIviz.exe``. Alternatively, after installing pyMALDIproc and pyMALDIviz as detailed in the
 :doc:`installation instructions <installation>`, pyMALDIviz can be launched from the command line via the
 ``pyMALDIviz`` command with the appropriate ``conda`` environment activated.
 
