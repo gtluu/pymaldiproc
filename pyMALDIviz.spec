@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['launch_dashboard.py'],
+    ['pyMALDIviz.py'],
     pathex=[],
     binaries=[],
     datas=[
