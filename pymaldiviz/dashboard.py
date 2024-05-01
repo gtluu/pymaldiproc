@@ -52,7 +52,7 @@ def upload_data(n_clicks_mzml, n_clicks_d):
         dirname = askdirectory(mustexist=True)
         main_tk_window.destroy()
         if dirname.endswith('.d'):
-            data = import_timstof_raw_data(dirname, mode='profile')
+            data = import_timstof_raw_data(dirname, mode='profile', exclude_mobility=True)
             for spectrum in data:
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
     return get_dropdown_layout(INDEXED_DATA)
