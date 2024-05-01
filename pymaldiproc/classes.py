@@ -104,25 +104,25 @@ class PMP2DMethods(object):
                 self.data_processing['baseline smoothing']['polyorder'] = polyorder
             elif method == 'apodization':
                 self.preprocessed_mz_array, self.preprocessed_intensity_array = apodization(
-                    self.preprocessed_mz_array,
+                    copy.deepcopy(self.preprocessed_mz_array),
                     copy.deepcopy(self.preprocessed_intensity_array),
                     w_size=window_length)
                 self.data_processing['baseline smoothing']['window length'] = window_length
             elif method == 'rebin':
                 self.preprocessed_mz_array, self.preprocessed_intensity_array = rebin(
-                    self.preprocessed_mz_array,
+                    copy.deepcopy(self.preprocessed_mz_array),
                     copy.deepcopy(self.preprocessed_intensity_array),
                     delta_mz=delta_mz)
                 self.data_processing['baseline smoothing']['delta m/z'] = delta_mz
             elif method == 'fast_change':
                 self.preprocessed_mz_array, self.preprocessed_intensity_array = fast_change(
-                    self.preprocessed_mz_array,
+                    copy.deepcopy(self.preprocessed_mz_array),
                     copy.deepcopy(self.preprocessed_intensity_array),
                     diff_thresh=diff_thresh)
                 self.data_processing['baseline smoothing']['difference threshold'] = diff_thresh
             elif method == 'median':
                 self.preprocessed_mz_array, self.preprocessed_intensity_array = median(
-                    self.preprocessed_mz_array,
+                    copy.deepcopy(self.preprocessed_mz_array),
                     copy.deepcopy(self.preprocessed_intensity_array),
                     w_size=window_length)
                 self.data_processing['baseline smoothing']['window length'] = window_length
@@ -263,16 +263,16 @@ class PMP2DMethods(object):
             raise Exception('Method must be "tic", "rms", "mad", or "sqrt"')
         else:
             if method == 'tic':
-                self.preprocessed_intensity_array = tic(self.preprocessed_mz_array,
+                self.preprocessed_intensity_array = tic(copy.deepcopy(self.preprocessed_mz_array),
                                                         copy.deepcopy(self.preprocessed_intensity_array))
             elif method == 'rms':
-                self.preprocessed_intensity_array = rms(self.preprocessed_mz_array,
+                self.preprocessed_intensity_array = rms(copy.deepcopy(self.preprocessed_mz_array),
                                                         copy.deepcopy(self.preprocessed_intensity_array))
             elif method == 'mad':
-                self.preprocessed_intensity_array = mad(self.preprocessed_mz_array,
+                self.preprocessed_intensity_array = mad(copy.deepcopy(self.preprocessed_mz_array),
                                                         copy.deepcopy(self.preprocessed_intensity_array))
             elif method == 'sqrt':
-                self.preprocessed_intensity_array = sqrt(self.preprocessed_mz_array,
+                self.preprocessed_intensity_array = sqrt(copy.deepcopy(self.preprocessed_mz_array),
                                                          copy.deepcopy(self.preprocessed_intensity_array))
             self.data_processing['intensity normalization'] = {'method': method}
             gc.collect()
@@ -375,7 +375,7 @@ class PMP2DMethods(object):
         self.data_processing['peak picking'] = {'method': method}
         if method == 'locmax':
             peak_indices, peak_properties = find_peaks(copy.deepcopy(self.preprocessed_intensity_array),
-                                                       height=np.mean(self.preprocessed_intensity_array) * snr)
+                                                       height=np.mean(copy.deepcopy(self.preprocessed_intensity_array)) * snr)
             self.peak_picking_indices = copy.deepcopy(peak_indices)
             self.peak_picked_mz_array = copy.deepcopy(self.preprocessed_mz_array)[peak_indices]
             self.peak_picked_intensity_array = copy.deepcopy(self.preprocessed_intensity_array)[peak_indices]
@@ -476,18 +476,18 @@ class PMP3DMethods(object):
         if self.peak_picked_mz_array is None and self.peak_picked_intensity_array is None and self.peak_picked_mobility_array is None:
             # If no peak list found, peak picking with default settings is used.
             self.peak_picking()
-        return pd.DataFrame(data={'m/z': self.peak_picked_mz_array,
-                                  'Intensity': self.peak_picked_intensity_array,
-                                  '1/K0': self.peak_picked_mobility_array})
+        return pd.DataFrame(data={'m/z': copy.deepcopy(self.peak_picked_mz_array),
+                                  'Intensity': copy.deepcopy(self.peak_picked_intensity_array),
+                                  '1/K0': copy.deepcopy(self.peak_picked_mobility_array)})
 
     def get_heatmap(self):
         """
         Produce a 2D numpy.array in which each column is an m/z value, each row is a 1/K0 value, and values are
         intensity values for each feature.
         """
-        self.heatmap = pd.DataFrame({'m/z': self.preprocessed_mz_array,
-                                     'Intensity': self.preprocessed_intensity_array,
-                                     '1/K0': self.preprocessed_mobility_array})
+        self.heatmap = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                                     'Intensity': copy.deepcopy(self.preprocessed_intensity_array),
+                                     '1/K0': copy.deepcopy(self.preprocessed_mobility_array)})
         self.heatmap = self.heatmap.pivot(index='1/K0', columns='m/z', values='Intensity').fillna(0)
 
     def get_picked_peak_heatmap(self):
@@ -523,7 +523,7 @@ class PMP3DMethods(object):
         """
         self.data_processing['peak picking'] = {'method': '3D'}
         if noise is None:
-            noise = np.median(self.preprocessed_intensity_array)
+            noise = np.median(copy.deepcopy(self.preprocessed_intensity_array))
         self.peak_picking_indices = peak_local_max(self.heatmap.values,
                                                    min_distance=min_distance,
                                                    threshold_abs=noise*snr,
@@ -594,9 +594,9 @@ class PMP3DMethods(object):
         """
         Plot and show a basic heatmap into a basic seaborn.jointplot.
         """
-        heatmap_df = pd.DataFrame({'m/z': self.preprocessed_mz_array,
-                                   'Intensity': self.preprocessed_intensity_array,
-                                   '1/K0': self.preprocessed_mobility_array})
+        heatmap_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                                   'Intensity': copy.deepcopy(self.preprocessed_intensity_array),
+                                   '1/K0': copy.deepcopy(self.preprocessed_mobility_array)})
         fig = sns.jointplot(data=heatmap_df, x='m/z', y='1/K0', kind='hist')
         plt.show()
 
