@@ -13,6 +13,8 @@ from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
 from pyopenms import *
 
 
@@ -524,6 +526,8 @@ class PMP3DMethods(object):
         self.data_processing['peak picking'] = {'method': '3D'}
         if noise is None:
             noise = np.median(copy.deepcopy(self.preprocessed_intensity_array))
+        if self.heatmap is None:
+            self.get_heatmap()
         self.peak_picking_indices = peak_local_max(self.heatmap.values,
                                                    min_distance=min_distance,
                                                    threshold_abs=noise*snr,
@@ -546,6 +550,8 @@ class PMP3DMethods(object):
         self.data_processing['peak picking']['noise'] = noise
         self.data_processing['peak picking']['signal to noise ratio'] = snr
         self.data_processing['peak picking']['exclude border'] = exclude_border
+
+        self.get_picked_peak_heatmap()
 
         # TODO: implement deisotoping for 3D TIMS spectra
 
@@ -590,15 +596,31 @@ class PMP3DMethods(object):
         fig = sns.lineplot(data=mobilogram_df, x='1/K0', y='Intensity')
         plt.show()
 
-    def plot_heatmap(self):
+    def plot_heatmap(self, backend='plotly'):
         """
-        Plot and show a basic heatmap into a basic seaborn.jointplot.
+        Plot and show a basic heatmap into a basic seaborn.jointplot or plotly.
+
+        :param backend: Whether to use seaborn.jointplot or plotly.express.density_contour plot.
+        :type backend: str
         """
         heatmap_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
                                    'Intensity': copy.deepcopy(self.preprocessed_intensity_array),
                                    '1/K0': copy.deepcopy(self.preprocessed_mobility_array)})
-        fig = sns.jointplot(data=heatmap_df, x='m/z', y='1/K0', kind='hist')
-        plt.show()
+        if backend == 'seaborn':
+            fig = sns.jointplot(data=heatmap_df, x='m/z', y='1/K0', kind='hist')
+            plt.show()
+        elif backend == 'plotly':
+            df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                               'Intensity': copy.deepcopy(self.preprocessed_intensity_array),
+                               '1/K0': copy.deepcopy(self.preprocessed_mobility_array)})
+            features = self.get_feature_list()
+            fig = px.density_contour(data_frame=df, x='m/z', y='1/K0',
+                                     marginal_x='histogram', marginal_y='histogram',
+                                     histfunc='sum',
+                                     nbinsx=len(set(df['m/z'])), nbinsy=len(set(df['1/K0'])))
+            fig.add_trace(go.Scatter(x=features['m/z'], y=features['1/K0'], mode='markers',
+                                     marker=dict(size=20, symbol='x-thin', line=dict(width=2, color='DarkSlateGrey'))))
+            fig.show()
 
 
 class OpenMALDISpectrum(PMP2DMethods):
