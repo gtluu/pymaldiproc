@@ -89,7 +89,7 @@ def get_spectrum(spectrum, label_peaks=False):
     Plot the spectrum to a plotly.express.line plot wrapped by plotly_resampler.FigureResampler.
 
     :param spectrum: Spectrum object whose data is used to generate the figure.
-    :type spectrum: pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMPTdfSpectrum
+    :type spectrum: pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum
     :param label_peaks: Whether to label the peak based on peak picking that has been performed.
     :type label_peaks: bool
     :return: Plotly figure containing mass spectrum.

@@ -41,7 +41,7 @@ def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_valu
     Create a feature matrix from two or more preprocessed spectra in which peak picking has been performed.
 
     :param list_of_spectra: List of spectrum objects.
-    :type list_of_spectra: list[pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMPTdfSpectrum]
+    :type list_of_spectra: list[pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum]
     :param tolerance: Tolerance in Da used to consider whether features from different spectra are the same feature.
     :type tolerance: float
     :param decimals: Number of decimal places to report for m/z values.

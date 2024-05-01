@@ -1,7 +1,7 @@
 import os
 from pyteomics import mzml as pyt_mzml
 from pyteomics import mzxml as pyt_mzxml
-from pymaldiproc.classes import OpenMALDISpectrum, PMPTsfSpectrum, PMPTdfSpectrum
+from pymaldiproc.classes import OpenMALDISpectrum, PMPTsfSpectrum, PMP2DTdfSpectrum, PMP3DTdfSpectrum
 from pyTDFSDK.classes import TsfData, TdfData
 from pyTDFSDK.init_tdf_sdk import init_tdf_sdk_api
 
@@ -43,7 +43,7 @@ def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclu
     :param exclude_mobility: Whether to include mobility data in the output files, defaults to True.
     :type exclude_mobility: bool | None
     :return: List of spectra.
-    :rtype: list[pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMPTdfSpectrum]
+    :rtype: list[pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum]
     """
     # find Bruker .d directories
     if input_path.endswith('.d'):
@@ -61,9 +61,14 @@ def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclu
                 list_of_spectra.append(PMPTsfSpectrum(data, frame, mode, profile_bins, encoding))
         elif schema_detection(dot_d_directory) == 'TDF':
             data = TdfData(dot_d_directory, init_tdf_sdk_api())
-            for frame in range(1, data.analysis['Frames'].shape[0] + 1):
-                list_of_spectra.append(PMPTdfSpectrum(data, frame, mode, profile_bins=profile_bins, encoding=encoding,
-                                                      exclude_mobility=exclude_mobility))
+            if exclude_mobility:
+                for frame in range(1, data.analysis['Frames'].shape[0] + 1):
+                    list_of_spectra.append(PMP2DTdfSpectrum(data, frame, mode, profile_bins=profile_bins,
+                                                            encoding=encoding))
+            elif not exclude_mobility:
+                for frame in range(1, data.analysis['Frames'].shape[0] + 1):
+                    list_of_spectra.append(PMP3DTdfSpectrum(data, frame, mode, profile_bins=profile_bins,
+                                                            encoding=encoding))
     return list_of_spectra
 
 
