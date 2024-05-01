@@ -5,6 +5,7 @@ import pandas as pd
 from uuid import uuid4
 from pyTDFSDK.classes import TsfSpectrum, TdfSpectrum
 from scipy.signal import savgol_filter, find_peaks, find_peaks_cwt, peak_widths
+from skimage.feature import peak_local_max
 from pyMSpec.smoothing import apodization, rebin, fast_change, median
 from pybaselines.smooth import snip, noise_median
 from pybaselines.morphological import tophat
@@ -15,7 +16,7 @@ import matplotlib.pyplot as plt
 from pyopenms import *
 
 
-class PMPMethods(object):
+class PMP2DMethods(object):
     """
     Class containing preprocessing methods for MALDI-TOF and MALDI-qTOF mass spectra.
     """
@@ -423,7 +424,7 @@ class PMPMethods(object):
 
     def undo_all_processing(self):
         """
-        Undo all processing that has been performed up to this and clear PMPMethods.data_processing dict.
+        Undo all processing that has been performed up to this and clear data_processing dict.
         """
         self.preprocessed_mz_array = None
         self.preprocessed_intensity_array = None
@@ -446,8 +447,161 @@ class PMPMethods(object):
         fig = sns.lineplot(data=spectrum_df, x='m/z', y='Intensity')
         plt.show()
 
+    def info(self):
+        """
+        Get basic spectrum metadata.
 
-class OpenMALDISpectrum(PMPMethods):
+        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
+        :rtype: dict
+        """
+        return {'Name': self.name,
+                'Coordinate': self.coord,
+                'MS Level': self.ms_level,
+                'Mode': 'Centroid' if self.centroided else 'Profile',
+                'Source File': self.source,
+                'UUID': self.uuid}
+
+
+class PMP3DMethods(object):
+    """
+    Class containing preprocessing methods for MALDI-TIMS-qTOF mass spectra.
+    """
+    def get_feature_list(self):
+        """
+        Obtain a peak picked (centroided) feature list. Performs peak picking if no peak list is found.
+
+        :return: Pandas DataFrame containing m/z, 1/K0, and intensity values.
+        :rtype: pandas.DataFrame
+        """
+        if self.peak_picked_mz_array is None and self.peak_picked_intensity_array is None and self.peak_picked_mobility_array is None:
+            # If no peak list found, peak picking with default settings is used.
+            self.peak_picking()
+        return pd.DataFrame(data={'m/z': self.peak_picked_mz_array,
+                                  'Intensity': self.peak_picked_intensity_array,
+                                  '1/K0': self.peak_picked_mobility_array})
+
+    def get_heatmap(self):
+        """
+        Produce a 2D numpy.array in which each column is an m/z value, each row is a 1/K0 value, and values are
+        intensity values for each feature.
+        """
+        self.heatmap = pd.DataFrame({'m/z': self.preprocessed_mz_array,
+                                     'Intensity': self.preprocessed_intensity_array,
+                                     '1/K0': self.preprocessed_mobility_array})
+        self.heatmap = self.heatmap.pivot(index='1/K0', columns='m/z', values='Intensity').fillna(0)
+
+    def get_picked_peak_heatmap(self):
+        """
+        Produce a 2D numpy.array in which each column is an m/z value, each row is a 1/K0 value, and values are either
+        1 to represent peak picked feature or 0 to represent all other unpicked features.
+        """
+        self.peak_picked_heatmap = np.zeros(self.heatmap.values.shape)
+        for i in range(0, self.peak_picking_indices.shape[0]):
+            row, col = self.peak_picking_indices[i]
+            self.peak_picked_heatmap[row, col] = 1
+        self.peak_picked_heatmap
+
+    def peak_picking(self, min_distance=5, noise=None, snr=3, exclude_border=False):
+        """
+        Perform peak picking on mass heatmap. Documentation for various parameters is taken from their respective
+        documentation pages.
+
+        :param min_distance: The minimal allowed distance separating peaks. To find the maximum number of peaks, use
+            min_distance=1.
+        :type min_distance: int
+        :param noise: Absolute intensity value to be used as baseline noise level. If None, the median value of the
+            intensity array is used as an estimate of the noise.
+        :type noise: int | None
+        :param snr: Minimum signal-to-noise ratio required to consider peak.
+        :type snr: int
+        :param exclude_border: If positive integer, excludes peaks from within n pixels of the border of the image. If
+            tuple of non-negative ints, the length of the tuple must match the input array's dimensionality. Each
+            element of the tuple will exclude peaks within n pixels of the border of the image along that dimension. If
+            True, takes the min_distance parameter as value. If zero or False, peaks are identified regardless of their
+            distance from the border.
+        :type exclude_border: int | tuple[int] | bool
+        """
+        self.data_processing['peak picking'] = {'method': '3D'}
+        if noise is None:
+            noise = np.median(self.preprocessed_intensity_array)
+        self.peak_picking_indices = peak_local_max(self.heatmap.values,
+                                                   min_distance=min_distance,
+                                                   threshold_abs=noise*snr,
+                                                   exclude_border=exclude_border)
+        peaks_df = []
+        for i in range(0, self.peak_picking_indices.shape[0]):
+            row, col = self.peak_picking_indices[i]
+            mz = self.heatmap.columns[col]
+            ook0 = self.heatmap.index[row]
+            peaks_df.append({'m/z': mz, '1/K0': ook0})
+        peaks_df = pd.DataFrame(peaks_df).sort_values(by='m/z').reset_index(drop=True)
+        features = pd.DataFrame({'m/z': self.preprocessed_mz_array,
+                                 'Intensity': self.preprocessed_intensity_array,
+                                 '1/K0': self.preprocessed_mobility_array})
+        peaks_df = pd.merge(peaks_df, features, how='inner', on=['m/z', '1/K0'])
+        self.peak_picked_mz_array = copy.deepcopy(peaks_df['m/z'].values)
+        self.peak_picked_intensity_array = copy.deepcopy(peaks_df['Intensity'].values)
+        self.peak_picked_mobility_array = copy.deepcopy(peaks_df['1/K0'].values)
+        self.data_processing['peak picking']['minimum distance'] = min_distance
+        self.data_processing['peak picking']['noise'] = noise
+        self.data_processing['peak picking']['signal to noise ratio'] = snr
+        self.data_processing['peak picking']['exclude border'] = exclude_border
+
+        # TODO: implement deisotoping for 3D TIMS spectra
+
+        gc.collect()
+
+    def undo_all_processing(self):
+        """
+        Undo all processing that has been performed up to this and clear data_processing dict.
+        """
+        self.preprocessed_mz_array = None
+        self.preprocessed_intensity_array = None
+        self.preprocessed_mobility_array = None
+        self.peak_picked_mz_array = None
+        self.peak_picked_intensity_array = None
+        self.peak_picked_mobility_array = None
+        self.peak_picking_indices = None
+        self.data_processing = None
+        gc.collect()
+        self.preprocessed_mz_array = copy.deepcopy(self.mz_array)
+        self.preprocessed_intensity_array = copy.deepcopy(self.intensity_array)
+        self.preprocessed_mobility_array = copy.deepcopy(self.mobility_array)
+        self.data_processing = {}
+        gc.collect()
+
+    def plot_spectrum(self):
+        """
+        Plot and show a basic spectrum into a basic seaborn.lineplot.
+        """
+        spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(self.preprocessed_mz_array),
+                                    'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
+        spectrum_df = spectrum_df.groupby(['m/z']).sum()
+        fig = sns.lineplot(data=spectrum_df, x='m/z', y='Intensity')
+        plt.show()
+
+    def plot_mobilogram(self):
+        """
+        Plot and show a basic mobilogram into a basic seaborn.lineplot.
+        """
+        mobilogram_df = pd.DataFrame({'1/K0': copy.deepcopy(self.preprocessed_mobility_array),
+                                      'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
+        mobilogram_df = mobilogram_df.groupby(['1/K0']).sum()
+        fig = sns.lineplot(data=mobilogram_df, x='1/K0', y='Intensity')
+        plt.show()
+
+    def plot_heatmap(self):
+        """
+        Plot and show a basic heatmap into a basic seaborn.jointplot.
+        """
+        heatmap_df = pd.DataFrame({'m/z': self.preprocessed_mz_array,
+                                   'Intensity': self.preprocessed_intensity_array,
+                                   '1/K0': self.preprocessed_mobility_array})
+        fig = sns.jointplot(data=heatmap_df, x='m/z', y='1/K0', kind='hist')
+        plt.show()
+
+
+class OpenMALDISpectrum(PMP2DMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
     spectra in .mzML and .mzXML files. Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.
@@ -517,22 +671,8 @@ class OpenMALDISpectrum(PMPMethods):
         self.preprocessed_mz_array = pyteomics_dict['m/z array']
         self.preprocessed_intensity_array = pyteomics_dict['intensity array']
 
-    def info(self):
-        """
-        Get basic spectrum metadata.
 
-        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
-        :rtype: dict
-        """
-        return {'Name': self.name,
-                'Coordinate': self.coord,
-                'MS Level': self.ms_level,
-                'Mode': 'Centroid' if self.centroided else 'Profile',
-                'Source File': self.source,
-                'UUID': self.uuid}
-
-
-class PMPTsfSpectrum(TsfSpectrum, PMPMethods):
+class PMPTsfSpectrum(TsfSpectrum, PMP2DMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
     spectra in Bruker TSF files. Data parsing methods are inherited from pyTDFSDK.classes.TsfSpectrum. Preprocessing
@@ -576,22 +716,8 @@ class PMPTsfSpectrum(TsfSpectrum, PMPMethods):
         self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
         self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
 
-    def info(self):
-        """
-        Get basic spectrum metadata.
 
-        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
-        :rtype: dict
-        """
-        return {'Name': self.name,
-                'Coordinate': self.coord,
-                'MS Level': self.ms_level,
-                'Mode': 'Centroid' if self.centroided else 'Profile',
-                'Source File': self.source,
-                'UUID': self.uuid}
-
-
-class PMPTdfSpectrum(TdfSpectrum, PMPMethods):
+class PMP2DTdfSpectrum(TdfSpectrum, PMP2DMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TIMS-TOF and MALDI-TIMS-qTOF
     mass spectra in Bruker TDF files. Data parsing methods are inherited from pyTDFSDK.classes.TdfSpectrum.
@@ -614,12 +740,12 @@ class PMPTdfSpectrum(TdfSpectrum, PMPMethods):
     :param encoding: Encoding bit mode, either "64" or "32"
     :type encoding: int
     """
-    def __init__(self, tdf_data, frame: int, mode: str, precursor=0, diapasef_window=None, profile_bins=0, encoding=64,
-                 exclude_mobility=False):
+    def __init__(self, tdf_data, frame: int, mode: str, precursor=0, diapasef_window=None, profile_bins=0, encoding=64):
         """
-        Construcor Method
+        Constructor Method
         """
-        super().__init__(tdf_data, frame, mode, precursor, diapasef_window, profile_bins, encoding, exclude_mobility)
+        super().__init__(tdf_data, frame, mode, precursor, diapasef_window, profile_bins, encoding,
+                         exclude_mobility=True)
 
         self.source = tdf_data.source_file
         self.name = None
@@ -642,16 +768,36 @@ class PMPTdfSpectrum(TdfSpectrum, PMPMethods):
         self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
         self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
 
-    def info(self):
-        """
-        Get basic spectrum metadata.
 
-        :return: Dictionary containing spectrum name, coordinate, MS level, mode, source file, and UUID.
-        :rtype: dict
+class PMP3DTdfSpectrum(TdfSpectrum, PMP3DMethods):
+    def __init__(self, tdf_data, frame: int, mode: str, precursor=0, diapasef_window=None, profile_bins=0, encoding=64):
         """
-        return {'Name': self.name,
-                'Coordinate': self.coord,
-                'MS Level': self.ms_level,
-                'Mode': 'Centroid' if self.centroided else 'Profile',
-                'Source File': self.source,
-                'UUID': self.uuid}
+        Constructor Method
+        """
+        super().__init__(tdf_data, frame, mode, precursor, diapasef_window, profile_bins, encoding,
+                         exclude_mobility=False)
+
+        self.source = tdf_data.source_file
+        self.name = None
+        self.uuid = str(uuid4())
+        self.spectrum_id = None
+        self.preprocessed_mz_array = copy.deepcopy(self.mz_array)
+        self.preprocessed_intensity_array = copy.deepcopy(self.intensity_array)
+        self.preprocessed_mobility_array = copy.deepcopy(self.mobility_array)
+        self.heatmap = None
+        self.peak_picked_mz_array = None
+        self.peak_picked_intensity_array = None
+        self.peak_picked_mobility_array = None
+        self.peak_picking_indices = None
+        self.peak_picked_heatmap = None
+        self.data_processing = {}
+
+        self.get_spectrum_metadata()
+
+    def get_spectrum_metadata(self):
+        """
+        Obtain the name of a spectrum and generate an ID based on a spectrum's name, position on the target plate, and
+        ID.
+        """
+        self.name = str(os.path.splitext(os.path.split(self.source)[-1])[0]) + '_' + str(self.frame)
+        self.spectrum_id = self.name + '|' + self.coord + '|' + self.uuid
