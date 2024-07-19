@@ -1,6 +1,5 @@
 from setuptools import setup
 import os
-from pymaldiproc import VERSION
 
 
 if os.path.isfile('requirements.txt'):
@@ -12,7 +11,7 @@ for package in install_requires:
         install_requires[install_requires.index(package)] = pname + ' @ ' + package
 
 setup(name='pyMALDIproc',
-      version=VERSION,
+      version='0.3.0a13',
       url='https://github.com/gtluu/pyMALDIproc',
       license='Apache License',
       author='Gordon T. Luu',
