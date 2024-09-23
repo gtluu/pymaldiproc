@@ -2,38 +2,6 @@ import copy
 import numpy as np
 import pandas as pd
 from functools import reduce
-from icoshift import icoshift
-
-
-"""align_spectra currently not functioning
-def align_spectra(list_of_spectra, method='average', inter='whole', n='f', scale=None, coshift_preprocessing=False,
-                  coshift_preprocessing_max_shift=None, fill_with_previous=True, average2_multiplier=3):
-    print('Aligning spectra')
-    # check method
-    if method not in ['average', 'median', 'max', 'average2']:
-        raise Exception('Method must be "average", "median", "max", or "average2"')
-
-    # intensity arrays must be binned/on same m/z axis prior to alignment
-    intensity_arrays = [copy.deepcopy(spectrum.preprocessed_intensity_array) for spectrum in list_of_spectra]
-    intensity_array_2d = np.stack(intensity_arrays)
-    xcs, ints, ind, target = icoshift(method, intensity_array_2d, inter=inter, n=n, scale=scale,
-                                      coshift_preprocessing=coshift_preprocessing,
-                                      coshift_preprocessing_max_shift=coshift_preprocessing_max_shift,
-                                      fill_with_previous=fill_with_previous,
-                                      average2_multiplier=average2_multiplier)
-
-    for spectrum, row in zip(list_of_spectra, xcs):
-        spectrum.preprocessed_intensity_array = copy.deepcopy(row)
-        spectrum.data_processing['spectra alignment'] = {'method': method}
-        spectrum.data_processing['spectra alignment']['inter'] = inter
-        spectrum.data_processing['spectra alignment']['n'] = n
-        spectrum.data_processing['spectra alignment']['scale'] = scale
-        spectrum.data_processing['spectra alignment']['coshift_preprocessing'] = coshift_preprocessing
-        spectrum.data_processing['spectra alignment']['coshift_preprocessing_max_shift'] = coshift_preprocessing_max_shift
-        spectrum.data_processing['spectra alignment']['fill_with_previous'] = fill_with_previous
-        spectrum.data_processing['spectra alignment']['average2_multiplier'] = average2_multiplier
-
-    return list_of_spectra"""
 
 
 def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_value_imputation=True):

@@ -40,7 +40,8 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    contents_directory='.'
+    contents_directory='.',
+    icon='imgs/pymaldiviz_icon.ico'
 )
 coll = COLLECT(
     exe,

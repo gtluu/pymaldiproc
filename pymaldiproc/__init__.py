@@ -21,7 +21,6 @@ from pybaselines.smooth import snip, noise_median
 from pybaselines.morphological import tophat
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
-from icoshift import icoshift
 from pyopenms import *
 
 import seaborn as sns

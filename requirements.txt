@@ -76,5 +76,4 @@ lazy-loader==0.4
 networkx==3.3
 scikit-image==0.23.2
 tifffile==2024.4.24
-git+https://github.com/mars20/icoshift.git
-git+https://github.com/gtluu/pyTDFSDK.git@v0.3.7
+git+https://github.com/gtluu/pyTDFSDK.git
