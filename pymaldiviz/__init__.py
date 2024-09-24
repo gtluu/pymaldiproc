@@ -41,6 +41,5 @@ from pymaldiviz.layout import *
 from pymaldiviz.dashboard import *
 from pymaldiviz.util import *
 from pymaldiviz.tmpdir import *
-from pymaldiviz.launch_dashboard import *
 
 VERSION = '0.3.0a13'
