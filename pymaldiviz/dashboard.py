@@ -23,7 +23,8 @@ app = DashProxy(prevent_initial_callbacks=True,
 app.layout = get_dashboard_layout(PREPROCESSING_PARAMS)
 
 
-@app.callback(Output('dropdown', 'children'),
+@app.callback([Output('spectrum_id', 'options', allow_duplicate=True),
+               Output('spectrum_id', 'value', allow_duplicate=True)],
               [Input('upload_mzml', 'n_clicks'),
                Input('upload_d', 'n_clicks')])
 def upload_data(n_clicks_mzml, n_clicks_d):
@@ -33,7 +34,7 @@ def upload_data(n_clicks_mzml, n_clicks_d):
 
     :param n_clicks_mzml: Input signal if the upload_mzml button is clicked.
     :param n_clicks_d: Input signal if the upload_d button is clicked.
-    :return: spectrum_id dropdown layout to select a spectrum to display.
+    :return: Tuple of options and value attributes for the dcc.Dropdown object.
     """
     global INDEXED_DATA
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
@@ -55,10 +56,12 @@ def upload_data(n_clicks_mzml, n_clicks_d):
             data = import_timstof_raw_data(dirname, mode='profile', exclude_mobility=True)
             for spectrum in data:
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
-    return get_dropdown_layout(INDEXED_DATA)
+    options = [{'label': i, 'value': i} for i in INDEXED_DATA.keys()]
+    value = [i for i in INDEXED_DATA.keys()]
+    return options, value
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('spectrum_id', 'value'))
 def plot_spectrum(value):
@@ -67,12 +70,12 @@ def plot_spectrum(value):
     plotly_resampler.FigureResampler.
 
     :param value: Input signal spectrum_id used as the key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
 @app.callback(Output('edit_processing_parameters_modal', 'is_open'),
@@ -442,7 +445,7 @@ def toggle_peak_picking_deisotope_parameters(n_clicks, value):
         return toggle_deisotope_off_style()
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('trim_spectrum', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -452,17 +455,17 @@ def trim_spectrum_button(n_clicks, value):
 
     :param n_clicks: Input signal if the trim_spectrum button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].trim_spectrum(**PREPROCESSING_PARAMS['TRIM_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('transform_intensity', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -472,17 +475,17 @@ def transform_intensity_button(n_clicks, value):
 
     :param n_clicks: Input signal if the transform_intensity button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].transform_intensity(**PREPROCESSING_PARAMS['TRANSFORM_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('smooth_baseline', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -492,17 +495,17 @@ def smooth_baseline_button(n_clicks, value):
 
     :param n_clicks: Input signal if the smooth_baseline button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].smooth_baseline(**PREPROCESSING_PARAMS['SMOOTH_BASELINE'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('remove_baseline', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -512,7 +515,7 @@ def remove_baseline_button(n_clicks, value):
 
     :param n_clicks: Input signal if the remove_baseline button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
@@ -520,10 +523,10 @@ def remove_baseline_button(n_clicks, value):
                                         )
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('normalize_intensity', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -533,17 +536,17 @@ def normalize_intensity_button(n_clicks, value):
 
     :param n_clicks: Input signal if the normalize_intensity button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].normalize_intensity(**PREPROCESSING_PARAMS['NORMALIZE_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('bin_spectrum', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -553,17 +556,17 @@ def bin_spectrum_button(n_clicks, value):
 
     :param n_clicks: Input signal if the bin_spectrum button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].bin_spectrum(**PREPROCESSING_PARAMS['BIN_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('peak_picking', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -573,17 +576,17 @@ def peak_picking_button(n_clicks, value):
 
     :param n_clicks: Input signal if the peak_picking button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].peak_picking(**PREPROCESSING_PARAMS['PEAK_PICKING'])
     fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('undo_peak_picking', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -593,7 +596,7 @@ def undo_peak_picking(n_clicks, value):
 
     :param n_clicks: Input signal if the undo_peak_picking button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     INDEXED_DATA[value].peak_picked_mz_array = None
@@ -603,7 +606,7 @@ def undo_peak_picking(n_clicks, value):
     gc.collect()
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
 @app.callback(Output('dummy', 'children'),
@@ -632,7 +635,7 @@ def export_peak_list(n_clicks, value):
     return []
 
 
-@app.callback([Output('spectrum', 'children'),
+@app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
               Input('undo_preprocessing', 'n_clicks'),
               State('spectrum_id', 'value'))
@@ -642,13 +645,13 @@ def undo_preprocessing(n_clicks, value):
 
     :param n_clicks: Input signal if the undo_preprocessing button is clicked.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
-    :return: Tuple of spectrum figure layout as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
     INDEXED_DATA[value].undo_all_processing()
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend()
-    return [get_spectrum_plot_layout(fig)], Serverside(fig)
+    return fig, Serverside(fig)
 
 
 @app.callback(Output('spectrum_plot', 'figure', allow_duplicate=True),

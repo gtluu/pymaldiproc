@@ -1,25 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-
-
-def get_spectrum_plot_layout(fig):
-    """
-    Obtain the layout for the spectrum plot.
-
-    :param fig: plotly.express.line figure wrapped using plotly_resampler.FigureResampler.
-    :return: Div containing the layout for the spectrum plot.
-    """
-    spectrum_plot = html.Div(
-        dcc.Graph(
-            id='spectrum_plot',
-            figure=fig,
-            style={
-                'width': '100%',
-                'height': '600px'
-            }
-        )
-    )
-    return spectrum_plot
+from pymaldiviz.util import blank_figure
 
 
 def get_preprocessing_parameters_layout(param_dict):
@@ -744,86 +725,6 @@ def get_preprocessing_parameters_layout(param_dict):
             peak_picking_parameters]
 
 
-def get_preprocessing_layout(param_dict):
-    """
-    Obtain the layout for the preprocessing section of the main dashboard.
-
-    :param param_dict: Dictionary of parameters used to populate default values.
-    :return: List of divs containing the layout for the preprocessing section of the main dashboard.
-    """
-    preprocessing_title = html.Div(
-        html.H1('Preprocessing', className='row')
-    )
-
-    preprocessing_buttons = html.Div(
-        [
-            dbc.Button('Trim Spectrum', id='trim_spectrum', style={'margin': '5px'}),
-            dbc.Button('Transform Intensity', id='transform_intensity', style={'margin': '5px'}),
-            dbc.Button('Smooth Baseline', id='smooth_baseline', style={'margin': '5px'}),
-            dbc.Button('Remove Baseline', id='remove_baseline', style={'margin': '5px'}),
-            dbc.Button('Normalize Intensity', id='normalize_intensity', style={'margin': '5px'}),
-            dbc.Button('Bin Spectrum', id='bin_spectrum', style={'margin': '5px'}),
-            dbc.Button('Label Peaks', id='peak_picking', style={'margin': '5px'}),
-            dbc.Button('Export Peak List from Labeled Peaks', id='export_peak_list', style={'margin': '5px'}),
-            dbc.Button('Undo Preprocessing', id='undo_preprocessing', style={'margin': '5px'}),
-            dbc.Button('Undo Peak Labeling', id='undo_peak_picking', style={'margin': '5px'}),
-            dbc.Button('Edit Preprocessing Parameters', id='edit_preprocessing_parameters', style={'margin': '5px'}),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
-                    dbc.ModalBody(get_preprocessing_parameters_layout(param_dict)),
-                    dbc.ModalFooter(dbc.ButtonGroup([
-                        dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
-                        dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
-                    ]))
-                ],
-                id='edit_processing_parameters_modal',
-                fullscreen=True,
-                backdrop='static',
-                scrollable=True,
-                centered=True,
-                is_open=False
-            ),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader(dbc.ModalTitle('Preprocessing parameters have been saved.')),
-                    dbc.ModalFooter(dbc.Button('Close',
-                                               id='edit_processing_parameters_modal_saved_close',
-                                               className='ms-auto'))
-                ],
-                id='edit_processing_parameters_modal_saved',
-                centered=True,
-                is_open=False
-            )
-        ],
-        style={'justify-content': 'center',
-               'display': 'flex'}
-    )
-
-    return [preprocessing_title, preprocessing_buttons]
-
-
-def get_dropdown_layout(data):
-    """
-    Obtain the layout for the dropdown menu used to select spectra for viewing in the main dashboard.
-
-    :param data: Data that has been uploaded into memory used to populate the dropdown menu.
-    :return: List of divs containing the layout for the dropdown menu in the main dashboard.
-    """
-    dropdown = [
-        html.Div(
-            html.H1('Spectrum ID', className='row')
-        ),
-        html.Div(
-            dcc.Dropdown(id='spectrum_id',
-                         multi=False,
-                         options=[{'label': i, 'value': i} for i in data.keys()],
-                         value=[i for i in data.keys()])
-        )
-    ]
-    return dropdown
-
-
 def get_dashboard_layout(param_dict):
     """
     Obtain the main dashboard layout. html.Div children elements are returned by various callback functions and added
@@ -834,44 +735,173 @@ def get_dashboard_layout(param_dict):
     """
     dashboard_layout = html.Div(
         [
-            html.Div(
-                [
-                    dbc.Button('Load *.mzML File', id='upload_mzml', style={'margin': '50px'}),
-                    dbc.Button('Load Bruker *.d File', id='upload_d', style={'margin': '50px'})
-                ],
-                style={'justify-content': 'center',
-                       'display': 'flex'}
-            ),
-            html.Div(
-                get_preprocessing_layout(param_dict),
-                id='preprocessing',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            html.Div(
-                id='dropdown',
-                className='one column',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
-            html.Div(
-                id='spectrum',
-                className='row',
-                style={'width': '97%',
-                       'margin': '20px'}
-            ),
-
             dcc.Loading(
-                dcc.Store(id='store_plot')
-            ),
+                [
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Div(
+                                    [
+                                        dbc.Button('Load mzML File',
+                                                   id='upload_mzml',
+                                                   style={'margin': '20px'},
+                                                   disabled=False),
+                                        dbc.Button('Load Bruker *.d Directory',
+                                                   id='upload_d',
+                                                   style={'margin': '20px'},
+                                                   disabled=False)
+                                    ],
+                                    style={'justify-content': 'center',
+                                           'display': 'flex'}
+                                ),
+                                width={'size': 4, 'offset': 4}
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Label('Spectrum ID'),
+                                width=12
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Dropdown(id='spectrum_id',
+                                             multi=False,
+                                             options=[],
+                                             value=[],
+                                             disabled=False),
+                                width=12
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Div(
+                                    [
+                                        dbc.Button('Trim Spectrum',
+                                                   id='trim_spectrum',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Transform Intensity',
+                                                   id='transform_intensity',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Smooth Baseline',
+                                                   id='smooth_baseline',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Remove Baseline',
+                                                   id='remove_baseline',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Normalize Intensity',
+                                                   id='normalize_intensity',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Bin Spectrum',
+                                                   id='bin_spectrum',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Label Peaks',
+                                                   id='peak_picking',
+                                                   style={'margin': '5px'},
+                                                   disabled=False)
+                                    ],
+                                    style={'justify-content': 'center',
+                                           'display': 'flex'}
+                                ),
+                                width=12
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Div(
+                                    [
+                                        dbc.Button('Export Peak List from Labeled Peaks',
+                                                   id='export_peak_list',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Undo Preprocessing',
+                                                   id='undo_preprocessing',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Undo Peak Labeling',
+                                                   id='undo_peak_picking',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
+                                        dbc.Button('Edit Preprocessing Parameters',
+                                                   id='edit_preprocessing_parameters',
+                                                   style={'margin': '5px'},
+                                                   disabled=False)
+                                    ],
+                                    style={'justify-content': 'center',
+                                           'display': 'flex'}
+                                ),
+                                width=12
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Graph(
+                                    id='spectrum_plot',
+                                    figure=blank_figure(),
+                                    style={'width': '100%',
+                                           'height': '600px'}
+                                ),
+                                width=12
+                            )
+                        ]
+                    ),
 
-            html.Div(
-                id='dummy',
-                children=[],
-                style={'display': 'none'}
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
+                            dbc.ModalBody(get_preprocessing_parameters_layout(param_dict)),
+                            dbc.ModalFooter(dbc.ButtonGroup([
+                                dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
+                                dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
+                            ]))
+                        ],
+                        id='edit_processing_parameters_modal',
+                        fullscreen=True,
+                        backdrop='static',
+                        scrollable=True,
+                        centered=True,
+                        is_open=False
+                    ),
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader(dbc.ModalTitle('Preprocessing parameters have been saved.')),
+                            dbc.ModalFooter(dbc.Button('Close',
+                                                       id='edit_processing_parameters_modal_saved_close',
+                                                       className='ms-auto'))
+                        ],
+                        id='edit_processing_parameters_modal_saved',
+                        centered=True,
+                        is_open=False
+                    ),
+
+                    dcc.Store(id='store_plot'),
+
+                    html.Div(
+                        id='dummy',
+                        children=[],
+                        style={'display': 'none'}
+                    )
+                ],
+                overlay_style={'visibility': 'visible', 'opacity': 0.9}
             )
-        ]
+        ],
+        style={'margin': '20px'}
     )
+
     return dashboard_layout

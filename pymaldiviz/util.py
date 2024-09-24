@@ -4,6 +4,7 @@ import configparser
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from plotly_resampler import FigureResampler
 from pymaldiviz.tmpdir import FILE_SYSTEM_BACKEND
 
@@ -84,6 +85,19 @@ def get_preprocessing_params():
             'PEAK_PICKING': peak_picking_params}
 
 
+def blank_figure():
+    """
+    Obtain a blank figure wrapped by plotly_resampler.FigureResampler to be used as a placeholder.
+
+    :return: Blank figure.
+    """
+    fig = FigureResampler(go.Figure(go.Scatter(x=[], y=[])))
+    fig.update_layout(template=None)
+    fig.update_xaxes(showgrid=False, showticklabels=False, zeroline=False)
+    fig.update_yaxes(showgrid=False, showticklabels=False, zeroline=False)
+    return fig
+
+
 def get_spectrum(spectrum, label_peaks=False):
     """
     Plot the spectrum to a plotly.express.line plot wrapped by plotly_resampler.FigureResampler.
@@ -109,6 +123,7 @@ def get_spectrum(spectrum, label_peaks=False):
                                                   'Intensity': ':.1f'},
                                       text=labels))
         fig.update_traces(textposition='top center')
+        fig.update_traces(marker=dict(color='rgba(0,0,0,0)', size=1))
     else:
         fig = FigureResampler(px.line(data_frame=spectrum_df,
                                       x='m/z',
