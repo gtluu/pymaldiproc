@@ -11,7 +11,7 @@ for package in install_requires:
         install_requires[install_requires.index(package)] = pname + ' @ ' + package
 
 setup(name='pyMALDIproc',
-      version='0.3.0a13',
+      version='0.3.0',
       url='https://github.com/gtluu/pyMALDIproc',
       license='Apache License',
       author='Gordon T. Luu',
