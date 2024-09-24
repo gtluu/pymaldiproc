@@ -15,7 +15,7 @@ a = Analysis(
 		('etc\\preprocessing.cfg', 'etc'),
 		('LICENSE', '.'),
 		('third-party-licenses.txt', '.'),
-		('third-party-notices.txt', '.'
+		('third-party-notices.txt', '.'),
 		('C:\\Users\\bass\\.conda\\envs\\pmp\\Lib\\site-packages\\TDF-SDK', 'TDF-SDK')
 	],
     hiddenimports=[],
