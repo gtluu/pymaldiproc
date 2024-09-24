@@ -12,7 +12,10 @@ a = Analysis(
 		('C:\\Users\\bass\\.conda\\envs\\pmp\\Lib\\site-packages\\dash_extensions', 'dash_extensions'),
 		('C:\\Users\\bass\\.conda\\envs\\pmp\\Lib\\site-packages\\dash_html_components', 'dash_html_components'),
 		('C:\\Users\\bass\\.conda\\envs\\pmp\\Lib\\site-packages\\dash_table', 'dash_table'),
-		('C:\\Users\\bass\\code\\pyMALDIproc\\etc\\preprocessing.cfg', 'etc'),
+		('etc\\preprocessing.cfg', 'etc'),
+		('LICENSE', '.'),
+		('third-party-licenses.txt', '.'),
+		('third-party-notices.txt', '.'
 		('C:\\Users\\bass\\.conda\\envs\\pmp\\Lib\\site-packages\\TDF-SDK', 'TDF-SDK')
 	],
     hiddenimports=[],
