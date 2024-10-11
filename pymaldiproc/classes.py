@@ -553,8 +553,6 @@ class PMP3DMethods(object):
 
         self.get_picked_peak_heatmap()
 
-        # TODO: implement deisotoping for 3D TIMS spectra
-
         gc.collect()
 
     def undo_all_processing(self):

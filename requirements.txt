@@ -55,6 +55,7 @@ pyinstaller==6.10.0
 pyinstaller-hooks-contrib==2024.8
 pyMSpec==0.1.2
 pyopenms==3.2.0
+pyopenms_viz==0.1.2
 pyparsing==3.1.4
 git+https://github.com/gtluu/pyTDFSDK.git
 pyteomics==4.7.3

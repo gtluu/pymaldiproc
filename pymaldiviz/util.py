@@ -89,6 +89,12 @@ def get_preprocessing_params(config_file=''):
             'PEAK_PICKING': peak_picking_params}
 
 
+def get_top_n_precursors_3d(spectrum, num_precursors=10):
+    return spectrum.get_feature_list().sort_values(by='Intensity',
+                                                   ascending=False,
+                                                   ignore_index=True).head(num_precursors)
+
+
 def blank_figure():
     """
     Obtain a blank figure wrapped by plotly_resampler.FigureResampler to be used as a placeholder.
@@ -136,6 +142,46 @@ def get_spectrum(spectrum, label_peaks=False):
                                                   'Intensity': ':.1f'}))
     fig.update_layout(xaxis_tickformat='d',
                       yaxis_tickformat='~e')
+
+    return fig
+
+
+def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False, num_precursors=10):
+    spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
+                                '1/K0': copy.deepcopy(spectrum.preprocessed_mobility_array),
+                                'Intensity': copy.deepcopy(spectrum.preprocessed_intensity_array)})
+
+    fig = spectrum_df.plot(x='m/z', y='1/K0', z='Intensity',
+                           kind='peakmap',
+                           add_marginals=True,
+                           z_log_scale=use_log_intensity,
+                           xlabel='m/z', ylabel='1/K0',
+                           aggregation_method='sum',
+                           num_x_bins=int((max(spectrum_df['m/z'].values) - min(spectrum_df['m/z'].values)) / 0.01),
+                           num_y_bins=int((max(spectrum_df['1/K0'].values) - min(spectrum_df['1/K0'].values)) / 0.001),
+                           width=1000, height=1000,
+                           backend='ms_plotly',
+                           show_plot=False).fig
+    fig.update_layout(dragmode='zoom')
+    fig.update_layout(showlegend=False)
+    fig['layout']['annotations'] = []
+    if label_peaks:
+        for index, row in get_top_n_precursors_3d(spectrum, num_precursors=num_precursors).iterrows():
+            fig.add_annotation(text=f"m/z {round(row['m/z'], 4)}<br>1/K0 {round(row['1/K0'], 3)}",
+                               x=row['m/z'], y=row['1/K0'],
+                               xref='x4', yref='y4',
+                               showarrow=False,
+                               font={'size': 16, 'color': 'Black'})
+    fig.data[0].marker.colorscale = 'Blues'
+    fig['layout']['xaxis']['domain'] = [0.0, 0.25]
+    fig['layout']['xaxis2']['domain'] = [0.25, 1.0]
+    fig['layout']['xaxis3']['domain'] = [0.0, 0.25]
+    fig['layout']['xaxis4']['domain'] = [0.25, 1.0]
+    fig['layout']['yaxis']['domain'] = [0.75, 1.0]
+    fig['layout']['yaxis2']['domain'] = [0.75, 1.0]
+    fig['layout']['yaxis3']['domain'] = [0.75, 1.0]
+    fig['layout']['yaxis4']['domain'] = [0.0, 0.75]
+    fig['layout']['yaxis5']['domain'] = [0.0, 0.75]
 
     return fig
 
