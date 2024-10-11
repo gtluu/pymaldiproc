@@ -73,6 +73,7 @@ def get_preprocessing_params(config_file=''):
                            'start_intensity_check': int(config['peak_picking']['start_intensity_check']),
                            'add_up_intensity': config['peak_picking'].getboolean('add_up_intensity')}
     peak_picking_3d_params = {'min_distance': int(config['peak_picking_3d']['min_distance']),
+                              'noise': None,
                               'snr': int(config['peak_picking_3d']['snr']),
                               'exclude_border': int(config['peak_picking_3d']['exclude_border'])}
     if config['remove_baseline']['smooth_half_window'] != 'None':
