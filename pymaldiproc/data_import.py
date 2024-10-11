@@ -25,7 +25,7 @@ def schema_detection(bruker_dot_d_file):
         return 'BAF'
 
 
-def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclude_mobility=True):
+def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclude_mobility=False):
     """
     Import spectra from Bruker TSF and TDF files. Due to incompatibility with current preprocessing methods, ion
     mobility data is not parsed by default.
@@ -67,7 +67,7 @@ def import_timstof_raw_data(input_path, mode, profile_bins=0, encoding=64, exclu
                                                             encoding=encoding))
             elif not exclude_mobility:
                 for frame in range(1, data.analysis['Frames'].shape[0] + 1):
-                    list_of_spectra.append(PMP3DTdfSpectrum(data, frame, mode, profile_bins=profile_bins,
+                    list_of_spectra.append(PMP3DTdfSpectrum(data, frame, mode='centroid', profile_bins=profile_bins,
                                                             encoding=encoding))
     return list_of_spectra
 

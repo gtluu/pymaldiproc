@@ -60,7 +60,7 @@ def upload_data(n_clicks_mzml, n_clicks_d):
         dirname = askdirectory(mustexist=True)
         main_tk_window.destroy()
         if dirname.endswith('.d'):
-            data = import_timstof_raw_data(dirname, mode='profile', exclude_mobility=True)
+            data = import_timstof_raw_data(dirname, mode='profile', exclude_mobility=False)
             for spectrum in data:
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
     options = [{'label': i, 'value': i} for i in INDEXED_DATA.keys()]
@@ -149,9 +149,9 @@ def plot_spectrum(value):
                Input('peak_picking_3d_min_distance_value', 'value'),
                Input('peak_picking_3d_noise_value', 'value'),
                Input('peak_picking_3d_snr_value', 'value'),
-               Input('peak_picking_3d_exclude_border', 'value'),
-               Input('store_preprocessing_params', 'data')],
-              State('edit_processing_parameters_modal', 'is_open'))
+               Input('peak_picking_3d_exclude_border_value', 'value')],
+              [State('store_preprocessing_params', 'data'),
+               State('edit_processing_parameters_modal', 'is_open')])
 def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
                                                n_clicks_save,
                                                n_clicks_cancel,
@@ -294,11 +294,12 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
         Each element of the tuple will exclude peaks within n pixels of the border of the image along that dimension.
         If True, takes the min_distance parameter as value. If zero or False, peaks are identified regardless of their
         distance from the border.
-    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
+    :param preprocessing_params: State signal containing data from store_preprocessing_params.
     :param is_open: State signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     :return: Output signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     """
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
+    print(changed_id)
     if (changed_id == 'edit_preprocessing_parameters.n_clicks' or
             changed_id == 'edit_processing_parameters_save.n_clicks' or
             changed_id == 'edit_processing_parameters_cancel.n_clicks'):
@@ -491,9 +492,9 @@ def toggle_peak_picking_deisotope_parameters(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('trim_spectrum', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('trim_spectrum', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def trim_spectrum_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply spectrum trimming to the currently selected spectrum.
@@ -512,9 +513,9 @@ def trim_spectrum_button(n_clicks, preprocessing_params, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('transform_intensity', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('transform_intensity', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def transform_intensity_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply intensity transformation to the currently selected spectrum.
@@ -533,9 +534,9 @@ def transform_intensity_button(n_clicks, preprocessing_params, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('smooth_baseline', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('smooth_baseline', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def smooth_baseline_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply baseline smoothing to the currently selected spectrum.
@@ -554,9 +555,9 @@ def smooth_baseline_button(n_clicks, preprocessing_params, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('remove_baseline', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('remove_baseline', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def remove_baseline_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply baseline removal to the currently selected spectrum.
@@ -576,9 +577,9 @@ def remove_baseline_button(n_clicks, preprocessing_params, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('normalize_intensity', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('normalize_intensity', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def normalize_intensity_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply intensity normalization to the currently selected spectrum.
@@ -597,9 +598,9 @@ def normalize_intensity_button(n_clicks, preprocessing_params, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('bin_spectrum', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('bin_spectrum', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def bin_spectrum_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply spectrum binning to the currently selected spectrum.
@@ -618,9 +619,9 @@ def bin_spectrum_button(n_clicks, preprocessing_params, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              [Input('peak_picking', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('peak_picking', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def peak_picking_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply peak picking to the currently selected spectrum.
@@ -660,7 +661,7 @@ def undo_peak_picking(n_clicks, value):
         INDEXED_DATA[value].peak_picked_intensity_array = None
         INDEXED_DATA[value].peak_picked_mobility_array = None
         INDEXED_DATA[value].peak_picking_indices = None
-        del INDEXED_DATA[value].data_processing['peak_picking']
+        del INDEXED_DATA[value].data_processing['peak picking']
         gc.collect()
         fig = get_peakmap(INDEXED_DATA[value])
         return fig, {}
@@ -676,9 +677,9 @@ def undo_peak_picking(n_clicks, value):
 
 
 @app.callback(Output('dummy', 'children'),
-              [Input('export_peak_list', 'n_clicks'),
-               Input('store_preprocessing_params', 'data')],
-              State('spectrum_id', 'value'))
+              Input('export_peak_list', 'n_clicks'),
+              [State('store_preprocessing_params', 'data'),
+               State('spectrum_id', 'value')])
 def export_peak_list(n_clicks, preprocessing_params, value):
     """
     Dash callback to export the current peak list obtained from peak picking as a CSV file.
@@ -727,7 +728,7 @@ def undo_preprocessing(n_clicks, value):
     global INDEXED_DATA
     if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
         INDEXED_DATA[value].undo_all_processing()
-        fig = get_peakmap(INDEXED_DATA['value'])
+        fig = get_peakmap(INDEXED_DATA[value])
         return fig, {}
     else:
         INDEXED_DATA[value].undo_all_processing()
@@ -755,4 +756,4 @@ def resample_spectrum(relayoutdata: dict, fig: FigureResampler):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)

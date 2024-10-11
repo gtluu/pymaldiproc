@@ -173,7 +173,7 @@ def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False):
                                xref='x4', yref='y4',
                                showarrow=False,
                                font={'size': 16, 'color': 'Black'})
-    fig.data[0].marker.colorscale = 'Blues'
+    fig.data[0].marker.colorscale = 'balance'
     fig['layout']['xaxis']['domain'] = [0.0, 0.25]
     fig['layout']['xaxis2']['domain'] = [0.25, 1.0]
     fig['layout']['xaxis3']['domain'] = [0.0, 0.25]
