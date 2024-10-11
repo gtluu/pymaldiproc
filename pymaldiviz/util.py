@@ -72,6 +72,9 @@ def get_preprocessing_params(config_file=''):
                            'use_decreasing_model': config['peak_picking'].getboolean('use_decreasing_model'),
                            'start_intensity_check': int(config['peak_picking']['start_intensity_check']),
                            'add_up_intensity': config['peak_picking'].getboolean('add_up_intensity')}
+    peak_picking_3d_params = {'min_distance': int(config['peak_picking_3d']['min_distance']),
+                              'snr': int(config['peak_picking_3d']['snr']),
+                              'exclude_border': int(config['peak_picking_3d']['exclude_border'])}
     if config['remove_baseline']['smooth_half_window'] != 'None':
         remove_baseline_params['smooth_half_window'] = int(config['remove_baseline']['smooth_half_window'])
     if config['remove_baseline']['sigma'] != 'None':
@@ -80,19 +83,16 @@ def get_preprocessing_params(config_file=''):
         remove_baseline_params['repetition'] = int(config['remove_baseline']['repetition'])
     if config['peak_picking']['widths'] != 'None':
         peak_picking_params['widths'] = int(config['peak_picking']['widths'])
+    if config['peak_picking_3d']['noise'] != 'None':
+        peak_picking_3d_params['noise'] = int(config['peak_picking_3d']['noise'])
     return {'TRIM_SPECTRUM': trim_spectrum_params,
             'TRANSFORM_INTENSITY': transform_intensity_params,
             'SMOOTH_BASELINE': smooth_baseline_params,
             'REMOVE_BASELINE': remove_baseline_params,
             'NORMALIZE_INTENSITY': normalize_intensity_params,
             'BIN_SPECTRUM': bin_spectrum_params,
-            'PEAK_PICKING': peak_picking_params}
-
-
-def get_top_n_precursors_3d(spectrum, num_precursors=10):
-    return spectrum.get_feature_list().sort_values(by='Intensity',
-                                                   ascending=False,
-                                                   ignore_index=True).head(num_precursors)
+            'PEAK_PICKING': peak_picking_params,
+            'PEAK_PICKING_3D': peak_picking_3d_params}
 
 
 def blank_figure():
@@ -146,7 +146,7 @@ def get_spectrum(spectrum, label_peaks=False):
     return fig
 
 
-def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False, num_precursors=10):
+def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False):
     spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
                                 '1/K0': copy.deepcopy(spectrum.preprocessed_mobility_array),
                                 'Intensity': copy.deepcopy(spectrum.preprocessed_intensity_array)})
@@ -166,7 +166,7 @@ def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False, num_precurs
     fig.update_layout(showlegend=False)
     fig['layout']['annotations'] = []
     if label_peaks:
-        for index, row in get_top_n_precursors_3d(spectrum, num_precursors=num_precursors).iterrows():
+        for index, row in spectrum.get_feature_list().iterrows():
             fig.add_annotation(text=f"m/z {round(row['m/z'], 4)}<br>1/K0 {round(row['1/K0'], 3)}",
                                x=row['m/z'], y=row['1/K0'],
                                xref='x4', yref='y4',

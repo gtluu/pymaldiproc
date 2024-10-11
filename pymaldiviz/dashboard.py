@@ -2,13 +2,14 @@ import copy
 import gc
 import pandas as pd
 from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
+from pymaldiproc.classes import PMP3DTdfSpectrum
 from pymaldiviz.layout import get_dashboard_layout
 from pymaldiviz.util import (get_preprocessing_params, get_spectrum, toggle_rebin_style, toggle_apodization_style,
                              toggle_cwt_style, toggle_snip_style, toggle_locmax_style, toggle_tophat_style,
                              toggle_smoothing_median_style, toggle_modpoly_style, toggle_imodpoly_style,
                              toggle_zhangfit_style, toggle_deisotope_on_style, toggle_deisotope_off_style,
                              toggle_fast_change_style, toggle_savitzky_golay_style, toggle_removal_median_style,
-                             cleanup_file_system_backend)
+                             cleanup_file_system_backend, get_peakmap)
 from pymaldiviz.tmpdir import FILE_SYSTEM_BACKEND
 from dash import State, callback_context, no_update
 from dash_extensions.enrich import (Input, Output, DashProxy, MultiplexerTransform, Serverside,
@@ -68,20 +69,32 @@ def upload_data(n_clicks_mzml, n_clicks_d):
 
 
 @app.callback([Output('spectrum_plot', 'figure'),
-               Output('store_plot', 'data')],
+               Output('store_plot', 'data'),
+               Output('trim_spectrum', 'disabled'),
+               Output('transform_intensity', 'disabled'),
+               Output('smooth_baseline', 'disabled'),
+               Output('remove_baseline', 'disabled'),
+               Output('normalize_intensity', 'disabled'),
+               Output('bin_spectrum', 'disabled')],
               Input('spectrum_id', 'value'))
 def plot_spectrum(value):
     """
     Dash callback to plot the spectrum selected from the spectrum_id dropdown using plotly.express and
-    plotly_resampler.FigureResampler.
+    plotly_resampler.FigureResampler. If a pymaldiproc.classes.PMP3DTdfSpectrum is detected, a 3D peakmap will be
+    plotted instead.
 
     :param value: Input signal spectrum_id used as the key in INDEXED_DATA.
-    :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
+    :return: Tuple of spectrum figure as a plotly.express.line plot, data store for plotly_resampler, and whether or
+        not preprocessing buttons are to be disabled.
     """
     global INDEXED_DATA
-    fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-    return fig, Serverside(fig)
+    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+        fig = get_peakmap(INDEXED_DATA[value])
+        return fig, {}, True, True, True, True, True, True
+    else:
+        fig = get_spectrum(INDEXED_DATA[value])
+        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+        return fig, Serverside(fig), False, False, False, False, False, False
 
 
 @app.callback([Output('edit_processing_parameters_modal', 'is_open'),
@@ -133,6 +146,10 @@ def plot_spectrum(value):
                Input('peak_picking_deisotope_use_decreasing_model', 'value'),
                Input('peak_picking_deisotope_start_intensity_check_value', 'value'),
                Input('peak_picking_deisotope_add_up_intensity', 'value'),
+               Input('peak_picking_3d_min_distance_value', 'value'),
+               Input('peak_picking_3d_noise_value', 'value'),
+               Input('peak_picking_3d_snr_value', 'value'),
+               Input('peak_picking_3d_exclude_border', 'value'),
                Input('store_preprocessing_params', 'data')],
               State('edit_processing_parameters_modal', 'is_open'))
 def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
@@ -182,6 +199,10 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
                                                peak_picking_use_decreasing_model,
                                                peak_picking_start_intensity_check,
                                                peak_picking_add_up_intensity,
+                                               peak_picking_3d_min_distance,
+                                               peak_picking_3d_noise,
+                                               peak_picking_3d_snr,
+                                               peak_picking_3d_exclude_border,
                                                preprocessing_params,
                                                is_open):
     """
@@ -263,6 +284,17 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
         3rd, etc. A number higher than max_isopeaks will effectively disable use_decreasing_model completely.
     :param peak_picking_add_up_intensity: Whether to sum up the total intensity of each isotopic pattern into the
         intensity of the reported monoisotopic peak.
+    :param peak_picking_3d_min_distance: The minimal allowed distance separating peaks. To find the maximum number of
+        peaks, use min_distance=1.
+    :param peak_picking_3d_noise: Absolute intensity value to be used as baseline noise level. If None, the median
+        value of the intensity array is used as an estimate of the noise.
+    :param peak_picking_3d_snr: Minimum signal-to-noise ratio required to consider peak.
+    :param peak_picking_3d_exclude_border: If positive integer, excludes peaks from within n pixels of the border of
+        the image. If tuple of non-negative ints, the length of the tuple must match the input array's dimensionality.
+        Each element of the tuple will exclude peaks within n pixels of the border of the image along that dimension.
+        If True, takes the min_distance parameter as value. If zero or False, peaks are identified regardless of their
+        distance from the border.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param is_open: State signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     :return: Output signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     """
@@ -315,6 +347,10 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
             preprocessing_params['PEAK_PICKING']['use_decreasing_model'] = peak_picking_use_decreasing_model
             preprocessing_params['PEAK_PICKING']['start_intensity_check'] = peak_picking_start_intensity_check
             preprocessing_params['PEAK_PICKING']['add_up_intensity'] = peak_picking_add_up_intensity
+            preprocessing_params['PEAK_PICKING_3D']['min_distance'] = peak_picking_3d_min_distance
+            preprocessing_params['PEAK_PICKING_3D']['noise'] = peak_picking_3d_noise
+            preprocessing_params['PEAK_PICKING_3D']['snr'] = peak_picking_3d_snr
+            preprocessing_params['PEAK_PICKING_3D']['exclude_border'] = peak_picking_3d_exclude_border
         return not is_open, preprocessing_params
     return is_open, preprocessing_params
 
@@ -595,10 +631,15 @@ def peak_picking_button(n_clicks, preprocessing_params, value):
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING'])
-    fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
-    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-    return fig, Serverside(fig)
+    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+        INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING_3D'])
+        fig = get_peakmap(INDEXED_DATA[value], label_peaks=True)
+        return fig, {}
+    else:
+        INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING'])
+        fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
+        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+        return fig, Serverside(fig)
 
 
 @app.callback([Output('spectrum_plot', 'figure'),
@@ -614,32 +655,53 @@ def undo_peak_picking(n_clicks, value):
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    INDEXED_DATA[value].peak_picked_mz_array = None
-    INDEXED_DATA[value].peak_picked_intensity_array = None
-    INDEXED_DATA[value].peak_picking_indices = None
-    del INDEXED_DATA[value].data_processing['peak picking']
-    gc.collect()
-    fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-    return fig, Serverside(fig)
+    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+        INDEXED_DATA[value].peak_picked_mz_array = None
+        INDEXED_DATA[value].peak_picked_intensity_array = None
+        INDEXED_DATA[value].peak_picked_mobility_array = None
+        INDEXED_DATA[value].peak_picking_indices = None
+        del INDEXED_DATA[value].data_processing['peak_picking']
+        gc.collect()
+        fig = get_peakmap(INDEXED_DATA[value])
+        return fig, {}
+    else:
+        INDEXED_DATA[value].peak_picked_mz_array = None
+        INDEXED_DATA[value].peak_picked_intensity_array = None
+        INDEXED_DATA[value].peak_picking_indices = None
+        del INDEXED_DATA[value].data_processing['peak picking']
+        gc.collect()
+        fig = get_spectrum(INDEXED_DATA[value])
+        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+        return fig, Serverside(fig)
 
 
 @app.callback(Output('dummy', 'children'),
-              Input('export_peak_list', 'n_clicks'),
+              [Input('export_peak_list', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def export_peak_list(n_clicks, value):
+def export_peak_list(n_clicks, preprocessing_params, value):
     """
     Dash callback to export the current peak list obtained from peak picking as a CSV file.
 
     :param n_clicks: Input signal if the export_peak_list button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Empty list to dummy div.
     """
     global INDEXED_DATA
-    if INDEXED_DATA[value].peak_picked_mz_array is None and INDEXED_DATA[value].peak_picked_intensity_array is None:
-        INDEXED_DATA[value].peak_picking()
-    spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
-                                     'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
+    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+        if (INDEXED_DATA[value].peak_picked_mz_array is None and
+                INDEXED_DATA[value].peak_picked_intensity_array is None and
+                INDEXED_DATA[value].peak_picked_mobility_array is None):
+            INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING_3D'])
+        spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
+                                         '1/K0': copy.deepcopy(INDEXED_DATA[value].peak_picked_mobility_array),
+                                         'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
+    else:
+        if INDEXED_DATA[value].peak_picked_mz_array is None and INDEXED_DATA[value].peak_picked_intensity_array is None:
+            INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING'])
+        spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
+                                         'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
     main_tk_window = tkinter.Tk()
     main_tk_window.attributes('-topmost', True, '-alpha', 0)
     csv_filename = asksaveasfilename(confirmoverwrite=True,
@@ -663,10 +725,15 @@ def undo_preprocessing(n_clicks, value):
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    INDEXED_DATA[value].undo_all_processing()
-    fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-    return fig, Serverside(fig)
+    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+        INDEXED_DATA[value].undo_all_processing()
+        fig = get_peakmap(INDEXED_DATA['value'])
+        return fig, {}
+    else:
+        INDEXED_DATA[value].undo_all_processing()
+        fig = get_spectrum(INDEXED_DATA[value])
+        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+        return fig, Serverside(fig)
 
 
 @app.callback(Output('spectrum_plot', 'figure', allow_duplicate=True),

@@ -451,7 +451,7 @@ def get_preprocessing_parameters_layout(param_dict):
 
     peak_picking_parameters = html.Div(
         [
-            html.H5('Peak Picking Parameters'),
+            html.H5('2D Peak Picking Parameters'),
             html.P('Method'),
             dbc.RadioItems(
                 id='peak_picking_method',
@@ -716,13 +716,79 @@ def get_preprocessing_parameters_layout(param_dict):
         style={'margin': '20px'}
     )
 
+    peak_picking_3d_parameters = html.Div(
+        [
+            html.H5('3D Peak Picking Parameters'),
+            html.P('Method'),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Minimum Distance'),
+                    dbc.Input(id='peak_picking_3d_min_distance_value',
+                              placeholder=param_dict['PEAK_PICKING_3D']['min_distance'],
+                              value=param_dict['PEAK_PICKING_3D']['min_distance'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='peak_picking_3d_min_distance',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Noise (Optional)'),
+                    dbc.Input(id='peak_picking_3d_noise_value',
+                              placeholder=param_dict['PEAK_PICKING_3D']['noise'],
+                              value=param_dict['PEAK_PICKING_3D']['noise'],
+                              type='number',
+                              min=0,
+                              step=0.1)
+                ],
+                id='peak_picking_3d_noise',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Signal-to-Noise Ratio'),
+                    dbc.Input(id='peak_picking_3d_snr_value',
+                              placeholder=param_dict['PEAK_PICKING_3D']['snr'],
+                              value=param_dict['PEAK_PICKING_3D']['snr'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='peak_picking_3d_snr',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            ),
+            dbc.InputGroup(
+                [
+                    dbc.InputGroupText('Exclude Border'),
+                    dbc.Input(id='peak_picking_3d_exclude_border_value',
+                              placeholder=param_dict['PEAK_PICKING_3D']['exclude_border'],
+                              value=param_dict['PEAK_PICKING_3D']['exclude_border'],
+                              type='number',
+                              min=0,
+                              step=1)
+                ],
+                id='peak_picking_3d_exclude_border',
+                style={'margin': '10px',
+                       'display': 'flex'}
+            )
+        ],
+        id='peak_picking_3d_parameters',
+        style={'margin': '20px'}
+    )
+
     return [trim_spectrum_parameters,
             transform_intensity_parameters,
             smooth_baseline_parameters,
             remove_baseline_parameters,
             normalize_intensity_parameters,
             bin_spectrum_parameters,
-            peak_picking_parameters]
+            peak_picking_parameters,
+            peak_picking_3d_parameters]
 
 
 def get_dashboard_layout(param_dict):

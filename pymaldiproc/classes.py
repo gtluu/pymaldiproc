@@ -503,7 +503,7 @@ class PMP3DMethods(object):
             self.peak_picked_heatmap[row, col] = 1
         self.peak_picked_heatmap
 
-    def peak_picking(self, min_distance=5, noise=None, snr=3, exclude_border=False):
+    def peak_picking(self, min_distance=5, noise=None, snr=3, exclude_border=0):
         """
         Perform peak picking on mass heatmap. Documentation for various parameters is taken from their respective
         documentation pages.
