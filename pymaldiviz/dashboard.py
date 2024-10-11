@@ -20,15 +20,13 @@ from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
 # will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
-# default processing parameters from config file
-PREPROCESSING_PARAMS = get_preprocessing_params()
 
 # Use DashProxy instead of Dash to allow for multiple callbacks to the same plot
 app = DashProxy(prevent_initial_callbacks=True,
                 transforms=[MultiplexerTransform(),
                             ServersideOutputTransform(backends=[FileSystemBackend(cache_dir=FILE_SYSTEM_BACKEND)])],
                 external_stylesheets=[dbc.themes.BOOTSTRAP])
-app.layout = get_dashboard_layout(PREPROCESSING_PARAMS)
+app.layout = get_dashboard_layout(get_preprocessing_params())
 
 
 @app.callback([Output('spectrum_id', 'options', allow_duplicate=True),
@@ -86,7 +84,8 @@ def plot_spectrum(value):
     return fig, Serverside(fig)
 
 
-@app.callback(Output('edit_processing_parameters_modal', 'is_open'),
+@app.callback([Output('edit_processing_parameters_modal', 'is_open'),
+               Output('store_preprocessing_params', 'data')],
               [Input('edit_preprocessing_parameters', 'n_clicks'),
                Input('edit_processing_parameters_save', 'n_clicks'),
                Input('edit_processing_parameters_cancel', 'n_clicks'),
@@ -133,7 +132,8 @@ def plot_spectrum(value):
                Input('peak_picking_deisotope_annotate_iso_peak_count', 'value'),
                Input('peak_picking_deisotope_use_decreasing_model', 'value'),
                Input('peak_picking_deisotope_start_intensity_check_value', 'value'),
-               Input('peak_picking_deisotope_add_up_intensity', 'value')],
+               Input('peak_picking_deisotope_add_up_intensity', 'value'),
+               Input('store_preprocessing_params', 'data')],
               State('edit_processing_parameters_modal', 'is_open'))
 def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
                                                n_clicks_save,
@@ -182,11 +182,12 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
                                                peak_picking_use_decreasing_model,
                                                peak_picking_start_intensity_check,
                                                peak_picking_add_up_intensity,
+                                               preprocessing_params,
                                                is_open):
     """
     Dash callback to toggle the preprocessing parameters modal window, populate the current preprocessing parameters
-    saved in the global variable PREPROCESSING_PARAMS, and save any modified preprocessing parameters to
-    PREPROCESSING_PARAMS if the Save button is clicked.
+    saved in the global variable preprocessing_params, and save any modified preprocessing parameters to
+    preprocessing_params if the Save button is clicked.
 
     :param n_clicks_button: Input signal if the edit_preprocessing_parameters button is clicked.
     :param n_clicks_save: Input signal if the edit_preprocessing_parameters_save button is clicked.
@@ -265,58 +266,57 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
     :param is_open: State signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     :return: Output signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     """
-    global PREPROCESSING_PARAMS
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
     if (changed_id == 'edit_preprocessing_parameters.n_clicks' or
             changed_id == 'edit_processing_parameters_save.n_clicks' or
             changed_id == 'edit_processing_parameters_cancel.n_clicks'):
         if changed_id == 'edit_processing_parameters_save.n_clicks':
-            PREPROCESSING_PARAMS['TRIM_SPECTRUM']['lower_mass_range'] = trim_spectrum_lower_mass_range
-            PREPROCESSING_PARAMS['TRIM_SPECTRUM']['upper_mass_range'] = trim_spectrum_upper_mass_range
-            PREPROCESSING_PARAMS['TRANSFORM_INTENSITY']['method'] = transform_intensity_method
-            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['method'] = smooth_baseline_method
-            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['window_length'] = smooth_baseline_window_length
-            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['polyorder'] = smooth_baseline_polyorder
-            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['delta_mz'] = smooth_baseline_delta_mz
-            PREPROCESSING_PARAMS['SMOOTH_BASELINE']['diff_thresh'] = smooth_baseline_diff_thresh
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['method'] = remove_baseline_method
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['min_half_window'] = remove_baseline_min_half_window
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['max_half_window'] = remove_baseline_max_half_window
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['decreasing'] = remove_baseline_decreasing
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['smooth_half_window'] = remove_baseline_smooth_half_window
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['filter_order'] = remove_baseline_filter_order
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['sigma'] = remove_baseline_sigma
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['increment'] = remove_baseline_increment
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['max_hits'] = remove_baseline_max_hits
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['window_tol'] = remove_baseline_window_tol
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['lambda_'] = remove_baseline_lambda_
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['porder'] = remove_baseline_porder
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['repetition'] = remove_baseline_repetition
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['degree'] = remove_baseline_degree
-            PREPROCESSING_PARAMS['REMOVE_BASELINE']['gradient'] = remove_baseline_gradient
-            PREPROCESSING_PARAMS['NORMALIZE_INTENSITY']['method'] = normalize_intensity_method
-            PREPROCESSING_PARAMS['BIN_SPECTRUM']['n_bins'] = bin_spectrum_n_bins
-            PREPROCESSING_PARAMS['BIN_SPECTRUM']['lower_mass_range'] = bin_spectrum_lower_mass_range
-            PREPROCESSING_PARAMS['BIN_SPECTRUM']['upper_mass_range'] = bin_spectrum_upper_mass_range
-            PREPROCESSING_PARAMS['PEAK_PICKING']['method'] = peak_picking_method
-            PREPROCESSING_PARAMS['PEAK_PICKING']['snr'] = peak_picking_snr
-            PREPROCESSING_PARAMS['PEAK_PICKING']['widths'] = peak_picking_widths
-            PREPROCESSING_PARAMS['PEAK_PICKING']['deisotope'] = peak_picking_deisotope
-            PREPROCESSING_PARAMS['PEAK_PICKING']['fragment_tolerance'] = peak_picking_fragment_tolerance
-            PREPROCESSING_PARAMS['PEAK_PICKING']['fragment_unit_ppm'] = peak_picking_fragment_unit_ppm
-            PREPROCESSING_PARAMS['PEAK_PICKING']['min_charge'] = peak_picking_min_charge
-            PREPROCESSING_PARAMS['PEAK_PICKING']['max_charge'] = peak_picking_max_charge
-            PREPROCESSING_PARAMS['PEAK_PICKING']['keep_only_deisotoped'] = peak_picking_keep_only_deisotoped
-            PREPROCESSING_PARAMS['PEAK_PICKING']['min_isopeaks'] = peak_picking_min_isopeaks
-            PREPROCESSING_PARAMS['PEAK_PICKING']['max_isopeaks'] = peak_picking_max_isopeaks
-            PREPROCESSING_PARAMS['PEAK_PICKING']['make_single_charged'] = peak_picking_make_single_charged
-            PREPROCESSING_PARAMS['PEAK_PICKING']['annotate_charge'] = peak_picking_annotate_charge
-            PREPROCESSING_PARAMS['PEAK_PICKING']['annotate_iso_peak_count'] = peak_picking_annotate_iso_peak_count
-            PREPROCESSING_PARAMS['PEAK_PICKING']['use_decreasing_model'] = peak_picking_use_decreasing_model
-            PREPROCESSING_PARAMS['PEAK_PICKING']['start_intensity_check'] = peak_picking_start_intensity_check
-            PREPROCESSING_PARAMS['PEAK_PICKING']['add_up_intensity'] = peak_picking_add_up_intensity
-        return not is_open
-    return is_open
+            preprocessing_params['TRIM_SPECTRUM']['lower_mass_range'] = trim_spectrum_lower_mass_range
+            preprocessing_params['TRIM_SPECTRUM']['upper_mass_range'] = trim_spectrum_upper_mass_range
+            preprocessing_params['TRANSFORM_INTENSITY']['method'] = transform_intensity_method
+            preprocessing_params['SMOOTH_BASELINE']['method'] = smooth_baseline_method
+            preprocessing_params['SMOOTH_BASELINE']['window_length'] = smooth_baseline_window_length
+            preprocessing_params['SMOOTH_BASELINE']['polyorder'] = smooth_baseline_polyorder
+            preprocessing_params['SMOOTH_BASELINE']['delta_mz'] = smooth_baseline_delta_mz
+            preprocessing_params['SMOOTH_BASELINE']['diff_thresh'] = smooth_baseline_diff_thresh
+            preprocessing_params['REMOVE_BASELINE']['method'] = remove_baseline_method
+            preprocessing_params['REMOVE_BASELINE']['min_half_window'] = remove_baseline_min_half_window
+            preprocessing_params['REMOVE_BASELINE']['max_half_window'] = remove_baseline_max_half_window
+            preprocessing_params['REMOVE_BASELINE']['decreasing'] = remove_baseline_decreasing
+            preprocessing_params['REMOVE_BASELINE']['smooth_half_window'] = remove_baseline_smooth_half_window
+            preprocessing_params['REMOVE_BASELINE']['filter_order'] = remove_baseline_filter_order
+            preprocessing_params['REMOVE_BASELINE']['sigma'] = remove_baseline_sigma
+            preprocessing_params['REMOVE_BASELINE']['increment'] = remove_baseline_increment
+            preprocessing_params['REMOVE_BASELINE']['max_hits'] = remove_baseline_max_hits
+            preprocessing_params['REMOVE_BASELINE']['window_tol'] = remove_baseline_window_tol
+            preprocessing_params['REMOVE_BASELINE']['lambda_'] = remove_baseline_lambda_
+            preprocessing_params['REMOVE_BASELINE']['porder'] = remove_baseline_porder
+            preprocessing_params['REMOVE_BASELINE']['repetition'] = remove_baseline_repetition
+            preprocessing_params['REMOVE_BASELINE']['degree'] = remove_baseline_degree
+            preprocessing_params['REMOVE_BASELINE']['gradient'] = remove_baseline_gradient
+            preprocessing_params['NORMALIZE_INTENSITY']['method'] = normalize_intensity_method
+            preprocessing_params['BIN_SPECTRUM']['n_bins'] = bin_spectrum_n_bins
+            preprocessing_params['BIN_SPECTRUM']['lower_mass_range'] = bin_spectrum_lower_mass_range
+            preprocessing_params['BIN_SPECTRUM']['upper_mass_range'] = bin_spectrum_upper_mass_range
+            preprocessing_params['PEAK_PICKING']['method'] = peak_picking_method
+            preprocessing_params['PEAK_PICKING']['snr'] = peak_picking_snr
+            preprocessing_params['PEAK_PICKING']['widths'] = peak_picking_widths
+            preprocessing_params['PEAK_PICKING']['deisotope'] = peak_picking_deisotope
+            preprocessing_params['PEAK_PICKING']['fragment_tolerance'] = peak_picking_fragment_tolerance
+            preprocessing_params['PEAK_PICKING']['fragment_unit_ppm'] = peak_picking_fragment_unit_ppm
+            preprocessing_params['PEAK_PICKING']['min_charge'] = peak_picking_min_charge
+            preprocessing_params['PEAK_PICKING']['max_charge'] = peak_picking_max_charge
+            preprocessing_params['PEAK_PICKING']['keep_only_deisotoped'] = peak_picking_keep_only_deisotoped
+            preprocessing_params['PEAK_PICKING']['min_isopeaks'] = peak_picking_min_isopeaks
+            preprocessing_params['PEAK_PICKING']['max_isopeaks'] = peak_picking_max_isopeaks
+            preprocessing_params['PEAK_PICKING']['make_single_charged'] = peak_picking_make_single_charged
+            preprocessing_params['PEAK_PICKING']['annotate_charge'] = peak_picking_annotate_charge
+            preprocessing_params['PEAK_PICKING']['annotate_iso_peak_count'] = peak_picking_annotate_iso_peak_count
+            preprocessing_params['PEAK_PICKING']['use_decreasing_model'] = peak_picking_use_decreasing_model
+            preprocessing_params['PEAK_PICKING']['start_intensity_check'] = peak_picking_start_intensity_check
+            preprocessing_params['PEAK_PICKING']['add_up_intensity'] = peak_picking_add_up_intensity
+        return not is_open, preprocessing_params
+    return is_open, preprocessing_params
 
 
 @app.callback(Output('edit_processing_parameters_modal_saved', 'is_open'),
@@ -455,19 +455,20 @@ def toggle_peak_picking_deisotope_parameters(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('trim_spectrum', 'n_clicks'),
+              [Input('trim_spectrum', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def trim_spectrum_button(n_clicks, value):
+def trim_spectrum_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply spectrum trimming to the currently selected spectrum.
 
     :param n_clicks: Input signal if the trim_spectrum button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].trim_spectrum(**PREPROCESSING_PARAMS['TRIM_SPECTRUM'])
+    INDEXED_DATA[value].trim_spectrum(**preprocessing_params['TRIM_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
@@ -475,19 +476,20 @@ def trim_spectrum_button(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('transform_intensity', 'n_clicks'),
+              [Input('transform_intensity', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def transform_intensity_button(n_clicks, value):
+def transform_intensity_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply intensity transformation to the currently selected spectrum.
 
     :param n_clicks: Input signal if the transform_intensity button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].transform_intensity(**PREPROCESSING_PARAMS['TRANSFORM_INTENSITY'])
+    INDEXED_DATA[value].transform_intensity(**preprocessing_params['TRANSFORM_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
@@ -495,19 +497,20 @@ def transform_intensity_button(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('smooth_baseline', 'n_clicks'),
+              [Input('smooth_baseline', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def smooth_baseline_button(n_clicks, value):
+def smooth_baseline_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply baseline smoothing to the currently selected spectrum.
 
     :param n_clicks: Input signal if the smooth_baseline button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].smooth_baseline(**PREPROCESSING_PARAMS['SMOOTH_BASELINE'])
+    INDEXED_DATA[value].smooth_baseline(**preprocessing_params['SMOOTH_BASELINE'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
@@ -515,19 +518,20 @@ def smooth_baseline_button(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('remove_baseline', 'n_clicks'),
+              [Input('remove_baseline', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def remove_baseline_button(n_clicks, value):
+def remove_baseline_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply baseline removal to the currently selected spectrum.
 
     :param n_clicks: Input signal if the remove_baseline button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].remove_baseline(**PREPROCESSING_PARAMS['REMOVE_BASELINE'],
+    INDEXED_DATA[value].remove_baseline(**preprocessing_params['REMOVE_BASELINE'],
                                         )
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
@@ -536,19 +540,20 @@ def remove_baseline_button(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('normalize_intensity', 'n_clicks'),
+              [Input('normalize_intensity', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def normalize_intensity_button(n_clicks, value):
+def normalize_intensity_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply intensity normalization to the currently selected spectrum.
 
     :param n_clicks: Input signal if the normalize_intensity button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].normalize_intensity(**PREPROCESSING_PARAMS['NORMALIZE_INTENSITY'])
+    INDEXED_DATA[value].normalize_intensity(**preprocessing_params['NORMALIZE_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
@@ -556,19 +561,20 @@ def normalize_intensity_button(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('bin_spectrum', 'n_clicks'),
+              [Input('bin_spectrum', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def bin_spectrum_button(n_clicks, value):
+def bin_spectrum_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply spectrum binning to the currently selected spectrum.
 
     :param n_clicks: Input signal if the bin_spectrum button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].bin_spectrum(**PREPROCESSING_PARAMS['BIN_SPECTRUM'])
+    INDEXED_DATA[value].bin_spectrum(**preprocessing_params['BIN_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
@@ -576,19 +582,20 @@ def bin_spectrum_button(n_clicks, value):
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data')],
-              Input('peak_picking', 'n_clicks'),
+              [Input('peak_picking', 'n_clicks'),
+               Input('store_preprocessing_params', 'data')],
               State('spectrum_id', 'value'))
-def peak_picking_button(n_clicks, value):
+def peak_picking_button(n_clicks, preprocessing_params, value):
     """
     Dash callback to apply peak picking to the currently selected spectrum.
 
     :param n_clicks: Input signal if the peak_picking button is clicked.
+    :param preprocessing_params: Input signal containing data from store_preprocessing_params.
     :param value: Input signal spectrum_id used as key in INDEXED_DATA.
     :return: Tuple of spectrum figure as a plotly.express.line plot and data store for plotly_resampler.
     """
     global INDEXED_DATA
-    global PREPROCESSING_PARAMS
-    INDEXED_DATA[value].peak_picking(**PREPROCESSING_PARAMS['PEAK_PICKING'])
+    INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING'])
     fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
     cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)

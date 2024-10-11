@@ -1,6 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from pymaldiviz.util import blank_figure
+from pymaldiviz.util import blank_figure, get_preprocessing_params
 
 
 def get_preprocessing_parameters_layout(param_dict):
@@ -890,6 +890,8 @@ def get_dashboard_layout(param_dict):
                         is_open=False
                     ),
 
+                    dcc.Store(id='store_preprocessing_params',
+                              data=get_preprocessing_params()),
                     dcc.Store(id='store_plot'),
 
                     html.Div(
