@@ -15,15 +15,20 @@ HIDDEN = {'margin': '10px',
           'display': 'none'}
 
 
-def get_preprocessing_params():
+def get_preprocessing_params(config_file=''):
     """
     Parse preprocessing parameters from the configuration file provided with pyMALDIproc.
 
+    :param config_file: Configuration file containing default preprocessing parameters.
+    :type config_file: str
     :return: Nest dictionaries containing preprocessing parameters for each preprocessing step.
     :rtype: dict
     """
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'etc', 'preprocessing.cfg'))
+    if config_file == '':
+        config.read(os.path.join(os.path.split(os.path.dirname(__file__))[0], 'etc', 'preprocessing.cfg'))
+    else:
+        config.read(config_file)
     trim_spectrum_params = {'lower_mass_range': int(config['trim_spectrum']['lower_mass_range']),
                             'upper_mass_range': int(config['trim_spectrum']['upper_mass_range'])}
     transform_intensity_params = {'method': config['transform_intensity']['method']}
