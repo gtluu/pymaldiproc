@@ -41,4 +41,4 @@ from pymaldiproc.classes import *
 from pymaldiproc.data_import import *
 from pymaldiproc.preprocessing import *
 
-VERSION = '0.4.0'
+VERSION = '0.4.1'

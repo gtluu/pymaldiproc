@@ -905,7 +905,11 @@ def get_dashboard_layout(param_dict):
                                         dbc.Button('Edit Preprocessing Parameters',
                                                    id='edit_preprocessing_parameters',
                                                    style={'margin': '5px'},
-                                                   disabled=False)
+                                                   disabled=False),
+                                        dbc.Button('Toggle log Intensity Scale',
+                                                   id='toggle_log_intensity',
+                                                   style={'margin': '5px'},
+                                                   disabled=True)
                                     ],
                                     style={'justify-content': 'center',
                                            'display': 'flex'}
@@ -958,6 +962,8 @@ def get_dashboard_layout(param_dict):
 
                     dcc.Store(id='store_preprocessing_params',
                               data=get_preprocessing_params()),
+                    dcc.Store(id='store_use_log_intensity',
+                              data=True),
                     dcc.Store(id='store_plot'),
 
                     html.Div(

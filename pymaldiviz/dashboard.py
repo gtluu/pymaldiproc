@@ -75,7 +75,8 @@ def upload_data(n_clicks_mzml, n_clicks_d):
                Output('smooth_baseline', 'disabled'),
                Output('remove_baseline', 'disabled'),
                Output('normalize_intensity', 'disabled'),
-               Output('bin_spectrum', 'disabled')],
+               Output('bin_spectrum', 'disabled'),
+               Output('toggle_log_intensity', 'disabled')],
               Input('spectrum_id', 'value'))
 def plot_spectrum(value):
     """
@@ -90,11 +91,28 @@ def plot_spectrum(value):
     global INDEXED_DATA
     if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
         fig = get_peakmap(INDEXED_DATA[value])
-        return fig, {}, True, True, True, True, True, True
+        return fig, {}, True, True, True, True, True, True, False
     else:
         fig = get_spectrum(INDEXED_DATA[value])
         cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-        return fig, Serverside(fig), False, False, False, False, False, False
+        return fig, Serverside(fig), False, False, False, False, False, False, True
+
+
+@app.callback([Output('spectrum_plot', 'figure'),
+               Output('store_use_log_intensity', 'data')],
+              Input('toggle_log_intensity', 'n_clicks'),
+              [State('spectrum_id', 'value'),
+               State('store_use_log_intensity', 'data')])
+def toggle_peakmap_log_intensity(n_clicks, value, use_log_intensity):
+    global INDEXED_DATA
+    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
+    if changed_id == 'toggle_log_intensity.n_clicks':
+        if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+            use_log_intensity = not use_log_intensity
+            fig = get_peakmap(INDEXED_DATA[value], use_log_intensity=use_log_intensity)
+            return fig, use_log_intensity
+        else:
+            return no_update
 
 
 @app.callback([Output('edit_processing_parameters_modal', 'is_open'),
