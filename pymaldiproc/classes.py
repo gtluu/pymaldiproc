@@ -626,7 +626,7 @@ class PMP3DMethods(object):
 class OpenMALDISpectrum(PMP2DMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
-    spectra in .mzML and .mzXML files. Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.
+    spectra in .mzML and .mzXML files. Preprocessing methods are inherited from pymaldiproc.classes.PMP2DMethods.
 
     :param pyteomics_dict: Dictionary containing spectrum metadata obtained from pyteomics.mzml.read or
         pyteomics.mzxml.read
@@ -698,7 +698,7 @@ class PMPTsfSpectrum(TsfSpectrum, PMP2DMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TOF and MALDI-qTOF mass
     spectra in Bruker TSF files. Data parsing methods are inherited from pyTDFSDK.classes.TsfSpectrum. Preprocessing
-    methods are inherited from pymaldiproc.classes.PMPMethods.
+    methods are inherited from pymaldiproc.classes.PMP2DMethods.
 
     :param tsf_data: TsfData object containing metadata from analysis.tsf database.
     :type tsf_data: pyTDFSDK.classes.TsfData
@@ -743,7 +743,8 @@ class PMP2DTdfSpectrum(TdfSpectrum, PMP2DMethods):
     """
     Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TIMS-TOF and MALDI-TIMS-qTOF
     mass spectra in Bruker TDF files. Data parsing methods are inherited from pyTDFSDK.classes.TdfSpectrum.
-    Preprocessing methods are inherited from pymaldiproc.classes.PMPMethods.
+    Preprocessing methods are inherited from pymaldiproc.classes.PMP2DMethods. Trapped ion mobility information is
+    ignored.
 
     :param tdf_data: TdfData object containing metadata from analysis.tdf database.
     :type tdf_data: pyTDFSDK.classes.TdfData
@@ -792,6 +793,29 @@ class PMP2DTdfSpectrum(TdfSpectrum, PMP2DMethods):
 
 
 class PMP3DTdfSpectrum(TdfSpectrum, PMP3DMethods):
+    """
+    Class for parsing and storing spectrum metadata and data arrays from open format MALDI-TIMS-TOF and MALDI-TIMS-qTOF
+    mass spectra in Bruker TDF files. Data parsing methods are inherited from pyTDFSDK.classes.TdfSpectrum.
+    Preprocessing methods are inherited from pymaldiproc.classes.PMP3DMethods. Trapped ion mobility is imported and can
+    undergo limited processing
+
+    :param tdf_data: TdfData object containing metadata from analysis.tdf database.
+    :type tdf_data: pyTDFSDK.classes.TdfData
+    :param frame: ID of the frame of interest.
+    :type frame: int
+    :param mode: Data array mode, either "profile", "centroid", or "raw".
+    :type mode: str
+    :param precursor: ID of the precursor of interest for ddaPASEF data. If specified, overrides the frame ID during
+        data parsing.
+    :type precursor: int
+    :param diapasef_window: Dictionary containing a row of metadata from the
+        pyTDFSDK.classesTdfData.analysis['DiaFrameMsMsWindows'] table required for parsing diaPASEF data.
+    :type diapasef_window: dict
+    :param profile_bins: Number of bins to bin spectrum to.
+    :type profile_bins: int
+    :param encoding: Encoding bit mode, either "64" or "32"
+    :type encoding: int
+    """
     def __init__(self, tdf_data, frame: int, mode: str, precursor=0, diapasef_window=None, profile_bins=0, encoding=64):
         """
         Constructor Method
