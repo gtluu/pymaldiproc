@@ -925,7 +925,7 @@ def get_dashboard_layout(param_dict):
                                     id='spectrum_plot',
                                     figure=blank_figure(),
                                     style={'width': '100%',
-                                           'height': '600px'}
+                                           'height': '1000px'}
                                 ),
                                 width=12
                             )
@@ -972,7 +972,7 @@ def get_dashboard_layout(param_dict):
                         style={'display': 'none'}
                     )
                 ],
-                overlay_style={'visibility': 'visible', 'opacity': 0.9}
+                overlay_style={'visibility': 'visible', 'opacity': 0.5}
             )
         ],
         style={'margin': '20px'}

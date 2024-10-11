@@ -183,6 +183,8 @@ def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False):
     fig['layout']['yaxis3']['domain'] = [0.75, 1.0]
     fig['layout']['yaxis4']['domain'] = [0.0, 0.75]
     fig['layout']['yaxis5']['domain'] = [0.0, 0.75]
+    fig['layout']['width'] = np.inf
+    fig['layout']['height'] = np.inf
 
     return fig
 
