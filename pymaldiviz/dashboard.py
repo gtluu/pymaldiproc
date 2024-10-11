@@ -91,7 +91,7 @@ def plot_spectrum(value):
     global INDEXED_DATA
     if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
         fig = get_peakmap(INDEXED_DATA[value])
-        return fig, {}, True, True, True, True, True, True, False
+        return fig, None, True, True, True, True, True, True, False
     else:
         fig = get_spectrum(INDEXED_DATA[value])
         cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
@@ -653,7 +653,7 @@ def peak_picking_button(n_clicks, preprocessing_params, value):
     if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
         INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING_3D'])
         fig = get_peakmap(INDEXED_DATA[value], label_peaks=True)
-        return fig, {}
+        return fig, None
     else:
         INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING'])
         fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
@@ -682,7 +682,7 @@ def undo_peak_picking(n_clicks, value):
         del INDEXED_DATA[value].data_processing['peak picking']
         gc.collect()
         fig = get_peakmap(INDEXED_DATA[value])
-        return fig, {}
+        return fig, None
     else:
         INDEXED_DATA[value].peak_picked_mz_array = None
         INDEXED_DATA[value].peak_picked_intensity_array = None
@@ -747,7 +747,7 @@ def undo_preprocessing(n_clicks, value):
     if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
         INDEXED_DATA[value].undo_all_processing()
         fig = get_peakmap(INDEXED_DATA[value])
-        return fig, {}
+        return fig, None
     else:
         INDEXED_DATA[value].undo_all_processing()
         fig = get_spectrum(INDEXED_DATA[value])
