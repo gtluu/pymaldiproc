@@ -1,12 +1,20 @@
+import copy
 import gc
+import pandas as pd
 from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
-from pymaldiviz.layout import *
-from pymaldiviz.util import *
+from pymaldiviz.layout import get_dashboard_layout
+from pymaldiviz.util import (get_preprocessing_params, get_spectrum, toggle_rebin_style, toggle_apodization_style,
+                             toggle_cwt_style, toggle_snip_style, toggle_locmax_style, toggle_tophat_style,
+                             toggle_smoothing_median_style, toggle_modpoly_style, toggle_imodpoly_style,
+                             toggle_zhangfit_style, toggle_deisotope_on_style, toggle_deisotope_off_style,
+                             toggle_fast_change_style, toggle_savitzky_golay_style, toggle_removal_median_style,
+                             cleanup_file_system_backend)
 from pymaldiviz.tmpdir import FILE_SYSTEM_BACKEND
 from dash import State, callback_context, no_update
 from dash_extensions.enrich import (Input, Output, DashProxy, MultiplexerTransform, Serverside,
                                     ServersideOutputTransform, FileSystemBackend)
 import dash_bootstrap_components as dbc
+from plotly_resampler import FigureResampler
 import tkinter
 from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
@@ -74,7 +82,7 @@ def plot_spectrum(value):
     """
     global INDEXED_DATA
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -461,7 +469,7 @@ def trim_spectrum_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].trim_spectrum(**PREPROCESSING_PARAMS['TRIM_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -481,7 +489,7 @@ def transform_intensity_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].transform_intensity(**PREPROCESSING_PARAMS['TRANSFORM_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -501,7 +509,7 @@ def smooth_baseline_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].smooth_baseline(**PREPROCESSING_PARAMS['SMOOTH_BASELINE'])
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -522,7 +530,7 @@ def remove_baseline_button(n_clicks, value):
     INDEXED_DATA[value].remove_baseline(**PREPROCESSING_PARAMS['REMOVE_BASELINE'],
                                         )
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -542,7 +550,7 @@ def normalize_intensity_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].normalize_intensity(**PREPROCESSING_PARAMS['NORMALIZE_INTENSITY'])
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -562,7 +570,7 @@ def bin_spectrum_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].bin_spectrum(**PREPROCESSING_PARAMS['BIN_SPECTRUM'])
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -582,7 +590,7 @@ def peak_picking_button(n_clicks, value):
     global PREPROCESSING_PARAMS
     INDEXED_DATA[value].peak_picking(**PREPROCESSING_PARAMS['PEAK_PICKING'])
     fig = get_spectrum(INDEXED_DATA[value], label_peaks=True)
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -605,7 +613,7 @@ def undo_peak_picking(n_clicks, value):
     del INDEXED_DATA[value].data_processing['peak picking']
     gc.collect()
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
@@ -650,7 +658,7 @@ def undo_preprocessing(n_clicks, value):
     global INDEXED_DATA
     INDEXED_DATA[value].undo_all_processing()
     fig = get_spectrum(INDEXED_DATA[value])
-    cleanup_file_system_backend()
+    cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
     return fig, Serverside(fig)
 
 
