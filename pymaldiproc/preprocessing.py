@@ -1,7 +1,123 @@
 import copy
+import gc
 import numpy as np
 import pandas as pd
 from functools import reduce
+from msalign import Aligner
+
+
+def align_spectra(list_of_spectra, lower_mass_range, upper_mass_range, method='pchip', ref_index=0, ref_peaks=None,
+                  ref_peaks_weights=None, num_ref_peaks=10, n_bins=0, width=10.0, ratio=2.5, resolution=100,
+                  iterations=5, grid_steps=20, shift_range=(-100, 100), align_by_index=True, only_shift=False,
+                  return_shifts=True):
+    """
+    Align two or more similar spectra to account for mass shifts across replicates. If not already done, spectrum
+    binning and peak picking using the local maxima algorithm and default parameters will be applied.
+
+    :param list_of_spectra: List of spectrum objects.
+    :type list_of_spectra: list[pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum]
+    :param lower_mass_range: Mass in daltons to use for the lower mass range.
+    :type lower_mass_range: int
+    :param upper_mass_range: Mass in Daltons to use for the upper mass range.
+    :type upper_mass_range: int
+    :param method: Interpolation method to be used for alignment: "pchip" or "cubic".
+    :type method: str
+    :param ref_index: Index of the spectrum (in which the first spectrum would be index 0) in the provided list of
+        spectra to be used as the reference spectrum to align to.
+    :type ref_index: int
+    :param ref_peaks: List of reference peaks to be aligned to from the reference spectrum. These peaks will act as
+        (re)calibration points in each spectrum and should be able to be detected in all spectra for best results.
+    :type ref_peaks: list|numpy.array
+    :param ref_peaks_weights: List of weights associated with the list of reference peaks. Must be the same length of
+        ref_peaks.
+    :type ref_peaks_weights: list|numpy.array
+    :param num_ref_peaks: If no reference peaks are provided, reference peaks up to this maximum number of reference
+        peaks will be automatically detected and used for spectra alignment.
+    :type num_ref_peaks: int
+    :param n_bins: Number of bins to use for spectra binning if binning has not already been performed. If 0, the number
+        of bins will automatically be calculated using a bin width of 0.05 Da.
+    :type n_bins: int
+    :param width: Width of the gaussian peak in separation units.
+    :type width: float
+    :param ratio: Scaling value that determines the size of the window around every alignment peak. The synthetic
+        signal is compared to the input signal within these regions.
+    :type ratio: float
+    :param resolution: Resolution of the peaks.
+    :type resolution: int
+    :param iterations: Number of iterations. Increasing this value will (slightly) slow down the function but will
+        improve performance.
+    :param grid_steps: Number of steps to be used in the grid search.
+    :type grid_steps: int
+    :param shift_range: Maximum allowed shifts.
+    :type shift_range: list|numpy.array
+    :param align_by_index: Decide whether alignment should be done based on index rather than the preprocessed m/z
+        array.
+    :type align_by_index: bool
+    :param only_shift: Determines if the signal should be shifted (True) or rescaled (False).
+    :type only_shift: bool
+    :param return_shifts: Decide whether shift parameter "shift_opt" should also be returned.
+    :type return_shifts: bool
+    """
+    for spectrum in list_of_spectra:
+        # bin spectra if not already done
+        if 'spectra binning' not in spectrum:
+            if n_bins == 0:
+                n_bins = int((upper_mass_range - lower_mass_range) / 0.05)
+            spectrum.bin_spectrum(n_bins=n_bins,
+                                  lower_mass_range=lower_mass_range,
+                                  upper_mass_range=upper_mass_range)
+        # pick peaks if not already done
+        if spectrum.peak_picked_mz_array is None or \
+                spectrum.peak_picked_intensity_array is None or \
+                spectrum.peak_picking_indices is None:
+            spectrum.peak_picking(method='locmax')
+
+    # get 2D array of intensities
+    intensity_array_2d = np.stack([copy.deepcopy(spectrum.preprocessed_intensity_array)
+                                   for spectrum in list_of_spectra])
+    # use first spectrum in the list as a reference spectrum if no reference peaks are provided by the user
+    ref_mz_array = copy.deepcopy(list_of_spectra[ref_index].preprocessed_mz_array)
+    if ref_peaks is None:
+        ref_peaks = pd.DataFrame({'m/z': copy.deepcopy(list_of_spectra[ref_index].peak_picked_mz_array),
+                                  'Intensity': copy.deepcopy(list_of_spectra[ref_index].peak_picked_intensity_array)})
+        subset_step = int((upper_mass_range - lower_mass_range) / num_ref_peaks)
+        ref_peaks_indices = []
+        for i in range(lower_mass_range, upper_mass_range, subset_step):
+            if i == lower_mass_range:
+                pass
+            else:
+                subset_peaks = ref_peaks[((i - subset_step) <= ref_peaks['m/z']) & (ref_peaks['m/z'] < i)]
+                if not subset_peaks.empty:
+                    ref_peaks_indices.append(np.where(ref_peaks['m/z'] ==
+                                                      subset_peaks.sort_values(by='Intensity',
+                                                                               ascending=False)['m/z'].values[0])[0][0])
+        ref_peaks = copy.deepcopy(list_of_spectra[ref_index].peak_picked_mz_array)[ref_peaks_indices]
+    # align all intensity arrays based on reference m/z array and reference points (i.e. calibration points)
+    aligner = Aligner(x=ref_mz_array,
+                      array=intensity_array_2d,
+                      method=method,
+                      peaks=ref_peaks,
+                      weights=ref_peaks_weights,
+                      width=width,
+                      ratio=ratio,
+                      resolution=resolution,
+                      iterations=iterations,
+                      grid_steps=grid_steps,
+                      shift_range=shift_range,
+                      return_shifts=return_shifts,
+                      align_by_index=align_by_index,
+                      only_shift=only_shift)
+    aligner.run()
+    aligned_intensity_array_2d, shifts_out = aligner.apply()
+    # write aligned intensity arrays to spectra and remove previous peak picking results
+    for i in range(0, len(list_of_spectra)):
+        list_of_spectra[i].preprocessed_intensity_array = copy.deepcopy(aligned_intensity_array_2d[i,])
+        list_of_spectra[i].peak_picked_mz_array = None
+        list_of_spectra[i].peak_picked_intensity_array = None
+        list_of_spectra[i].peak_picking_indices = None
+        del list_of_spectra[i].data_processing['peak picking']
+        gc.collect()
+    return list_of_spectra
 
 
 def get_feature_matrix(list_of_spectra, tolerance=0.05, decimals=4, missing_value_imputation=True):

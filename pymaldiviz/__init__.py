@@ -22,6 +22,7 @@ from pybaselines.morphological import tophat
 from BaselineRemoval import BaselineRemoval
 from pyMSpec.normalisation import tic, rms, mad, sqrt
 from pyopenms import *
+from msalign import Aligner
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -42,4 +43,4 @@ from pymaldiviz.dashboard import *
 from pymaldiviz.util import *
 from pymaldiviz.tmpdir import *
 
-VERSION = '0.4.1'
+VERSION = '0.4.2'
