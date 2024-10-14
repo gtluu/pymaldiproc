@@ -4,12 +4,13 @@ import numpy as np
 import pandas as pd
 from functools import reduce
 from msalign import Aligner
+import matplotlib.pyplot as plt
 
 
 def align_spectra(list_of_spectra, lower_mass_range, upper_mass_range, method='pchip', ref_index=0, ref_peaks=None,
                   ref_peaks_weights=None, num_ref_peaks=10, n_bins=0, width=10.0, ratio=2.5, resolution=100,
                   iterations=5, grid_steps=20, shift_range=(-100, 100), align_by_index=True, only_shift=False,
-                  return_shifts=True):
+                  return_shifts=True, plot=False):
     """
     Align two or more similar spectra to account for mass shifts across replicates. If not already done, spectrum
     binning and peak picking using the local maxima algorithm and default parameters will be applied.
@@ -57,6 +58,10 @@ def align_spectra(list_of_spectra, lower_mass_range, upper_mass_range, method='p
     :type only_shift: bool
     :param return_shifts: Decide whether shift parameter "shift_opt" should also be returned.
     :type return_shifts: bool
+    :param plot: Plot the overlaid spectra using matplotlib
+    :type plot: bool
+    :return: List of spectrum objects.
+    :rtype: list[pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum]
     """
     for spectrum in list_of_spectra:
         # bin spectra if not already done
@@ -117,6 +122,22 @@ def align_spectra(list_of_spectra, lower_mass_range, upper_mass_range, method='p
         list_of_spectra[i].peak_picking_indices = None
         del list_of_spectra[i].data_processing['peak picking']
         gc.collect()
+
+    # plot
+    def overlay_plot(ax, x, array, peak):
+        """Generate overlay plot, showing each signal and the alignment peak(s)"""
+        for i, y in enumerate(array):
+            y = (y / y.max()) + (i * 0.2)
+            ax.plot(x, y, lw=3)
+        ax.axes.get_yaxis().set_visible(False)
+        ax.set_xlabel("Index", fontsize=18)
+        ax.set_xlim((x[0], x[-1]))
+        ax.vlines(peak, *ax.get_ylim())
+    fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(12, 10))
+    overlay_plot(ax[0], ref_mz_array, intensity_array_2d, ref_peaks)
+    overlay_plot(ax[1], ref_mz_array, aligned_intensity_array_2d, ref_peaks)
+    plt.show()
+
     return list_of_spectra
 
 
