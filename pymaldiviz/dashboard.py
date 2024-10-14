@@ -1,3 +1,4 @@
+import os
 import copy
 import gc
 import pandas as pd
@@ -721,13 +722,19 @@ def export_peak_list(n_clicks, preprocessing_params, value):
             INDEXED_DATA[value].peak_picking(**preprocessing_params['PEAK_PICKING'])
         spectrum_df = pd.DataFrame(data={'m/z': copy.deepcopy(INDEXED_DATA[value].peak_picked_mz_array),
                                          'Intensity': copy.deepcopy(INDEXED_DATA[value].peak_picked_intensity_array)})
+    export_filetypes = [('Comma Separated Values', '*.csv')]
+    if INDEXED_DATA[value].ms_level == 2:
+        export_filetypes.append(('MASCOT Generic Format', '*.mgf'))
     main_tk_window = tkinter.Tk()
     main_tk_window.attributes('-topmost', True, '-alpha', 0)
-    csv_filename = asksaveasfilename(confirmoverwrite=True,
-                                     filetypes=[('Comma Separated Values', '*.csv')],
-                                     defaultextension='csv')
+    export_filename = asksaveasfilename(confirmoverwrite=True,
+                                        filetypes=export_filetypes,
+                                        defaultextension='csv')
     main_tk_window.destroy()
-    spectrum_df.to_csv(csv_filename, index=False)
+    if os.path.splitext(export_filename)[1] == '.csv':
+        spectrum_df.to_csv(export_filename, index=False)
+    elif os.path.splitext(export_filename)[1] == '.mgf':
+        INDEXED_DATA[value].to_mgf(export_filename, peak_list=True)
     return []
 
 

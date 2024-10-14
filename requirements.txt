@@ -47,7 +47,6 @@ pefile==2024.8.26
 pillow==10.4.0
 plotly==5.24.1
 plotly-resampler==0.10.0
-proxy-tools==0.1.0
 pybaselines==1.1.0
 pycparser==2.22
 pydantic==2.9.2
@@ -58,7 +57,7 @@ pyMSpec==0.1.2
 pyopenms==3.2.0
 pyopenms_viz==0.1.2
 pyparsing==3.1.4
-git+https://github.com/gtluu/pyTDFSDK.git
+pyTDFSDK @ git+https://github.com/gtluu/pyTDFSDK.git@b2a77afe380392ce372cc5a40d6a23dbadde6339
 pyteomics==4.7.3
 python-dateutil==2.9.0.post0
 pythonnet==3.0.4

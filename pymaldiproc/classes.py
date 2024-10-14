@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from pyopenms import *
+from pyteomics import mgf
 
 
 class PMP2DMethods(object):
@@ -448,6 +449,45 @@ class PMP2DMethods(object):
                                     'Intensity': copy.deepcopy(self.preprocessed_intensity_array)})
         fig = sns.lineplot(data=spectrum_df, x='m/z', y='Intensity')
         plt.show()
+
+    def to_mgf(self, output_filename, peak_list=True):
+        """
+        Export MS/MS peak list or spectrum to MASCOT generic format file. Note: The PEPMASS parameter will only be
+        available if exporting an MGF file from a PMPTsfSpectrum, PMP2DTdfSpectrum, or PMP3DTdfSpectrum.
+
+        :param output_filename: Name of the MGF file to be saved.
+        :type output_filename: str
+        :param peak_list: Whether or not to export the peak list from self.peak_picked_mz_array. If False, will export
+            the preprocessed spectrum from self.preprocessed_mz_array.
+        :type peak_list: bool
+        """
+        if self.ms_level < 2:
+            print('MS1 level spectrum cannot be exported as an MGF file.')
+        else:
+            if not output_filename.endswith('.mgf'):
+                output_filename += '.mgf'
+            msms_dict = {'params': {'FEATURE_ID': 1,
+                                    'SCANS': 1,
+                                    'MSLEVEL': self.ms_level}}
+            if peak_list:
+                msms_dict['m/z array'] = copy.deepcopy(self.peak_picked_mz_array)
+                msms_dict['intensity array'] = copy.deepcopy(self.peak_picked_intensity_array)
+            else:
+                msms_dict['m/z array'] = copy.deepcopy(self.preprocessed_mz_array)
+                msms_dict['intensity array'] = copy.deepcopy(self.preprocessed_intensity_array)
+            try:
+                msms_dict['params']['PEPMASS'] = self.selected_ion_mz
+            except AttributeError:
+                msms_dict['params']['PEPMASS'] = ''
+            try:
+                if self.charge_state is not None and not np.isnan(self.charge_state):
+                    if self.polarity == '+':
+                        msms_dict['params']['CHARGE'] = f'{self.charge_state}+'
+                    elif self.polarity == '-':
+                        msms_dict['params']['CHARGE'] = f'{self.charge_state}-'
+            except AttributeError:
+                pass
+            mgf.write([msms_dict], output=output_filename, file_mode='w')
 
     def info(self):
         """
