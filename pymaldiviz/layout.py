@@ -1,5 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+from pymaldiviz import VERSION
 from pymaldiviz.util import blank_figure, get_preprocessing_params
 
 
@@ -909,7 +910,11 @@ def get_dashboard_layout(param_dict):
                                         dbc.Button('Toggle log Intensity Scale',
                                                    id='toggle_log_intensity',
                                                    style={'margin': '5px'},
-                                                   disabled=True)
+                                                   disabled=True),
+                                        dbc.Button('About',
+                                                   id='about',
+                                                   style={'margin': '5px'},
+                                                   disabled=False)
                                     ],
                                     style={'justify-content': 'center',
                                            'display': 'flex'}
@@ -956,6 +961,19 @@ def get_dashboard_layout(param_dict):
                                                        className='ms-auto'))
                         ],
                         id='edit_processing_parameters_modal_saved',
+                        centered=True,
+                        is_open=False
+                    ),
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader(dbc.ModalTitle(f'pyMALDIviz {VERSION}')),
+                            dbc.ModalBody('Included software components: Copyright © 2022 by Bruker Daltonics GmbH & '
+                                          'Co. KG. All rights reserved.'),
+                            dbc.ModalFooter(dbc.Button('Close',
+                                                       id='about_close',
+                                                       className='ms-auto'))
+                        ],
+                        id='about_modal',
                         centered=True,
                         is_open=False
                     ),

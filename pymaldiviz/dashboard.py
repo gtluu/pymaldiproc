@@ -755,6 +755,24 @@ def undo_preprocessing(n_clicks, value):
         return fig, Serverside(fig)
 
 
+@app.callback(Output('about_modal', 'is_open'),
+              [Input('about', 'n_clicks'),
+               Input('about_close', 'n_clicks')],
+              State('about_modal', 'is_open'))
+def toggle_about_modal(n_clicks_about, n_clicks_about_close, is_open):
+    """
+    Dash callback to toggle the about modal window.
+
+    :param n_clicks_about: Input signal if the about button is clicked.
+    :param n_clicks_about_close: Input signal if the about_close button is clicked.
+    :param is_open: State signal to determine whether the about_modal modal window is open.
+    :return: Output signal to determine whether the about_modal modal window is open.
+    """
+    if n_clicks_about or n_clicks_about_close:
+        return not is_open
+    return is_open
+
+
 @app.callback(Output('spectrum_plot', 'figure', allow_duplicate=True),
               Input('spectrum_plot', 'relayoutData'),
               State('store_plot', 'data'),
@@ -774,4 +792,4 @@ def resample_spectrum(relayoutdata: dict, fig: FigureResampler):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

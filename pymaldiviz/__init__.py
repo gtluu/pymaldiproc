@@ -38,9 +38,4 @@ import webview
 import tkinter
 from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
-from pymaldiviz.layout import *
-from pymaldiviz.dashboard import *
-from pymaldiviz.util import *
-from pymaldiviz.tmpdir import *
-
-VERSION = '0.4.2'
+VERSION = '0.4.3'
