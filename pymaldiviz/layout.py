@@ -848,6 +848,19 @@ def get_dashboard_layout(param_dict):
                     dbc.Row(
                         [
                             dbc.Col(
+                                dcc.Dropdown(id='spectrum_id_2',
+                                             multi=False,
+                                             options=[],
+                                             value=[],
+                                             disabled=False,
+                                             style={'display': 'none'}),
+                                width=12
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
                                 html.Div(
                                     [
                                         dbc.Button('Trim Spectrum',
@@ -907,6 +920,10 @@ def get_dashboard_layout(param_dict):
                                                    id='toggle_log_intensity',
                                                    style={'margin': '5px'},
                                                    disabled=True),
+                                        dbc.Button('Toggle Mirror Plot',
+                                                   id='toggle_mirror_plot',
+                                                   style={'margin': '5px'},
+                                                   disabled=False),
                                         dbc.Button('Edit Preprocessing Parameters',
                                                    id='edit_preprocessing_parameters',
                                                    style={'margin': '5px'},
@@ -982,6 +999,19 @@ def get_dashboard_layout(param_dict):
                                                        className='ms-auto'))
                         ],
                         id='edit_processing_parameters_modal_saved',
+                        centered=True,
+                        is_open=False
+                    ),
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader(dbc.ModalTitle('Error')),
+                            dbc.ModalBody('Mirror spectrum cannot be visualized with a three dimensional spectrum '
+                                          'containing ion mobility data.'),
+                            dbc.ModalFooter(dbc.Button('Close',
+                                                       id='plot_mirror_spectrum_error_modal_close',
+                                                       className='ms-auto'))
+                        ],
+                        id='plot_mirror_spectrum_error_modal',
                         centered=True,
                         is_open=False
                     ),

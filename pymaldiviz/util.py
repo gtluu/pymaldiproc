@@ -147,6 +147,68 @@ def get_spectrum(spectrum, label_peaks=False):
     return fig
 
 
+def get_mirror_spectrum(spectrum_1, spectrum_2, label_peaks=False):
+    """
+    Plot the two spectra in a mirror plot to a plotly.express.line plot wrapped by plotly_resampler.FigureResampler.
+
+    :param spectrum_1: Spectrum object whose data is used to generate the figure.
+    :type spectrum_1: pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum
+    :param spectrum_2: Spectrum object whose data is used to generate the figure.
+    :type spectrum_2: pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum
+    :param label_peaks: Whether to label the peak based on peak picking that has been performed.
+    :type label_peaks: bool
+    :return: Plotly figure containing mass spectrum.
+    """
+    spectrum_df_1 = pd.DataFrame({'m/z': copy.deepcopy(spectrum_1.preprocessed_mz_array),
+                                  'Intensity': copy.deepcopy(spectrum_1.preprocessed_intensity_array)})
+    spectrum_df_2 = pd.DataFrame({'m/z': copy.deepcopy(spectrum_2.preprocessed_mz_array),
+                                  'Intensity': copy.deepcopy(spectrum_2.preprocessed_intensity_array)})
+
+    def get_labels(spectrum):
+        labels = copy.deepcopy(np.round(copy.deepcopy(spectrum.preprocessed_mz_array), decimals=4).astype(str))
+        mask = np.ones(labels.size, dtype=bool)
+        mask[spectrum.peak_picking_indices] = False
+        labels[mask] = ''
+        return labels
+
+    if label_peaks:
+        labels_1 = get_labels(spectrum_1)
+        labels_2 = get_labels(spectrum_2)
+        fig_1 = px.line(data_frame=spectrum_df_1,
+                        x='m/z',
+                        y='Intensity',
+                        hover_data={'m/z': ':.4f',
+                                    'Intensity': ':.1f'},
+                        text=labels_1)
+        fig_1.update_traces(textposition='top center')
+        fig_1.update_traces(marker=dict(color='rgba(0,0,0,0)', size=1))
+        fig_2 = px.line(data_frame=spectrum_df_2,
+                        x='m/z',
+                        y='Intensity',
+                        hover_data={'m/z': ':.4f',
+                                    'Intensity': ':.1f'},
+                        text=labels_2)
+        fig_2.update_traces(textposition='top center')
+        fig_2.update_traces(marker=dict(color='rgba(0,0,0,0)', size=1))
+    else:
+        fig_1 = px.line(data_frame=spectrum_df_1,
+                        x='m/z',
+                        y='Intensity',
+                        hover_data={'m/z': ':.4f',
+                                    'Intensity': ':.1f'})
+        fig_2 = px.line(data_frame=spectrum_df_2,
+                        x='m/z',
+                        y='Intensity',
+                        hover_data={'m/z': ':.4f',
+                                    'Intensity': ':.1f'})
+
+    fig = FigureResampler(go.Figure(data=fig_1.data+fig_2.data))
+    fig.update_layout(xaxis_tickformat='d',
+                      yaxis_tickformat='~e')
+
+    return fig
+
+
 def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False):
     spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
                                 '1/K0': copy.deepcopy(spectrum.preprocessed_mobility_array),
