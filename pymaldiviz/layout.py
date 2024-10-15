@@ -940,11 +940,32 @@ def get_dashboard_layout(param_dict):
                     dbc.Modal(
                         [
                             dbc.ModalHeader(dbc.ModalTitle('Preprocessing Parameters')),
-                            dbc.ModalBody(get_preprocessing_parameters_layout(param_dict)),
-                            dbc.ModalFooter(dbc.ButtonGroup([
-                                dbc.Button('Cancel', id='edit_processing_parameters_cancel', className='ms-auto'),
-                                dbc.Button('Save', id='edit_processing_parameters_save', className='ms-auto')
-                            ]))
+                            dbc.ModalBody(children=get_preprocessing_parameters_layout(param_dict),
+                                          id='edit_processing_parameters_modal_body'),
+                            dbc.ModalFooter(
+                                [
+                                    dbc.ButtonGroup(
+                                        [
+                                            dbc.Button('Load Parameters',
+                                                       id='edit_processing_parameters_load',
+                                                       className='ms-auto'),
+                                            dbc.Button('Export Parameters',
+                                                       id='edit_processing_parameters_export',
+                                                       className='ms-auto')
+                                        ]
+                                    ),
+                                    dbc.ButtonGroup(
+                                        [
+                                            dbc.Button('Cancel',
+                                                       id='edit_processing_parameters_cancel',
+                                                       className='ms-auto'),
+                                            dbc.Button('Save',
+                                                       id='edit_processing_parameters_save',
+                                                       className='ms-auto')
+                                        ]
+                                    )
+                                ]
+                            )
                         ],
                         id='edit_processing_parameters_modal',
                         fullscreen=True,

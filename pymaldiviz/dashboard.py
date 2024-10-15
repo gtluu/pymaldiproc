@@ -1,10 +1,11 @@
 import os
 import copy
 import gc
+import configparser
 import pandas as pd
 from pymaldiproc.data_import import import_mzml, import_timstof_raw_data
 from pymaldiproc.classes import PMP3DTdfSpectrum
-from pymaldiviz.layout import get_dashboard_layout
+from pymaldiviz.layout import get_dashboard_layout, get_preprocessing_parameters_layout
 from pymaldiviz.util import (get_preprocessing_params, get_spectrum, toggle_rebin_style, toggle_apodization_style,
                              toggle_cwt_style, toggle_snip_style, toggle_locmax_style, toggle_tophat_style,
                              toggle_smoothing_median_style, toggle_modpoly_style, toggle_imodpoly_style,
@@ -18,7 +19,7 @@ from dash_extensions.enrich import (Input, Output, DashProxy, MultiplexerTransfo
 import dash_bootstrap_components as dbc
 from plotly_resampler import FigureResampler
 import tkinter
-from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
+from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename, askopenfilename
 
 # will be a dictionary of MALDISpectrum objects used for the spectrum plot
 INDEXED_DATA = {}
@@ -318,7 +319,6 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
     :return: Output signal to determine whether the edit_preprocessing_parameters_modal modal window is open.
     """
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
-    print(changed_id)
     if (changed_id == 'edit_preprocessing_parameters.n_clicks' or
             changed_id == 'edit_processing_parameters_save.n_clicks' or
             changed_id == 'edit_processing_parameters_cancel.n_clicks'):
@@ -373,6 +373,357 @@ def toggle_edit_preprocessing_parameters_modal(n_clicks_button,
             preprocessing_params['PEAK_PICKING_3D']['exclude_border'] = peak_picking_3d_exclude_border
         return not is_open, preprocessing_params
     return is_open, preprocessing_params
+
+
+@app.callback([Output('edit_processing_parameters_modal_body', 'children'),
+               Output('smooth_baseline_window_length', 'style'),
+               Output('smooth_baseline_polyorder', 'style'),
+               Output('smooth_baseline_delta_mz', 'style'),
+               Output('smooth_baseline_diff_thresh', 'style'),
+               Output('remove_baseline_min_half_window', 'style'),
+               Output('remove_baseline_max_half_window', 'style'),
+               Output('remove_baseline_decreasing', 'style'),
+               Output('remove_baseline_smooth_half_window', 'style'),
+               Output('remove_baseline_filter_order', 'style'),
+               Output('remove_baseline_sigma', 'style'),
+               Output('remove_baseline_increment', 'style'),
+               Output('remove_baseline_max_hits', 'style'),
+               Output('remove_baseline_window_tol', 'style'),
+               Output('remove_baseline_lambda_', 'style'),
+               Output('remove_baseline_porder', 'style'),
+               Output('remove_baseline_repetition', 'style'),
+               Output('remove_baseline_degree', 'style'),
+               Output('remove_baseline_gradient', 'style'),
+               Output('peak_picking_snr', 'style'),
+               Output('peak_picking_widths', 'style'),
+               Output('peak_picking_deisotope_fragment_tolerance', 'style'),
+               Output('peak_picking_deisotope_fragment_unit_ppm_label', 'style'),
+               Output('peak_picking_deisotope_fragment_unit_ppm', 'style'),
+               Output('peak_picking_deisotope_min_charge', 'style'),
+               Output('peak_picking_deisotope_max_charge', 'style'),
+               Output('peak_picking_deisotope_keep_only_deisotoped', 'style'),
+               Output('peak_picking_deisotope_min_isopeaks', 'style'),
+               Output('peak_picking_deisotope_max_isopeaks', 'style'),
+               Output('peak_picking_deisotope_make_single_charged', 'style'),
+               Output('peak_picking_deisotope_annotate_charge', 'style'),
+               Output('peak_picking_deisotope_annotate_iso_peak_count', 'style'),
+               Output('peak_picking_deisotope_use_decreasing_model', 'style'),
+               Output('peak_picking_deisotope_start_intensity_check', 'style'),
+               Output('peak_picking_deisotope_add_up_intensity', 'style'),
+               ],
+              Input('edit_processing_parameters_load', 'n_clicks'))
+def load_processing_parameters(n_clicks):
+    """
+    Dash callback to load preprocessing parameters from a configuration file and populate the preprocessing parameters
+    modal window with the updated parameters.
+
+    :param n_clicks: Input signal when the edit_processing_parameters_load button is clicked.
+    """
+    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
+    if changed_id == 'edit_processing_parameters_load.n_clicks':
+        main_tk_window = tkinter.Tk()
+        main_tk_window.attributes('-topmost', True, '-alpha', 0)
+        filename = askopenfilename(filetypes=[('Configuration Files', '*.cfg')])
+        main_tk_window.destroy()
+        params_dict = get_preprocessing_params(filename)
+
+        style = []
+        if params_dict['SMOOTH_BASELINE']['method'] == 'SavitzkyGolay':
+            style += toggle_savitzky_golay_style()
+        elif params_dict['SMOOTH_BASELINE']['method'] == 'apodization':
+            style += toggle_apodization_style()
+        elif params_dict['SMOOTH_BASELINE']['method'] == 'rebin':
+            style += toggle_rebin_style()
+        elif params_dict['SMOOTH_BASELINE']['method'] == 'fast_change':
+            style += toggle_fast_change_style()
+        elif params_dict['SMOOTH_BASELINE']['method'] == 'median':
+            style += toggle_smoothing_median_style()
+        if params_dict['REMOVE_BASELINE']['method'] == 'SNIP':
+            style += toggle_snip_style()
+        elif params_dict['REMOVE_BASELINE']['method'] == 'TopHat':
+            style += toggle_tophat_style()
+        elif params_dict['REMOVE_BASELINE']['method'] == 'Median':
+            style += toggle_removal_median_style()
+        elif params_dict['REMOVE_BASELINE']['method'] == 'ZhangFit':
+            style += toggle_zhangfit_style()
+        elif params_dict['REMOVE_BASELINE']['method'] == 'ModPoly':
+            style += toggle_modpoly_style()
+        elif params_dict['REMOVE_BASELINE']['method'] == 'IModPoly':
+            style += toggle_imodpoly_style()
+        if params_dict['PEAK_PICKING']['method'] == 'locmax':
+            style += toggle_locmax_style()
+        elif params_dict['PEAK_PICKING']['method'] == 'cwt':
+            style += toggle_cwt_style()
+        if params_dict['PEAK_PICKING']['deisotope']:
+            style += toggle_deisotope_on_style()
+        elif not params_dict['PEAK_PICKING']['deisotope']:
+            style += toggle_deisotope_off_style()
+
+        return [get_preprocessing_parameters_layout(params_dict)] + style
+
+
+@app.callback(Output('dummy', 'children'),
+              [Input('edit_processing_parameters_export', 'n_clicks'),
+               Input('trim_spectrum_lower_mass_range_value', 'value'),
+               Input('trim_spectrum_upper_mass_range_value', 'value'),
+               Input('transform_intensity_method', 'value'),
+               Input('smooth_baseline_method', 'value'),
+               Input('smooth_baseline_window_length_value', 'value'),
+               Input('smooth_baseline_polyorder_value', 'value'),
+               Input('smooth_baseline_delta_mz_value', 'value'),
+               Input('smooth_baseline_diff_thresh_value', 'value'),
+               Input('remove_baseline_method', 'value'),
+               Input('remove_baseline_min_half_window_value', 'value'),
+               Input('remove_baseline_max_half_window_value', 'value'),
+               Input('remove_baseline_decreasing', 'value'),
+               Input('remove_baseline_smooth_half_window_value', 'value'),
+               Input('remove_baseline_filter_order_value', 'value'),
+               Input('remove_baseline_sigma_value', 'value'),
+               Input('remove_baseline_increment_value', 'value'),
+               Input('remove_baseline_max_hits_value', 'value'),
+               Input('remove_baseline_window_tol_value', 'value'),
+               Input('remove_baseline_lambda__value', 'value'),
+               Input('remove_baseline_porder_value', 'value'),
+               Input('remove_baseline_repetition_value', 'value'),
+               Input('remove_baseline_degree_value', 'value'),
+               Input('remove_baseline_gradient_value', 'value'),
+               Input('normalize_intensity_method', 'value'),
+               Input('bin_spectrum_n_bins_value', 'value'),
+               Input('bin_spectrum_lower_mass_range_value', 'value'),
+               Input('bin_spectrum_upper_mass_range_value', 'value'),
+               Input('peak_picking_method', 'value'),
+               Input('peak_picking_snr_value', 'value'),
+               Input('peak_picking_widths_value', 'value'),
+               Input('peak_picking_deisotope', 'value'),
+               Input('peak_picking_deisotope_fragment_tolerance_value', 'value'),
+               Input('peak_picking_deisotope_fragment_unit_ppm', 'value'),
+               Input('peak_picking_deisotope_min_charge_value', 'value'),
+               Input('peak_picking_deisotope_max_charge_value', 'value'),
+               Input('peak_picking_deisotope_keep_only_deisotoped', 'value'),
+               Input('peak_picking_deisotope_min_isopeaks_value', 'value'),
+               Input('peak_picking_deisotope_max_isopeaks_value', 'value'),
+               Input('peak_picking_deisotope_make_single_charged', 'value'),
+               Input('peak_picking_deisotope_annotate_charge', 'value'),
+               Input('peak_picking_deisotope_annotate_iso_peak_count', 'value'),
+               Input('peak_picking_deisotope_use_decreasing_model', 'value'),
+               Input('peak_picking_deisotope_start_intensity_check_value', 'value'),
+               Input('peak_picking_deisotope_add_up_intensity', 'value'),
+               Input('peak_picking_3d_min_distance_value', 'value'),
+               Input('peak_picking_3d_noise_value', 'value'),
+               Input('peak_picking_3d_snr_value', 'value'),
+               Input('peak_picking_3d_exclude_border_value', 'value')],
+              State('store_preprocessing_params', 'data'))
+def export_processing_parameters(n_clicks_export,
+                                 trim_spectrum_lower_mass_range,
+                                 trim_spectrum_upper_mass_range,
+                                 transform_intensity_method,
+                                 smooth_baseline_method,
+                                 smooth_baseline_window_length,
+                                 smooth_baseline_polyorder,
+                                 smooth_baseline_delta_mz,
+                                 smooth_baseline_diff_thresh,
+                                 remove_baseline_method,
+                                 remove_baseline_min_half_window,
+                                 remove_baseline_max_half_window,
+                                 remove_baseline_decreasing,
+                                 remove_baseline_smooth_half_window,
+                                 remove_baseline_filter_order,
+                                 remove_baseline_sigma,
+                                 remove_baseline_increment,
+                                 remove_baseline_max_hits,
+                                 remove_baseline_window_tol,
+                                 remove_baseline_lambda_,
+                                 remove_baseline_porder,
+                                 remove_baseline_repetition,
+                                 remove_baseline_degree,
+                                 remove_baseline_gradient,
+                                 normalize_intensity_method,
+                                 bin_spectrum_n_bins,
+                                 bin_spectrum_lower_mass_range,
+                                 bin_spectrum_upper_mass_range,
+                                 peak_picking_method,
+                                 peak_picking_snr,
+                                 peak_picking_widths,
+                                 peak_picking_deisotope,
+                                 peak_picking_fragment_tolerance,
+                                 peak_picking_fragment_unit_ppm,
+                                 peak_picking_min_charge,
+                                 peak_picking_max_charge,
+                                 peak_picking_keep_only_deisotoped,
+                                 peak_picking_min_isopeaks,
+                                 peak_picking_max_isopeaks,
+                                 peak_picking_make_single_charged,
+                                 peak_picking_annotate_charge,
+                                 peak_picking_annotate_iso_peak_count,
+                                 peak_picking_use_decreasing_model,
+                                 peak_picking_start_intensity_check,
+                                 peak_picking_add_up_intensity,
+                                 peak_picking_3d_min_distance,
+                                 peak_picking_3d_noise,
+                                 peak_picking_3d_snr,
+                                 peak_picking_3d_exclude_border,
+                                 preprocessing_params):
+    """
+    Dash callback to export the preprocessing parameters shown in the preprocessing parameters modal window.
+
+    :param n_clicks_export: Input signal if the edit_preprocessing_parameters_load button is clicked.
+    :param trim_spectrum_lower_mass_range: Mass in daltons to use for the lower mass range during spectrum trimming.
+    :param trim_spectrum_upper_mass_range: Mass in Daltons to use for the upper mass range during spectrum trimming.
+    :param transform_intensity_method: Method to use for intensity transformation. Either square root ('sqrt'), natural
+        log ('log'), log2 ('log2'), or log10 ('log10') transformation.
+    :param smooth_baseline_method: Method to use for baseline smoothing. Either Savitzky Golay ('SavitzkyGolay'),
+        apodization ('apodization'), rebin ('rebin'), fast change ('fast_change'), or median ('median').
+    :param smooth_baseline_window_length: The length of the filter window (i.e. number of coefficients).
+    :param smooth_baseline_polyorder: The order of the polynomial used to fit the samples. Must be less than
+        window_length.
+    :param smooth_baseline_delta_mz: New m/z dimension bin width.
+    :param smooth_baseline_diff_thresh: Numeric change to remove.
+    :param remove_baseline_method: Method to use for baseline removal. Either statistics-sensitive non-linear iterative
+        peak-clipping ('SNIP'), TopHat ('TopHat'), median ('Median'), ZhangFit ('ZhangFit'), modified polynomial
+        fit ('ModPoly'), or improved modified polynomial fit ('IModPoly').
+    :param remove_baseline_min_half_window: The minimum half window size used for morphological operations.
+    :param remove_baseline_max_half_window: The maximum number of iterations/maximum half window size used for
+        morphological operations. Should be (w-1)/2 where w is the index-based width of feature or peak.
+    :param remove_baseline_decreasing: If False, will iterate through window sizes from 1 to max_half_window. If True,
+        will reverse the order and iterate from max_half_window to 1 (gives smoother baseline).
+    :param remove_baseline_smooth_half_window: The half window to use for smoothing the data. If greater than 0, will
+        perform a moving average smooth on the data for each window to give better results for noisy data.
+    :param remove_baseline_filter_order: If the measured data has a more complicated baseline consisting of other
+        elements such as Compton edges, thena  higher filter_order should be selected.
+    :param remove_baseline_sigma: The standard deviation of the smoothing Gaussian kernal. If None, uses
+        (2 * smooth_half_window + 1) / 6.
+    :param remove_baseline_increment: The step size for iterating half windows.
+    :param remove_baseline_max_hits: The number of consecutive half windows that must produce the same morphological
+        opening before accepting the half window as the optimum value.
+    :param remove_baseline_window_tol: The tolerance value for considering two morphological openings as equivalent.
+    :param remove_baseline_lambda_: Affects smoothness of the resulting background. The larger the lambda, the smoother
+        the background.
+    :param remove_baseline_porder: Adaptive iteratively reweighted penalized least squares for baseline fitting.
+    :param remove_baseline_repetition: How many iterations to run.
+    :param remove_baseline_degree: Polynomial degree.
+    :param remove_baseline_gradient: Gradient for polynomial loss. Measures incremental gain over each iteration. If
+        gain in any iteration is less than this, further improvement will stop.
+    :param normalize_intensity_method: Method to use for normalizaton. Either total ion count ('tic'), root mean
+        squared ('rms'), median absolute deviation ('mad'), or square root ('sqrt').
+    :param bin_spectrum_n_bins: Number of bins to use.
+    :param bin_spectrum_lower_mass_range: Mass in daltons to use for the lower mass range during spectrum binning.
+    :param bin_spectrum_upper_mass_range: Mass in Daltons to use for the upper mass range during spectrum binning.
+    :param peak_picking_method: Method to use for peak picking. Either local maxima ('locmax') or continuous wavelet
+        transformation ('cwt').
+    :param peak_picking_snr: Minimum signal-to-noise ratio required to consider peak.
+    :param peak_picking_widths: Required width of peaks in samples. If using 'cwt' method, used for calculating the CWT
+        matrix. Range should cover the expected width of peaks of interest.
+    :param peak_picking_deisotope: Whether to perform deisotoping/ion deconvolution. Deisotoping performed using
+        pyopenms.Deisotoper.
+    :param peak_picking_fragment_tolerance: The tolerance used to match isotopic peaks.
+    :param peak_picking_fragment_unit_ppm: Whether ppm or m/z is used as tolerance.
+    :param peak_picking_min_charge: The minimum charge considered.
+    :param peak_picking_max_charge: The maximum charge considered.
+    :param peak_picking_keep_only_deisotoped: If True, only monoisotopic peaks of fragments with isotopic pattern are
+        retained.
+    :param peak_picking_min_isopeaks: The minimum number of isotopic peaks (at least 2) required for an isotopic
+        cluster.
+    :param peak_picking_max_isopeaks: The maximum number of isotopic peaks (at least 2) required for an isotopic
+        cluster.
+    :param peak_picking_make_single_charged: Whether to convert deisotoped monoisotopic peak to single charge.
+    :param peak_picking_annotate_charge: Whether to annotate the charge to the peaks in
+        pyopenms.MSSpectrum.IntegerDataArray: 'charge'.
+    :param peak_picking_annotate_iso_peak_count: Whether to annotate the number of isotopic peaks in a pattern for each
+        monoisotopic peak in pyopenms.MSSpectrum.IntegerDataArray: 'iso_peak_count'.
+    :param peak_picking_use_decreasing_model: Whether to use a simple averagine model that expects heavier isotopes to
+        have less intensity. If False, no intensity checks are applied.
+    :param peak_picking_start_intensity_check: Number of the isotopic peak from which the decreasing model should be
+        applied. <= 1 will force the monoisotopic peak to be most intense. 2 will allow the monoisotopic peak to be
+        less intense than the 2nd peak. 3 will allow the monoisotopic peak and the 2nd peak to be less intense than the
+        3rd, etc. A number higher than max_isopeaks will effectively disable use_decreasing_model completely.
+    :param peak_picking_add_up_intensity: Whether to sum up the total intensity of each isotopic pattern into the
+        intensity of the reported monoisotopic peak.
+    :param peak_picking_3d_min_distance: The minimal allowed distance separating peaks. To find the maximum number of
+        peaks, use min_distance=1.
+    :param peak_picking_3d_noise: Absolute intensity value to be used as baseline noise level. If None, the median
+        value of the intensity array is used as an estimate of the noise.
+    :param peak_picking_3d_snr: Minimum signal-to-noise ratio required to consider peak.
+    :param peak_picking_3d_exclude_border: If positive integer, excludes peaks from within n pixels of the border of
+        the image. If tuple of non-negative ints, the length of the tuple must match the input array's dimensionality.
+        Each element of the tuple will exclude peaks within n pixels of the border of the image along that dimension.
+        If True, takes the min_distance parameter as value. If zero or False, peaks are identified regardless of their
+        distance from the border.
+    :param preprocessing_params: State signal containing data from store_preprocessing_params.
+    :return: Output signal dummy.
+    """
+    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
+    if changed_id == 'edit_processing_parameters_export.n_clicks':
+        preprocessing_params['TRIM_SPECTRUM']['lower_mass_range'] = trim_spectrum_lower_mass_range
+        preprocessing_params['TRIM_SPECTRUM']['upper_mass_range'] = trim_spectrum_upper_mass_range
+        preprocessing_params['TRANSFORM_INTENSITY']['method'] = transform_intensity_method
+        preprocessing_params['SMOOTH_BASELINE']['method'] = smooth_baseline_method
+        preprocessing_params['SMOOTH_BASELINE']['window_length'] = smooth_baseline_window_length
+        preprocessing_params['SMOOTH_BASELINE']['polyorder'] = smooth_baseline_polyorder
+        preprocessing_params['SMOOTH_BASELINE']['delta_mz'] = smooth_baseline_delta_mz
+        preprocessing_params['SMOOTH_BASELINE']['diff_thresh'] = smooth_baseline_diff_thresh
+        preprocessing_params['REMOVE_BASELINE']['method'] = remove_baseline_method
+        preprocessing_params['REMOVE_BASELINE']['min_half_window'] = remove_baseline_min_half_window
+        preprocessing_params['REMOVE_BASELINE']['max_half_window'] = remove_baseline_max_half_window
+        preprocessing_params['REMOVE_BASELINE']['decreasing'] = remove_baseline_decreasing
+        preprocessing_params['REMOVE_BASELINE']['smooth_half_window'] = remove_baseline_smooth_half_window
+        preprocessing_params['REMOVE_BASELINE']['filter_order'] = remove_baseline_filter_order
+        preprocessing_params['REMOVE_BASELINE']['sigma'] = remove_baseline_sigma
+        preprocessing_params['REMOVE_BASELINE']['increment'] = remove_baseline_increment
+        preprocessing_params['REMOVE_BASELINE']['max_hits'] = remove_baseline_max_hits
+        preprocessing_params['REMOVE_BASELINE']['window_tol'] = remove_baseline_window_tol
+        preprocessing_params['REMOVE_BASELINE']['lambda_'] = remove_baseline_lambda_
+        preprocessing_params['REMOVE_BASELINE']['porder'] = remove_baseline_porder
+        preprocessing_params['REMOVE_BASELINE']['repetition'] = remove_baseline_repetition
+        preprocessing_params['REMOVE_BASELINE']['degree'] = remove_baseline_degree
+        preprocessing_params['REMOVE_BASELINE']['gradient'] = remove_baseline_gradient
+        preprocessing_params['NORMALIZE_INTENSITY']['method'] = normalize_intensity_method
+        preprocessing_params['BIN_SPECTRUM']['n_bins'] = bin_spectrum_n_bins
+        preprocessing_params['BIN_SPECTRUM']['lower_mass_range'] = bin_spectrum_lower_mass_range
+        preprocessing_params['BIN_SPECTRUM']['upper_mass_range'] = bin_spectrum_upper_mass_range
+        preprocessing_params['PEAK_PICKING']['method'] = peak_picking_method
+        preprocessing_params['PEAK_PICKING']['snr'] = peak_picking_snr
+        preprocessing_params['PEAK_PICKING']['widths'] = peak_picking_widths
+        preprocessing_params['PEAK_PICKING']['deisotope'] = peak_picking_deisotope
+        preprocessing_params['PEAK_PICKING']['fragment_tolerance'] = peak_picking_fragment_tolerance
+        preprocessing_params['PEAK_PICKING']['fragment_unit_ppm'] = peak_picking_fragment_unit_ppm
+        preprocessing_params['PEAK_PICKING']['min_charge'] = peak_picking_min_charge
+        preprocessing_params['PEAK_PICKING']['max_charge'] = peak_picking_max_charge
+        preprocessing_params['PEAK_PICKING']['keep_only_deisotoped'] = peak_picking_keep_only_deisotoped
+        preprocessing_params['PEAK_PICKING']['min_isopeaks'] = peak_picking_min_isopeaks
+        preprocessing_params['PEAK_PICKING']['max_isopeaks'] = peak_picking_max_isopeaks
+        preprocessing_params['PEAK_PICKING']['make_single_charged'] = peak_picking_make_single_charged
+        preprocessing_params['PEAK_PICKING']['annotate_charge'] = peak_picking_annotate_charge
+        preprocessing_params['PEAK_PICKING']['annotate_iso_peak_count'] = peak_picking_annotate_iso_peak_count
+        preprocessing_params['PEAK_PICKING']['use_decreasing_model'] = peak_picking_use_decreasing_model
+        preprocessing_params['PEAK_PICKING']['start_intensity_check'] = peak_picking_start_intensity_check
+        preprocessing_params['PEAK_PICKING']['add_up_intensity'] = peak_picking_add_up_intensity
+        preprocessing_params['PEAK_PICKING_3D']['min_distance'] = peak_picking_3d_min_distance
+        preprocessing_params['PEAK_PICKING_3D']['noise'] = peak_picking_3d_noise
+        preprocessing_params['PEAK_PICKING_3D']['snr'] = peak_picking_3d_snr
+        preprocessing_params['PEAK_PICKING_3D']['exclude_border'] = peak_picking_3d_exclude_border
+
+        params_for_export = {}
+        for key1, section in preprocessing_params.items():
+            params_for_export[key1.lower()] = {}
+            for key2, value in section.items():
+                params_for_export[key1.lower()][key2] = str(value)
+                if params_for_export[key1.lower()][key2] == 'True':
+                    params_for_export[key1.lower()][key2] = 'yes'
+                elif params_for_export[key1.lower()][key2] == 'False':
+                    params_for_export[key1.lower()][key2] = 'no'
+
+        config = configparser.ConfigParser()
+        for section, values in params_for_export.items():
+            config[section] = values
+        main_tk_window = tkinter.Tk()
+        main_tk_window.attributes('-topmost', True, '-alpha', 0)
+        config_filename = asksaveasfilename(confirmoverwrite=True,
+                                            filetypes=[('Configuration File', '*.cfg')],
+                                            defaultextension='cfg')
+        main_tk_window.destroy()
+        with open(config_filename, 'w') as config_file:
+            config.write(config_file)
+    return []
 
 
 @app.callback(Output('edit_processing_parameters_modal_saved', 'is_open'),
