@@ -840,7 +840,8 @@ def get_dashboard_layout(param_dict):
                                              multi=False,
                                              options=[],
                                              value=[],
-                                             disabled=False),
+                                             disabled=False,
+                                             style={'margin': '5px'}),
                                 width=12
                             )
                         ]
@@ -853,7 +854,8 @@ def get_dashboard_layout(param_dict):
                                              options=[],
                                              value=[],
                                              disabled=False,
-                                             style={'display': 'none'}),
+                                             style={'margin': '5px',
+                                                    'display': 'none'}),
                                 width=12
                             )
                         ]
@@ -1033,6 +1035,8 @@ def get_dashboard_layout(param_dict):
                               data=get_preprocessing_params()),
                     dcc.Store(id='store_use_log_intensity',
                               data=True),
+                    dcc.Store(id='store_plot_type',
+                              data='single'),
                     dcc.Store(id='store_plot'),
 
                     html.Div(

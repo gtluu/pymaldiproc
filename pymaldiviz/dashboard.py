@@ -81,8 +81,9 @@ def upload_data(n_clicks_mzml, n_clicks_d):
                Output('normalize_intensity', 'disabled'),
                Output('bin_spectrum', 'disabled'),
                Output('toggle_log_intensity', 'disabled')],
-              Input('spectrum_id', 'value'))
-def plot_spectrum(value):
+              Input('spectrum_id', 'value'),
+              State('store_plot_type', 'data'))
+def plot_spectrum(value, plot_type):
     """
     Dash callback to plot the spectrum selected from the spectrum_id dropdown using plotly.express and
     plotly_resampler.FigureResampler. If a pymaldiproc.classes.PMP3DTdfSpectrum is detected, a 3D peakmap will be
@@ -93,16 +94,20 @@ def plot_spectrum(value):
         not preprocessing buttons are to be disabled.
     """
     global INDEXED_DATA
-    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
-        fig = get_peakmap(INDEXED_DATA[value])
-        return fig, None, True, True, True, True, True, True, False
+    if plot_type == 'single':
+        if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+            fig = get_peakmap(INDEXED_DATA[value])
+            return fig, None, True, True, True, True, True, True, False
+        else:
+            fig = get_spectrum(INDEXED_DATA[value])
+            cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+            return fig, Serverside(fig), False, False, False, False, False, False, True
     else:
-        fig = get_spectrum(INDEXED_DATA[value])
-        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-        return fig, Serverside(fig), False, False, False, False, False, False, True
+        return no_update
 
 
 @app.callback([Output('spectrum_id_2', 'style'),
+               Output('store_plot_type', 'data'),
                Output('trim_spectrum', 'disabled'),
                Output('transform_intensity', 'disabled'),
                Output('smooth_baseline', 'disabled'),
@@ -114,28 +119,37 @@ def plot_spectrum(value):
                Output('undo_preprocessing', 'disabled'),
                Output('undo_peak_picking', 'disabled'),
                Output('toggle_log_intensity', 'disabled')],
-              Input('toggle_mirror_plot', 'n_clicks'))
-def toggle_mirror_plot(n_clicks):
+              Input('toggle_mirror_plot', 'n_clicks'),
+              State('store_plot_type', 'data'))
+def toggle_mirror_plot(n_clicks, plot_type):
     changed_id = [i['prop_id'] for i in callback_context.triggered][0]
     if changed_id == 'toggle_mirror_plot.n_clicks':
-        return {}, True, True, True, True, True, True, True, True, True, True, True
+        if plot_type == 'single':
+            return {'margin': '5px'}, 'mirror', True, True, True, True, True, True, True, True, True, True, True
+        elif plot_type == 'mirror':
+            return ({'margin': '5px', 'display': 'none'}, 'single',
+                    False, False, False, False, False, False, False, False, False, False, True)
 
 
 @app.callback([Output('spectrum_plot', 'figure'),
                Output('store_plot', 'data'),
+               Output('toggle_log_intensity', 'disabled'),
                Output('plot_mirror_spectrum_error_modal', 'is_open')],
               [Input('spectrum_id', 'value'),
                Input('spectrum_id_2', 'value')],
-              State('plot_mirror_spectrum_error_modal', 'is_open'))
-def plot_mirror_spectrum(value, value2, is_open):
-    # TODO: need a data store from toggle_mirror_plot button that says whether spectrum_id input should trigger plot_spectrum or plot_mirror_spectrum
+              [State('plot_mirror_spectrum_error_modal', 'is_open'),
+               State('store_plot_type', 'data')])
+def plot_mirror_spectrum(value, value2, is_open, plot_type):
     global INDEXED_DATA
-    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum) or isinstance(INDEXED_DATA[value2], PMP3DTdfSpectrum):
-        return blank_figure(), None, not is_open
+    if plot_type == 'mirror':
+        if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum) or isinstance(INDEXED_DATA[value2], PMP3DTdfSpectrum):
+            return blank_figure(), None, False, not is_open
+        else:
+            fig = get_mirror_spectrum(INDEXED_DATA[value], INDEXED_DATA[value2])
+            cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+            return fig, Serverside(fig), True, is_open
     else:
-        fig = get_mirror_spectrum(INDEXED_DATA[value], INDEXED_DATA[value2])
-        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-        return fig, Serverside(fig), is_open
+        return no_update
 
 
 @app.callback(Output('plot_mirror_spectrum_error_modal', 'is_open'),
