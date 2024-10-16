@@ -11,7 +11,7 @@ from pymaldiviz.util import (get_preprocessing_params, get_spectrum, toggle_rebi
                              toggle_smoothing_median_style, toggle_modpoly_style, toggle_imodpoly_style,
                              toggle_zhangfit_style, toggle_deisotope_on_style, toggle_deisotope_off_style,
                              toggle_fast_change_style, toggle_savitzky_golay_style, toggle_removal_median_style,
-                             cleanup_file_system_backend, get_peakmap)
+                             cleanup_file_system_backend, get_peakmap, get_mirror_spectrum, blank_figure)
 from pymaldiviz.tmpdir import FILE_SYSTEM_BACKEND
 from dash import State, callback_context, no_update
 from dash_extensions.enrich import (Input, Output, DashProxy, MultiplexerTransform, Serverside,
@@ -33,7 +33,9 @@ app.layout = get_dashboard_layout(get_preprocessing_params())
 
 
 @app.callback([Output('spectrum_id', 'options', allow_duplicate=True),
-               Output('spectrum_id', 'value', allow_duplicate=True)],
+               Output('spectrum_id', 'value', allow_duplicate=True),
+               Output('spectrum_id_2', 'options', allow_duplicate=True),
+               Output('spectrum_id_2', 'value', allow_duplicate=True)],
               [Input('upload_mzml', 'n_clicks'),
                Input('upload_d', 'n_clicks')])
 def upload_data(n_clicks_mzml, n_clicks_d):
@@ -67,7 +69,7 @@ def upload_data(n_clicks_mzml, n_clicks_d):
                 INDEXED_DATA[spectrum.spectrum_id] = spectrum
     options = [{'label': i, 'value': i} for i in INDEXED_DATA.keys()]
     value = [i for i in INDEXED_DATA.keys()]
-    return options, value
+    return options, value, options, value
 
 
 @app.callback([Output('spectrum_plot', 'figure'),
@@ -79,8 +81,9 @@ def upload_data(n_clicks_mzml, n_clicks_d):
                Output('normalize_intensity', 'disabled'),
                Output('bin_spectrum', 'disabled'),
                Output('toggle_log_intensity', 'disabled')],
-              Input('spectrum_id', 'value'))
-def plot_spectrum(value):
+              Input('spectrum_id', 'value'),
+              State('store_plot_type', 'data'))
+def plot_spectrum(value, plot_type):
     """
     Dash callback to plot the spectrum selected from the spectrum_id dropdown using plotly.express and
     plotly_resampler.FigureResampler. If a pymaldiproc.classes.PMP3DTdfSpectrum is detected, a 3D peakmap will be
@@ -91,13 +94,78 @@ def plot_spectrum(value):
         not preprocessing buttons are to be disabled.
     """
     global INDEXED_DATA
-    if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
-        fig = get_peakmap(INDEXED_DATA[value])
-        return fig, None, True, True, True, True, True, True, False
+    if plot_type == 'single':
+        if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum):
+            fig = get_peakmap(INDEXED_DATA[value])
+            return fig, None, True, True, True, True, True, True, False
+        else:
+            fig = get_spectrum(INDEXED_DATA[value])
+            cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+            return fig, Serverside(fig), False, False, False, False, False, False, True
     else:
-        fig = get_spectrum(INDEXED_DATA[value])
-        cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
-        return fig, Serverside(fig), False, False, False, False, False, False, True
+        return no_update
+
+
+@app.callback([Output('spectrum_id_2', 'style'),
+               Output('store_plot_type', 'data'),
+               Output('trim_spectrum', 'disabled'),
+               Output('transform_intensity', 'disabled'),
+               Output('smooth_baseline', 'disabled'),
+               Output('remove_baseline', 'disabled'),
+               Output('normalize_intensity', 'disabled'),
+               Output('bin_spectrum', 'disabled'),
+               Output('peak_picking', 'disabled'),
+               Output('export_peak_list', 'disabled'),
+               Output('undo_preprocessing', 'disabled'),
+               Output('undo_peak_picking', 'disabled'),
+               Output('toggle_log_intensity', 'disabled')],
+              Input('toggle_mirror_plot', 'n_clicks'),
+              State('store_plot_type', 'data'))
+def toggle_mirror_plot(n_clicks, plot_type):
+    changed_id = [i['prop_id'] for i in callback_context.triggered][0]
+    if changed_id == 'toggle_mirror_plot.n_clicks':
+        if plot_type == 'single':
+            return {'margin': '5px'}, 'mirror', True, True, True, True, True, True, True, True, True, True, True
+        elif plot_type == 'mirror':
+            return ({'margin': '5px', 'display': 'none'}, 'single',
+                    False, False, False, False, False, False, False, False, False, False, True)
+
+
+@app.callback([Output('spectrum_plot', 'figure'),
+               Output('store_plot', 'data'),
+               Output('toggle_log_intensity', 'disabled'),
+               Output('plot_mirror_spectrum_error_modal', 'is_open')],
+              [Input('spectrum_id', 'value'),
+               Input('spectrum_id_2', 'value')],
+              [State('plot_mirror_spectrum_error_modal', 'is_open'),
+               State('store_plot_type', 'data')])
+def plot_mirror_spectrum(value, value2, is_open, plot_type):
+    global INDEXED_DATA
+    if plot_type == 'mirror':
+        if isinstance(INDEXED_DATA[value], PMP3DTdfSpectrum) or isinstance(INDEXED_DATA[value2], PMP3DTdfSpectrum):
+            return blank_figure(), None, False, not is_open
+        else:
+            fig = get_mirror_spectrum(INDEXED_DATA[value], INDEXED_DATA[value2])
+            cleanup_file_system_backend(FILE_SYSTEM_BACKEND)
+            return fig, Serverside(fig), True, is_open
+    else:
+        return no_update
+
+
+@app.callback(Output('plot_mirror_spectrum_error_modal', 'is_open'),
+              Input('plot_mirror_spectrum_error_modal_close', 'n_clicks'),
+              State('plot_mirror_spectrum_error_modal', 'is_open'))
+def toggle_edit_processing_parameters_saved_modal(n_clicks, is_open):
+    """
+    Dash callback to toggle the plot mirror spectrum error message modal window.
+
+    :param n_clicks: Input signal if the plot_mirror_spectrum_error_modal_close button is clicked.
+    :param is_open: State signal to determine whether the plot_mirror_spectrum_error_modal modal window is open.
+    :return: Output signal to determine whether the edit_preprocessing_parameters_modal_saved modal window is open.
+    """
+    if n_clicks:
+        return not is_open
+    return is_open
 
 
 @app.callback([Output('spectrum_plot', 'figure'),

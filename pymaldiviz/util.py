@@ -147,6 +147,52 @@ def get_spectrum(spectrum, label_peaks=False):
     return fig
 
 
+def get_mirror_spectrum(spectrum_1, spectrum_2, label_peaks=False):
+    """
+    Plot the two spectra in a mirror plot to a plotly.express.line plot wrapped by plotly_resampler.FigureResampler.
+
+    :param spectrum_1: Spectrum object whose data is used to generate the figure.
+    :type spectrum_1: pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum
+    :param spectrum_2: Spectrum object whose data is used to generate the figure.
+    :type spectrum_2: pymaldiproc.classes.OpenMALDISpectrum|pymaldiproc.classes.PMPTsfSpectrum|pymaldiproc.classes.PMP2DTdfSpectrum
+    :param label_peaks: Whether to label the peak based on peak picking that has been performed.
+    :type label_peaks: bool
+    :return: Plotly figure containing mass spectrum.
+    """
+    def get_labels(spectrum):
+        labels = copy.deepcopy(np.round(copy.deepcopy(spectrum.preprocessed_mz_array), decimals=4).astype(str))
+        mask = np.ones(labels.size, dtype=bool)
+        mask[spectrum.peak_picking_indices] = False
+        labels[mask] = ''
+        return labels
+
+    fig = FigureResampler(go.Figure())
+    if label_peaks:
+        fig.add_trace(go.Scatter(x=copy.deepcopy(spectrum_1.preprocessed_mz_array),
+                                 y=copy.deepcopy(spectrum_1.preprocessed_intensity_array),
+                                 name='Spectrum 1',
+                                 text=get_labels(spectrum_1),
+                                 hovertemplate='m/z: %{x}<br>Intensity: %{y}'))
+        fig.add_trace(go.Scatter(x=copy.deepcopy(spectrum_2.preprocessed_mz_array),
+                                 y=np.negative(copy.deepcopy(spectrum_2.preprocessed_intensity_array)),
+                                 name='Spectrum 2',
+                                 text=get_labels(spectrum_2),
+                                 hovertemplate='m/z: %{x}<br>Intensity: %{y}'))
+    else:
+        fig.add_trace(go.Scatter(x=copy.deepcopy(spectrum_1.preprocessed_mz_array),
+                                 y=copy.deepcopy(spectrum_1.preprocessed_intensity_array),
+                                 name='Spectrum 1',
+                                 hovertemplate='m/z: %{x}<br>Intensity: %{y}'))
+        fig.add_trace(go.Scatter(x=copy.deepcopy(spectrum_2.preprocessed_mz_array),
+                                 y=np.negative(copy.deepcopy(spectrum_2.preprocessed_intensity_array)),
+                                 name='Spectrum 2',
+                                 hovertemplate='m/z: %{x}<br>Intensity: %{y}'))
+    fig.update_layout(yaxis_tickformat='~e',
+                      showlegend=False)
+
+    return fig
+
+
 def get_peakmap(spectrum, use_log_intensity=True, label_peaks=False):
     spectrum_df = pd.DataFrame({'m/z': copy.deepcopy(spectrum.preprocessed_mz_array),
                                 '1/K0': copy.deepcopy(spectrum.preprocessed_mobility_array),

@@ -38,4 +38,4 @@ import webview
 import tkinter
 from tkinter.filedialog import askopenfilenames, askdirectory, asksaveasfilename
 
-VERSION = '0.4.6'
+VERSION = '0.4.7'
