@@ -187,6 +187,7 @@ def get_mirror_spectrum(spectrum_1, spectrum_2, label_peaks=False):
                                  y=np.negative(copy.deepcopy(spectrum_2.preprocessed_intensity_array)),
                                  name='Spectrum 2',
                                  hovertemplate='m/z: %{x}<br>Intensity: %{y}'))
+    #fig.update_traces(connectgaps=True)
     fig.update_layout(yaxis_tickformat='~e',
                       showlegend=False)
 
