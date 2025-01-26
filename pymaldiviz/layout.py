@@ -949,7 +949,7 @@ def get_dashboard_layout(param_dict):
                                     id='spectrum_plot',
                                     figure=blank_figure(),
                                     style={'width': '100%',
-                                           'height': '1000px'}
+                                           'height': '600px'}
                                 ),
                                 width=12
                             )

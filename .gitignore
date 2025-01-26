@@ -14,3 +14,5 @@ msedgedriver.exe
 /dist
 /__pycache__
 /pymaldiviz/file_system_backend
+config.bat
+node_modules
